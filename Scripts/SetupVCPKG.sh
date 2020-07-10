@@ -17,4 +17,4 @@ cd vcpkg-2020.06
 
 bash ./bootstrap-vcpkg.sh
 
-./vcpkg install opencv yaml-cpp eigen3 glog suitesparse glfw3
+./vcpkg install opencv yaml-cpp eigen3 glog suitesparse glfw3 glew nativefiledialog

@@ -1,10 +1,10 @@
 #include <iostream>
-
+#include "Core.h"
 
 int main(int argc, char *argv[]) {
-	std::cout << "Hello World!" << std::endl;
 	
-	
+    Orb::Core core;
+    core.Run();
 	
 	
 	return 0;
