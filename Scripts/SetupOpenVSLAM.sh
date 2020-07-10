@@ -13,12 +13,13 @@ cd build
 
 export g2o_DIR=../../../ThirdParty/g2o/lib/cmake/g2o
 export DBoW2_DIR=../../../ThirdParty/DBoW2/lib/cmake/DBoW2
+export OpenCV_DIR=../../../ThirdParty/opencv/share/OpenCV
     
  cmake \
-    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_BUILD_TYPE=Debug \
     -DCMAKE_TOOLCHAIN_FILE=../../../ThirdParty/vcpkg-2020.06/scripts/buildsystems/vcpkg.cmake \
     -DCMAKE_INSTALL_PREFIX=../../../ThirdParty/openvslam/ \
-    -DBUILD_WITH_MARCH_NATIVE=ON \
+    -DBUILD_WITH_MARCH_NATIVE=OFF \
     -DUSE_PANGOLIN_VIEWER=OFF \
     -DUSE_SOCKET_PUBLISHER=OFF \
     -DUSE_STACK_TRACE_LOGGER=ON \

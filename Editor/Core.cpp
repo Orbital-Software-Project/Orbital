@@ -114,7 +114,6 @@ void Core::Run() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version.c_str());
 
-    bool demoWnd = true;
     std::string videoFile = "";
     std::string vocabFile = "";
     std::string cfgFile = "";

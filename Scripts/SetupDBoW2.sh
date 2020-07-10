@@ -11,9 +11,11 @@ git clone https://github.com/shinsumicco/DBoW2.git
 cd DBoW2
 mkdir build && cd build
 
+export OpenCV_DIR=../../../ThirdParty/opencv/share/OpenCV
+
 cmake                                        \
     -DCMAKE_TOOLCHAIN_FILE=../../../ThirdParty/vcpkg-2020.06/scripts/buildsystems/vcpkg.cmake \
-    -DCMAKE_BUILD_TYPE=Release               \
+    -DCMAKE_BUILD_TYPE=Debug               \
     -DCMAKE_INSTALL_PREFIX=../../../ThirdParty/DBoW2/ \
     ..
     

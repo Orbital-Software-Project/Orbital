@@ -10,6 +10,13 @@ cd Scripts
 # Install vcpkg
 bash SetupVCPKG.sh
 
+# Install Eigen3
+# Atm vcpkg version is used
+#bash SetupEigen3.sh
+
+# Install OpenCV
+bash SetupOpenCV.sh
+
 # Install DBoW2
 bash SetupDBoW2.sh
 

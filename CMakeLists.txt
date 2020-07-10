@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8.9)
 set(CMAKE_TOOLCHAIN_FILE ./ThirdParty/vcpkg-2020.06/scripts/buildsystems/vcpkg.cmake)
 set(openvslam_DIR ./ThirdParty/openvslam/lib/cmake/openvslam)
 set(g2o_DIR ./ThirdParty/g2o/lib/cmake/g2o)
-
+set(OpenCV_DIR ./ThirdParty/opencv/share/OpenCV)
 project(Orbital)
 
 # Required for openvslam
