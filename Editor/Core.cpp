@@ -168,6 +168,10 @@ void Core::Run() {
             }
         }
 
+        if(this->numFrames > 0) {
+            ImGui::ProgressBar(static_cast<float>(this->framesProcessed) / static_cast<float>(this->numFrames));
+        }
+
         ImGui::End();
 
 
@@ -191,102 +195,111 @@ void Core::Run() {
     glfwTerminate();
 }
 
-void Core::ExecuteSLAM(const std::shared_ptr<openvslam::config>& cfg,
-                       const std::string& vocab_file_path,
-                       const std::string& video_file_path) {
+void Core::ExecuteSLAM(const std::shared_ptr<openvslam::config> cfg,
+                       const std::string vocab_file_path,
+                       const std::string video_file_path) {
 
-
-    // build a SLAM system
-    openvslam::system SLAM(cfg, vocab_file_path);
-
-    // startup the SLAM process
-    SLAM.startup();
-
-    cv::VideoCapture video(video_file_path);
-
-
-
-
-
-
-
-
-    std::vector<double> track_times;
-
-    cv::Mat frame;
-    double timestamp = 0.0;
-
-    int frame_skip = 1;
-
-    unsigned int num_frame = 0;
-
-    bool is_not_end = true;
 
 
     // run the SLAM in another thread
-    //std::thread thread([&]() {
-    while (is_not_end) {
-        is_not_end = video.read(frame);
+    this->slamTask = std::thread([cfg, vocab_file_path, video_file_path, this]() {
 
-        const auto tp_1 = std::chrono::steady_clock::now();
 
-        if (!frame.empty() && (num_frame % frame_skip == 0)) {
-            // input the current frame and estimate the camera pose
-            SLAM.feed_monocular_frame(frame, timestamp, cv::Mat());
+
+        // build a SLAM system
+        openvslam::system SLAM(cfg, vocab_file_path);
+
+        // startup the SLAM process
+        SLAM.startup();
+
+        cv::VideoCapture video(video_file_path);
+        this->numFrames = video.get(cv::CAP_PROP_FRAME_COUNT);
+
+
+
+        std::vector<double> track_times;
+
+        cv::Mat frame;
+        double timestamp = 0.0;
+
+        int frame_skip = 1;
+
+        unsigned int num_frame = 0;
+
+        bool is_not_end = true;
+
+
+        while (is_not_end) {
+            is_not_end = video.read(frame);
+
+            const auto tp_1 = std::chrono::steady_clock::now();
+
+            if (!frame.empty() && (num_frame % frame_skip == 0)) {
+                // input the current frame and estimate the camera pose
+                SLAM.feed_monocular_frame(frame, timestamp, cv::Mat());
+            }
+
+            this->framesProcessed++;
+
+            const auto tp_2 = std::chrono::steady_clock::now();
+
+            const auto track_time = std::chrono::duration_cast<std::chrono::duration<double>>(tp_2 - tp_1).count();
+            if (num_frame % frame_skip == 0) {
+                track_times.push_back(track_time);
+            }
+
+
+
+            timestamp += 1.0 / cfg->camera_->fps_;
+            ++num_frame;
+
+            // check if the termination of SLAM system is requested or not
+            if (SLAM.terminate_is_requested()) {
+                break;
+            }
         }
 
-        const auto tp_2 = std::chrono::steady_clock::now();
-
-        const auto track_time = std::chrono::duration_cast<std::chrono::duration<double>>(tp_2 - tp_1).count();
-        if (num_frame % frame_skip == 0) {
-            track_times.push_back(track_time);
+        // wait until the loop BA is finished
+        while (SLAM.loop_BA_is_running()) {
+            std::this_thread::sleep_for(std::chrono::microseconds(5000));
         }
 
 
 
-        timestamp += 1.0 / cfg->camera_->fps_;
-        ++num_frame;
+        // shutdown the SLAM process
+        SLAM.shutdown();
 
-        // check if the termination of SLAM system is requested or not
-        if (SLAM.terminate_is_requested()) {
-            break;
+
+        if (true /*eval_log*/) {
+            //output the trajectories for evaluation
+            SLAM.save_frame_trajectory("frame_trajectory.txt", "TUM");
+            SLAM.save_keyframe_trajectory("keyframe_trajectory.txt", "TUM");
+            //output the tracking times for evaluation
+            std::ofstream ofs("track_times.txt", std::ios::out);
+            if (ofs.is_open()) {
+                for (const auto track_time : track_times) {
+                    ofs << track_time << std::endl;
+                }
+                ofs.close();
+            }
         }
-    }
 
-    // wait until the loop BA is finished
-    while (SLAM.loop_BA_is_running()) {
-        std::this_thread::sleep_for(std::chrono::microseconds(5000));
-    }
-    //});
+        //if (!map_db_path.empty()) {
+        // output the map database
+        //  SLAM.save_map_database(map_db_path);
+        //}
+
+        std::sort(track_times.begin(), track_times.end());
+        const auto total_track_time = std::accumulate(track_times.begin(), track_times.end(), 0.0);
+        std::cout << "median tracking time: " << track_times.at(track_times.size() / 2) << "[s]" << std::endl;
+        std::cout << "mean tracking time: " << total_track_time / track_times.size() << "[s]" << std::endl;
+
+
+    });
 
     //thread.join();
 
-    // shutdown the SLAM process
-    SLAM.shutdown();
 
-    //if (eval_log) {
-    // output the trajectories for evaluation
-    //    SLAM.save_frame_trajectory("frame_trajectory.txt", "TUM");
-    //    SLAM.save_keyframe_trajectory("keyframe_trajectory.txt", "TUM");
-    // output the tracking times for evaluation
-    //    std::ofstream ofs("track_times.txt", std::ios::out);
-    //    if (ofs.is_open()) {
-    //        for (const auto track_time : track_times) {
-    //            ofs << track_time << std::endl;
-    //        }
-    //        ofs.close();
-    //    }
-    //}
-
-    //if (!map_db_path.empty()) {
-    // output the map database
-    //  SLAM.save_map_database(map_db_path);
-    //}
-
-    std::sort(track_times.begin(), track_times.end());
-    const auto total_track_time = std::accumulate(track_times.begin(), track_times.end(), 0.0);
-    std::cout << "median tracking time: " << track_times.at(track_times.size() / 2) << "[s]" << std::endl;
-    std::cout << "mean tracking time: " << total_track_time / track_times.size() << "[s]" << std::endl;
 
 
 
