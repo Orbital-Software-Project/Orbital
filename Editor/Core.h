@@ -1,9 +1,18 @@
 #pragma once
 
-#include <openvslam/system.h>
-#include "openvslam/config.h"
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
-struct GLFWwindow;
+#include <openvslam/system.h>
+#include <openvslam/config.h>
+#include <openvslam/publish/frame_publisher.h>
+#include <openvslam/publish/map_publisher.h>
+
+#include <opencv2/core.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/imgproc.hpp>
+
+#include <memory>
 
 namespace Orb {
     class Core {
@@ -22,11 +31,14 @@ namespace Orb {
 
             std::string PickFile();
 
+            void UpdateVideoFrame(cv::Mat& image);
 
     private:
-            int numFrames = 0;
-            int framesProcessed = 0;
             std::thread slamTask;
+            GLuint currVideoFrameTexID = 0;
+            bool cancelRequested = false;
+
+
 
     };
 

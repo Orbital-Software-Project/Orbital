@@ -52,8 +52,27 @@ Set(SRC
 	Editor/Main.cpp
         Editor/Core.h
         Editor/Core.cpp
+        Editor/VideoPreview.h
+        Editor/VideoPreview.cpp
+        Editor/MapViewer.h
+        Editor/MapViewer.cpp
+        Editor/Global.h
+        Editor/Utils.hpp
+        Editor/Texture.hpp
+        Editor/Shader.h
+        Editor/Shader.cpp
+        Editor/Mesh.h
+        Editor/Mesh.cpp
+
+)
+Set(SHADERS
+        Shaders/MapViewer.vs
+        Shaders/MapViewer.fs
 )
 
-add_executable(Orbital ${SRC})
+add_executable(Orbital ${SRC} ${SHADERS})
 
 target_link_libraries(Orbital PRIVATE openvslam::openvslam ImGui GLEW::GLEW ${OpenCV_LIBS} unofficial::nativefiledialog::nfd)
+
+# Copy shaders
+file( COPY ${CMAKE_CURRENT_SOURCE_DIR}/Shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )

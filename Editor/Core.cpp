@@ -12,17 +12,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <opencv2/core.hpp>
-
-#include <opencv2/videoio.hpp>
-
 #include <memory>
+
+#include "VideoPreview.h"
+#include "MapViewer.h"
+
+#include "Global.h"
+#include "Utils.hpp"
 
 namespace Orb {
 
+
+
+
 Core::Core() {}
 
-Core::~Core() {}
+Core::~Core() {
+    this->cancelRequested = true;
+    if(this->slamTask.joinable()) {
+        this->slamTask.join();
+    }
+}
 
 void Core::OnResize(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -106,7 +116,6 @@ void Core::Run() {
     glViewport(0, 0, actualWindowWidth, actualWindowHeight);
 
 
-
     // Init ImGui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -114,70 +123,75 @@ void Core::Run() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version.c_str());
 
-    std::string videoFile = "";
-    std::string vocabFile = "";
-    std::string cfgFile = "";
+    // Default example paths
+    std::string videoFile = "/home/celvin/Documents/Projects/Orbital/Content/aist_living_lab_1/video.mp4";
+    std::string vocabFile = "/home/celvin/Documents/Projects/Orbital/Content/orb_vocab/orb_vocab.dbow2";
+    std::string cfgFile   = "/home/celvin/Documents/Projects/Orbital/Content/aist_living_lab_1/config.yaml";
 
+    VideoPreview preview;
+    MapViewer mapViewer;
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
         glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+
         // feed inputs to dear imgui, start new frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-
-        ImGui::Begin("Demo window");
-        ImGui::Text("Select a file");
-
+        preview.OnRender();
+        mapViewer.OnRender();
 
 
-        // Filepicker
-        if(ImGui::Button("Video")) {
-            videoFile = this->PickFile();
+        {
+            ImGui::Begin("Panel");
 
-        }
-
-        ImGui::Text(videoFile.c_str());
-
-
-        if(ImGui::Button("Vocab")) {
-            vocabFile = this->PickFile();
-
-        }
-
-        ImGui::Text(vocabFile.c_str());
-
-        if(ImGui::Button("Cfg")) {
-            cfgFile = this->PickFile();
-
-        }
-
-        ImGui::Text(cfgFile.c_str());
-
-
-        if(videoFile != "" && cfgFile != "" && vocabFile != "") {
-            if(ImGui::Button("Run SLAM")) {
-                this->ExecuteSLAM(std::make_shared<openvslam::config>(cfgFile),
-                                  vocabFile,
-                                  videoFile
-                                  );
+            // Filepicker
+            if(ImGui::Button("Video")) {
+                videoFile = this->PickFile();
             }
+
+            ImGui::Text(videoFile.c_str());
+
+
+            if(ImGui::Button("Vocab")) {
+                vocabFile = this->PickFile();
+            }
+
+            ImGui::Text(vocabFile.c_str());
+
+            if(ImGui::Button("Cfg")) {
+                cfgFile = this->PickFile();
+            }
+
+            ImGui::Text(cfgFile.c_str());
+
+
+            if(videoFile != "" && cfgFile != "" && vocabFile != "") {
+                if(ImGui::Button("Run SLAM")) {
+                    this->ExecuteSLAM(std::make_shared<openvslam::config>(cfgFile),
+                                      vocabFile,
+                                      videoFile
+                                      );
+                }
+                if(ImGui::Button("Cancel")) {
+                    this->cancelRequested = true;
+                    this->slamTask.join();
+
+                }
+            }
+
+            if(Global::NumFrames > 0) {
+                ImGui::ProgressBar(static_cast<float>(Global::FramesProcessed) / static_cast<float>(Global::NumFrames));
+
+            }
+
+            ImGui::End();
         }
-
-        if(this->numFrames > 0) {
-            ImGui::ProgressBar(static_cast<float>(this->framesProcessed) / static_cast<float>(this->numFrames));
-        }
-
-        ImGui::End();
-
-
-
-
-
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -201,9 +215,12 @@ void Core::ExecuteSLAM(const std::shared_ptr<openvslam::config> cfg,
 
 
 
+
+
+    Global::FramesProcessed = 0;
+
     // run the SLAM in another thread
     this->slamTask = std::thread([cfg, vocab_file_path, video_file_path, this]() {
-
 
 
         // build a SLAM system
@@ -212,24 +229,28 @@ void Core::ExecuteSLAM(const std::shared_ptr<openvslam::config> cfg,
         // startup the SLAM process
         SLAM.startup();
 
+        Global::MapPublisher   = SLAM.get_map_publisher();
+        Global::FramePublisher = SLAM.get_frame_publisher();
+
+        //this->mapPublisher->get_landmarks()
+
         cv::VideoCapture video(video_file_path);
-        this->numFrames = video.get(cv::CAP_PROP_FRAME_COUNT);
-
-
+        Global::NumFrames = video.get(cv::CAP_PROP_FRAME_COUNT);
 
         std::vector<double> track_times;
-
         cv::Mat frame;
         double timestamp = 0.0;
-
         int frame_skip = 1;
-
         unsigned int num_frame = 0;
-
         bool is_not_end = true;
 
 
+
         while (is_not_end) {
+            if(this->cancelRequested) {
+                break;
+            }
+
             is_not_end = video.read(frame);
 
             const auto tp_1 = std::chrono::steady_clock::now();
@@ -239,7 +260,8 @@ void Core::ExecuteSLAM(const std::shared_ptr<openvslam::config> cfg,
                 SLAM.feed_monocular_frame(frame, timestamp, cv::Mat());
             }
 
-            this->framesProcessed++;
+            Global::VideoFrame = Global::FramePublisher->draw_frame().clone();
+            Global::FramesProcessed++;
 
             const auto tp_2 = std::chrono::steady_clock::now();
 
@@ -247,8 +269,6 @@ void Core::ExecuteSLAM(const std::shared_ptr<openvslam::config> cfg,
             if (num_frame % frame_skip == 0) {
                 track_times.push_back(track_time);
             }
-
-
 
             timestamp += 1.0 / cfg->camera_->fps_;
             ++num_frame;
@@ -264,13 +284,16 @@ void Core::ExecuteSLAM(const std::shared_ptr<openvslam::config> cfg,
             std::this_thread::sleep_for(std::chrono::microseconds(5000));
         }
 
-
-
         // shutdown the SLAM process
         SLAM.shutdown();
 
+        // Do not output trajectories etc. data
+        if(this->cancelRequested) {
+            return;
+        }
 
-        if (true /*eval_log*/) {
+
+        if (false /*eval_log*/) {
             //output the trajectories for evaluation
             SLAM.save_frame_trajectory("frame_trajectory.txt", "TUM");
             SLAM.save_keyframe_trajectory("keyframe_trajectory.txt", "TUM");
@@ -310,6 +333,7 @@ void Core::ExecuteSLAM(const std::shared_ptr<openvslam::config> cfg,
 
 
 std::string Core::PickFile() {
+
     std::string file = "";
     nfdchar_t *outPath = NULL;
     nfdresult_t result = NFD_OpenDialog( NULL, NULL, &outPath );
@@ -328,7 +352,6 @@ std::string Core::PickFile() {
     }
     return file;
 }
-
 
 }
 
