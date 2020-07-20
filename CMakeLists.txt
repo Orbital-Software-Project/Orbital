@@ -63,6 +63,10 @@ Set(SRC
         Editor/Shader.cpp
         Editor/Mesh.h
         Editor/Mesh.cpp
+        Editor/SceneRenderer.h
+        Editor/SceneRenderer.cpp
+        Editor/Camera.h
+        Editor/Camera.cpp
 
 )
 Set(SHADERS

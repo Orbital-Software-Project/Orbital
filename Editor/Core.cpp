@@ -36,6 +36,7 @@ Core::~Core() {
 
 void Core::OnResize(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
+
 }
 
 void Core::Run() {
@@ -72,7 +73,7 @@ void Core::Run() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 #endif
 
-    float highDPIscaleFactor = 1.0;
+    //float highDPIscaleFactor = 1.0;
 #ifdef _WIN32
     // if it's a HighDPI monitor, try to scale everything
     GLFWmonitor *monitor = glfwGetPrimaryMonitor();
@@ -155,20 +156,20 @@ void Core::Run() {
                 videoFile = this->PickFile();
             }
 
-            ImGui::Text(videoFile.c_str());
+            ImGui::Text("%s", videoFile.c_str());
 
 
             if(ImGui::Button("Vocab")) {
                 vocabFile = this->PickFile();
             }
 
-            ImGui::Text(vocabFile.c_str());
+            ImGui::Text("%s", vocabFile.c_str());
 
             if(ImGui::Button("Cfg")) {
                 cfgFile = this->PickFile();
             }
 
-            ImGui::Text(cfgFile.c_str());
+            ImGui::Text("%s", cfgFile.c_str());
 
 
             if(videoFile != "" && cfgFile != "" && vocabFile != "") {
@@ -243,7 +244,6 @@ void Core::ExecuteSLAM(const std::shared_ptr<openvslam::config> cfg,
         int frame_skip = 1;
         unsigned int num_frame = 0;
         bool is_not_end = true;
-
 
 
         while (is_not_end) {

@@ -1,9 +1,11 @@
-#pragma once
-
 #include "Shader.h"
 
 #include <GL/glew.h>
 #include <examples/imgui_impl_opengl3.h>
+
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 namespace Orb {
 
@@ -112,6 +114,12 @@ Shader::~Shader() {
 
 void Shader::Use() {
     glUseProgram(this->programID);
+}
+
+void Shader::SetVec4(std::string uniform, Eigen::Vector4f value) {
+    int vertexColorLocation = glGetUniformLocation(this->programID, uniform.c_str());
+
+    glUniform4f(vertexColorLocation, value.x(), value.y(), value.z(), value.w());
 }
 
 
