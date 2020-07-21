@@ -100,8 +100,6 @@ void MapViewer::OnRender() {
                 p1 = io->MousePos;
             }
 
-            //ImGui::Text("%f / %f  -  %f / %f", p0.x, p0.y, p1.x, p1.y);
-
             // TODO: Logic to rotate in viewport
             ImDrawList* drawList = ImGui::GetWindowDrawList();
             drawList->AddLine(p0, p1, 0xFF0000FF, 10.0f);
@@ -111,9 +109,9 @@ void MapViewer::OnRender() {
             static ImVec2 p1Old = ImVec2(0, 0);
             if(p1Old.x != p1.x || p1Old.y != p1.y) {
                 // Rotate camera up or down
-                this->view = glm::rotate(this->view, glm::radians((p1.y - p0.y) / 10), glm::vec3(1.0f, 0.0f, 0.0f));
+                this->view = glm::rotate(this->view, glm::radians((p0.y - p1.y) / 50), glm::vec3(1.0f, 0.0f, 0.0f));
                 // Rotate left or right
-                this->view = glm::rotate(this->view, glm::radians((p1.x - p0.x) / 10), glm::vec3(0.0f, 1.0f, 0.0f));
+                this->view = glm::rotate(this->view, glm::radians((p1.x - p0.x) / 50), glm::vec3(0.0f, 1.0f, 0.0f));
                 p1Old = p1;
             }
 
@@ -166,12 +164,12 @@ void MapViewer::initGridMesh() {
     }
 
     for (int y = -10; y <= 10; y += 1) {
+        gridVerticies.push_back(grid_min );
         gridVerticies.push_back(y * 10.0f * interval_ratio);
-        gridVerticies.push_back(grid_min);
         gridVerticies.push_back(0);
 
-        gridVerticies.push_back(y * 10.0f * interval_ratio);
         gridVerticies.push_back(grid_max);
+        gridVerticies.push_back(y * 10.0f * interval_ratio);
         gridVerticies.push_back(0);
     }
 
