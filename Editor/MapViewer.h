@@ -31,10 +31,12 @@ private:
 
 private:
     std::shared_ptr<Shader> shader;
+
     std::shared_ptr<Mesh> gridMesh;
     std::shared_ptr<Mesh> pointCloud;
 
     std::unique_ptr<SceneRenderer> renderer;
+    glm::mat4 view = glm::mat4(1.0f);
 
 };
 

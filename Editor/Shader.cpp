@@ -1,11 +1,12 @@
 #include "Shader.h"
 
 #include <GL/glew.h>
-#include <examples/imgui_impl_opengl3.h>
 
 #include <fstream>
 #include <sstream>
 #include <iostream>
+
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Orb {
 
@@ -77,6 +78,7 @@ Shader::Shader(std::string vertexPath, std::string fragmentPath)  {
     glCompileShader(fragment);
     // print compile errors if any
     glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
+
     if(!success)
     {
         glGetShaderInfoLog(fragment, 512, NULL, infoLog);
@@ -107,19 +109,20 @@ Shader::Shader(std::string vertexPath, std::string fragmentPath)  {
 
 }
 
-Shader::~Shader() {
-
-
-}
+Shader::~Shader() {}
 
 void Shader::Use() {
     glUseProgram(this->programID);
 }
 
-void Shader::SetVec4(std::string uniform, Eigen::Vector4f value) {
-    int vertexColorLocation = glGetUniformLocation(this->programID, uniform.c_str());
+void Shader::SetVec4(std::string uniform, glm::vec4 value) {
+    int uniformLoc = glGetUniformLocation(this->programID, uniform.c_str());
+    glUniform4f(uniformLoc, value.x, value.y, value.z, value.w);
+}
 
-    glUniform4f(vertexColorLocation, value.x(), value.y(), value.z(), value.w());
+void Shader::SetMat4(std::string uniform, glm::mat4 value) {
+    int uniformLoc = glGetUniformLocation(this->programID, uniform.c_str());
+    glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, glm::value_ptr(value));
 }
 
 

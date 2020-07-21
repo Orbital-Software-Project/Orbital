@@ -18,6 +18,9 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(unofficial-nativefiledialog CONFIG REQUIRED)
 
+find_package(glm CONFIG REQUIRED)
+
+
 
 Set(IMGUI_VERSION "imgui-1.77")
 Set(IMGUI_SRC
@@ -76,7 +79,7 @@ Set(SHADERS
 
 add_executable(Orbital ${SRC} ${SHADERS})
 
-target_link_libraries(Orbital PRIVATE openvslam::openvslam ImGui GLEW::GLEW ${OpenCV_LIBS} unofficial::nativefiledialog::nfd)
+target_link_libraries(Orbital PRIVATE openvslam::openvslam ImGui GLEW::GLEW ${OpenCV_LIBS} unofficial::nativefiledialog::nfd glm)
 
 # Copy shaders
 file( COPY ${CMAKE_CURRENT_SOURCE_DIR}/Shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )

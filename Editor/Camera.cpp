@@ -2,7 +2,11 @@
 
 namespace Orb {
 
-Camera::Camera()  { }
+Camera::Camera()  {
+    // Init view matrix
+    this->view = Eigen::Matrix4f::Identity();
+
+}
 
 Camera::~Camera() { }
 

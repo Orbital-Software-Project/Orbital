@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <Eigen/Core>
+#include <glm/glm.hpp>
 
 namespace Orb {
 
@@ -14,7 +14,9 @@ public:
 
     void Use();
 
-    void SetVec4(std::string uniform, Eigen::Vector4f value);
+    void SetVec4(std::string uniform, glm::vec4 value);
+
+    void SetMat4(std::string uniform, glm::mat4 value);
 
 private:
     unsigned int programID;
