@@ -19,7 +19,7 @@ SceneRenderer::SceneRenderer()  {
 
 SceneRenderer::~SceneRenderer() {}
 
-GLuint SceneRenderer::Render(int width, int height) {
+GLuint SceneRenderer::Render(int width, int height, std::shared_ptr<Shader> shader) {
 
     // Update framebuffer size when size has changed
     if(this->width != width || this->height != height) {
@@ -36,6 +36,8 @@ GLuint SceneRenderer::Render(int width, int height) {
         glBindTexture(GL_TEXTURE_2D, 0);
         glEnable(GL_TEXTURE_2D);
 
+        glEnable(GL_DEPTH_TEST);
+
         // TODO:
         // - Render from active camera perspective
         // - Render all meshes
@@ -43,7 +45,11 @@ GLuint SceneRenderer::Render(int width, int height) {
 
 
         for(std::shared_ptr<Mesh> mesh : this->meshes) {
-            mesh->Draw();
+            mesh->Draw(shader);
+        }
+
+        for(std::shared_ptr<Camera> camera : this->cameras) {
+            camera->Draw(shader);
         }
 
 
@@ -62,6 +68,10 @@ GLuint SceneRenderer::Render(int width, int height) {
 
 void SceneRenderer::AddMesh(std::shared_ptr<Mesh> mesh) {
     this->meshes.push_back(mesh);
+}
+
+void SceneRenderer::AddCamera(std::shared_ptr<Camera> camera) {
+    this->cameras.push_back(camera);
 }
 
 void SceneRenderer::setFBOSize(int width, int height) {

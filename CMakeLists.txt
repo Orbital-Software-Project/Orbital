@@ -5,6 +5,7 @@ set(CMAKE_TOOLCHAIN_FILE ./ThirdParty/vcpkg-2020.06/scripts/buildsystems/vcpkg.c
 set(openvslam_DIR ./ThirdParty/openvslam/lib/cmake/openvslam)
 set(g2o_DIR ./ThirdParty/g2o/lib/cmake/g2o)
 set(OpenCV_DIR ./ThirdParty/opencv/share/OpenCV)
+
 project(Orbital)
 
 # Required for openvslam
@@ -48,7 +49,30 @@ Set(IMGUI_SRC
 
 add_library(ImGui ${IMGUI_SRC})
 target_include_directories(ImGui PUBLIC ThirdParty/${IMGUI_VERSION})
-target_link_libraries(ImGui PRIVATE glfw)
+target_link_libraries(ImGui PRIVATE glfw GLEW::GLEW)
+
+
+Set(ENGINE_SRC
+	Engine/Texture.hpp
+        Engine/Shader.h
+        Engine/Shader.cpp
+        Engine/Mesh.h
+        Engine/Mesh.cpp
+        Engine/SceneRenderer.h
+        Engine/SceneRenderer.cpp
+        Engine/Camera.h
+        Engine/Camera.cpp
+)
+
+Set(SHADERS
+        Shaders/MapViewer.vs
+        Shaders/MapViewer.fs
+)
+
+add_library(Engine ${ENGINE_SRC} ${SHADERS})
+target_include_directories(Engine PUBLIC Engine/)
+target_link_libraries(Engine PRIVATE GLEW::GLEW glm)
+
 
 
 Set(SRC
@@ -61,25 +85,10 @@ Set(SRC
         Editor/MapViewer.cpp
         Editor/Global.h
         Editor/Utils.hpp
-        Editor/Texture.hpp
-        Editor/Shader.h
-        Editor/Shader.cpp
-        Editor/Mesh.h
-        Editor/Mesh.cpp
-        Editor/SceneRenderer.h
-        Editor/SceneRenderer.cpp
-        Editor/Camera.h
-        Editor/Camera.cpp
-
-)
-Set(SHADERS
-        Shaders/MapViewer.vs
-        Shaders/MapViewer.fs
 )
 
-add_executable(Orbital ${SRC} ${SHADERS})
-
-target_link_libraries(Orbital PRIVATE openvslam::openvslam ImGui GLEW::GLEW ${OpenCV_LIBS} unofficial::nativefiledialog::nfd glm)
+add_executable(Orbital ${SRC})
+target_link_libraries(Orbital PRIVATE Engine ImGui ${OpenCV_LIBS} openvslam::openvslam unofficial::nativefiledialog::nfd)
 
 # Copy shaders
-file( COPY ${CMAKE_CURRENT_SOURCE_DIR}/Shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR} )
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

@@ -16,10 +16,11 @@ public:
 
     void Update(std::vector<float> vertices, std::vector<unsigned int> indices);
 
-    void Draw();
+    void Draw(std::shared_ptr<Shader> shader);
 
     void SetPolygonMode(GLenum polygonMode);
-    void SetShader(std::shared_ptr<Shader> shader);
+
+    void SetModel(glm::mat4 model);
 
 
 private:
@@ -27,7 +28,8 @@ private:
     std::vector<unsigned int> indices;
     unsigned int vbo = 0, vao = 0, ebo = 0;
     GLenum polygonMode = GL_TRIANGLES;
-    std::shared_ptr<Shader> shader;
+
+    glm::mat4 model = glm::mat4(1.0f);
 
 };
 

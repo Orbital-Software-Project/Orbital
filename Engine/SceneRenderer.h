@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mesh.h"
+#include "Camera.h"
 
 #include <GL/glew.h>
 #include <vector>
@@ -15,9 +16,11 @@ public:
 
     ~SceneRenderer();
 
-    GLuint Render(int width, int height);
+    GLuint Render(int width, int height, std::shared_ptr<Shader> shader);
 
     void AddMesh(std::shared_ptr<Mesh> mesh);
+
+    void AddCamera(std::shared_ptr<Camera> camera);
 
 private:
     void setFBOSize(int widht, int height);
@@ -30,6 +33,8 @@ private:
     int width = 800, height = 600;
 
     std::vector<std::shared_ptr<Mesh>> meshes;
+
+    std::vector<std::shared_ptr<Camera>> cameras;
 
 };
 

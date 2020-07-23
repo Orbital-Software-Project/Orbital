@@ -202,7 +202,6 @@ void Core::Run() {
         glfwPollEvents();
     }
 
-
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -241,7 +240,7 @@ void Core::ExecuteSLAM(const std::shared_ptr<openvslam::config> cfg,
         std::vector<double> track_times;
         cv::Mat frame;
         double timestamp = 0.0;
-        int frame_skip = 1;
+        int frame_skip = 5;
         unsigned int num_frame = 0;
         bool is_not_end = true;
 

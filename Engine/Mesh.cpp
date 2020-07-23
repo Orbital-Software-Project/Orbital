@@ -24,7 +24,7 @@ void Mesh::Update(std::vector<float> vertices, std::vector<unsigned int> indices
     this->indices  = indices;
 }
 
-void Mesh::Draw() {
+void Mesh::Draw(std::shared_ptr<Shader> shader) {
 
     // Bind vertex array object
     glBindVertexArray(this->vao);
@@ -42,13 +42,8 @@ void Mesh::Draw() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(float), indices.data(), GL_STATIC_DRAW);
 
-    if(this->shader.get() == nullptr) {
-        std::cerr << "No shader defined." << std::endl;
-        exit(-1);
-        return;
-    }
-
-    this->shader->Use();
+    shader->Use();
+    shader->SetMat4("model", this->model);
 
     glPointSize(3.0f);
 
@@ -61,8 +56,8 @@ void Mesh::SetPolygonMode(GLenum polygonMode) {
     this->polygonMode = polygonMode;
 }
 
-void Mesh::SetShader(std::shared_ptr<Shader> shader) {
-    this->shader = shader;
+void Mesh::SetModel(glm::mat4 model) {
+    this->model = model;
 }
 
 
