@@ -16,9 +16,9 @@
 
 // TODO:
 // - Draw camera mesh [done]
-// - Draw camera trajectory
+// - Draw camera trajectory [done]
 // - Improve viewport navigation
-// - Draw local landmarks
+// - Draw local landmarks -> needs vertex colors
 // - Filter view (show grid, landmarks, keyframes etc.)
 // - Draw keyframes
 // - Export via assimp
@@ -89,7 +89,7 @@ void MapViewer::OnRender() {
     this->updateKeyFrames();
 
     // Set fragment point colors to red
-    this->shader->SetVec4("color", glm::vec4(0.0f, 0.0f, 255.0f, 1.0f));
+    //this->shader->SetVec4("color", glm::vec4(0.0f, 0.0f, 255.0f, 1.0f));
 
 
     this->shader->SetMat4("view", this->view);
