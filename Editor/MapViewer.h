@@ -10,7 +10,7 @@
 #include <imgui.h>
 #include <memory>
 
-
+#include <openvslam/publish/map_publisher.h>
 namespace Orb {
 
 class MapViewer {
@@ -24,6 +24,7 @@ public:
 private:
     void updatePointCloudMesh();
     void updateCameraPos();
+    void updateKeyFrames();
     void initGridMesh();
 
 
@@ -31,6 +32,7 @@ private:
     std::shared_ptr<Shader> shader;
     std::shared_ptr<Mesh> gridMesh;
     std::shared_ptr<Mesh> pointCloud;
+    std::shared_ptr<Mesh> keyframes;
     std::shared_ptr<Camera> camera;
 
     std::unique_ptr<SceneRenderer> renderer;

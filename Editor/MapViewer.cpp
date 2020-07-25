@@ -45,12 +45,9 @@ namespace Orb {
 
 MapViewer::MapViewer() {
 
-
     this->shader = std::make_shared<Shader>("Shaders/MapViewer.vs", "Shaders/MapViewer.fs");
 
-
     static std::vector<float> vertices;
-
     static std::vector<unsigned int> indices;
 
     this->pointCloud = std::make_shared<Mesh>(vertices, indices);
@@ -61,6 +58,11 @@ MapViewer::MapViewer() {
 
     this->camera = std::make_shared<Camera>();
     this->renderer->AddCamera(this->camera);
+
+    this->keyframes = std::make_shared<Mesh>();
+    this->keyframes->SetPolygonMode(GL_LINE_STRIP);
+    this->renderer->AddMesh(this->keyframes);
+
 
     this->initGridMesh();
 }
@@ -77,12 +79,14 @@ void MapViewer::OnRender() {
     // get current size of the imgui window
     ImVec2 vSize = ImVec2(vMax.x - vMin.x, vMax.y - vMin.y);
 
-
     // Update points
     this->updatePointCloudMesh();
 
     // Update reconstructed camera
     this->updateCameraPos();
+
+    // Update camera trajectory with its keyframes
+    this->updateKeyFrames();
 
     // Set fragment point colors to red
     this->shader->SetVec4("color", glm::vec4(0.0f, 0.0f, 255.0f, 1.0f));
@@ -97,11 +101,10 @@ void MapViewer::OnRender() {
     // Draw opengl texture (viewport) as imgui image
     ImGui::Image((void*)(intptr_t)this->renderer->Render(vSize.x, vSize.y, this->shader), vSize);
 
+
     // ImGui Viewport navigation
     {
-
         if(ImGui::IsWindowFocused()) {
-
 
             static bool dragging = false;
             static ImVec2 p0 = ImVec2(0, 0);
@@ -116,10 +119,12 @@ void MapViewer::OnRender() {
                     p0 = io->MousePos;
                     p1 = io->MousePos;
                     dragging = true;
+
                 } else {
                     // Update second mouse position to calc offset from p0
                     p1 = io->MousePos;
                 }
+
                 // Only apply rotation when cursor has moved
                 static ImVec2 p1Old = ImVec2(0, 0);
                 if(p1Old.x != p1.x || p1Old.y != p1.y) {
@@ -159,7 +164,6 @@ void MapViewer::OnRender() {
             }
 
         }
-
     }
 
     ImGui::EndChild();
@@ -179,6 +183,80 @@ void MapViewer::updateCameraPos() {
     glm::mat4 converted = Utils::ToGLM_Mat4f(camera_pos_wc);
 
     this->camera->SetViewMat(converted);
+
+}
+
+void MapViewer::updateKeyFrames() {
+
+    if(Global::MapPublisher.get() == nullptr) {
+        return;
+    }
+
+    std::vector<openvslam::data::keyframe*> keyFrames;
+    Global::MapPublisher->get_keyframes(keyFrames);
+
+    std::vector<float> vertices;
+    std::vector<unsigned int> indices;
+
+    const auto draw_edge = [&](const openvslam::Vec3_t& cam_center_1, const openvslam::Vec3_t& cam_center_2) {
+        //glVertex3fv(cam_center_1.cast<float>().eval().data());
+        //glVertex3fv(cam_center_2.cast<float>().eval().data());
+
+        vertices.push_back(cam_center_1.cast<float>().x());
+        vertices.push_back(cam_center_1.cast<float>().y());
+        vertices.push_back(cam_center_1.cast<float>().z());
+        indices.push_back(indices.size());
+
+        vertices.push_back(cam_center_2.cast<float>().x());
+        vertices.push_back(cam_center_2.cast<float>().y());
+        vertices.push_back(cam_center_2.cast<float>().z());
+        indices.push_back(indices.size());
+    };
+
+    for (const auto keyFrame : keyFrames) {
+        if (!keyFrame || keyFrame->will_be_erased()) {
+            continue;
+        }
+
+        const openvslam::Vec3_t cam_center_1 = keyFrame->get_cam_center();
+
+        // covisibility graph
+        const auto covisibilities = keyFrame->graph_node_->get_covisibilities_over_weight(100);
+        if (!covisibilities.empty()) {
+            for (const auto covisibility : covisibilities) {
+                if (!covisibility || covisibility->will_be_erased()) {
+                    continue;
+                }
+                if (covisibility->id_ < keyFrame->id_) {
+                    continue;
+                }
+                const openvslam::Vec3_t cam_center_2 = covisibility->get_cam_center();
+                draw_edge(cam_center_1, cam_center_2);
+            }
+        }
+
+        // spanning tree
+        auto spanning_parent = keyFrame->graph_node_->get_spanning_parent();
+        if (spanning_parent) {
+            const openvslam::Vec3_t cam_center_2 = spanning_parent->get_cam_center();
+            draw_edge(cam_center_1, cam_center_2);
+        }
+
+        // loop edges
+        const auto loop_edges = keyFrame->graph_node_->get_loop_edges();
+        for (const auto loop_edge : loop_edges) {
+            if (!loop_edge) {
+                continue;
+            }
+            if (loop_edge->id_ < keyFrame->id_) {
+                continue;
+            }
+            const openvslam::Vec3_t cam_center_2 = loop_edge->get_cam_center();
+            draw_edge(cam_center_1, cam_center_2);
+        }
+    }
+
+    this->keyframes->Update(vertices, indices);
 
 }
 

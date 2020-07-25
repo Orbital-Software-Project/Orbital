@@ -5,11 +5,17 @@
 
 namespace Orb {
 
-Mesh::Mesh(std::vector<float> vertices, std::vector<unsigned int> indices)  {
-    glGenBuffers(1, &this->ebo);
-    glGenVertexArrays(1, &this->vao);
-    glGenBuffers(1, &this->vbo);
+Mesh::Mesh() {
+    this->init();
 
+    std::vector<float> vertices;
+    std::vector<unsigned int> indices;
+
+    this->Update(vertices, indices);
+}
+
+Mesh::Mesh(std::vector<float> vertices, std::vector<unsigned int> indices)  {
+    this->init();
     this->Update(vertices, indices);
 }
 
@@ -58,6 +64,13 @@ void Mesh::SetPolygonMode(GLenum polygonMode) {
 
 void Mesh::SetModel(glm::mat4 model) {
     this->model = model;
+}
+
+
+void Mesh::init() {
+    glGenBuffers(1, &this->ebo);
+    glGenVertexArrays(1, &this->vao);
+    glGenBuffers(1, &this->vbo);
 }
 
 

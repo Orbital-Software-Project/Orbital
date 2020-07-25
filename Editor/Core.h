@@ -19,25 +19,14 @@ namespace Orb {
 
         public:
             Core();
+
             ~Core();
 
             static void OnResize(GLFWwindow *window, int width, int height);
 
             void Run();
 
-            void ExecuteSLAM(const std::shared_ptr<openvslam::config> cfg,
-                             const std::string vocab_file_path,
-                             const std::string video_file_path);
-
-            std::string PickFile();
-
             void UpdateVideoFrame(cv::Mat& image);
-
-    private:
-            std::thread slamTask;
-            GLuint currVideoFrameTexID = 0;
-            bool cancelRequested = false;
-
 
 
     };

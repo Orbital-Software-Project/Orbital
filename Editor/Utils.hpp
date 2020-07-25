@@ -8,6 +8,8 @@
 
 #include <Eigen/Core>
 #include <glm/glm.hpp>
+#include <string>
+#include <nfd.h>
 
 namespace Orb {
 
@@ -37,6 +39,30 @@ public:
         res[3][3] = mat4(3, 3);
 
         return res;
+    }
+
+    static glm::vec3 ToGLM_Vec3(Eigen::Vector3f vec3) {
+        return glm::vec3(vec3(0), vec3(1), vec3(2));
+    }
+
+    static std::string PickFile() {
+        std::string file = "";
+        nfdchar_t *outPath = NULL;
+        nfdresult_t result = NFD_OpenDialog( NULL, NULL, &outPath );
+
+        if ( result == NFD_OKAY ) {
+            puts("Success!");
+            file = outPath;
+            puts(outPath);
+            free(outPath);
+        }
+        else if ( result == NFD_CANCEL ) {
+            puts("User pressed cancel.");
+        }
+        else {
+            printf("Error: %s\n", NFD_GetError() );
+        }
+        return file;
     }
 
 

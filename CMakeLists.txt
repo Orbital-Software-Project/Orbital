@@ -85,6 +85,8 @@ Set(SRC
         Editor/MapViewer.cpp
         Editor/Global.h
         Editor/Utils.hpp
+        Editor/SlamTask.h
+        Editor/SlamTask.cpp
 )
 
 add_executable(Orbital ${SRC})
