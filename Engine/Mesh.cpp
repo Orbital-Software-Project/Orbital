@@ -7,41 +7,11 @@ namespace Orb {
 
 Mesh::Mesh() {
     this->init();
-
-    std::vector<float> vertices;
-    std::vector<unsigned int> indices;
-
-    this->Update(vertices, indices);
 }
 
-Mesh::Mesh(std::vector<float> vertices, std::vector<unsigned int> indices)  {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
     this->init();
-    this->Update(vertices, indices);
-}
-
-Mesh::Mesh(std::vector<Vertex> vertices) {
-    this->init();
-
-    std::vector<unsigned int> indices;
-    for(int i=0; i < vertices.size(); i++) {
-        indices.push_back(i);
-    }
-
-    std::vector<float> vertices_colored;
-    for(Vertex vert : vertices) {
-        vertices_colored.push_back(vert.Position[0]);
-        vertices_colored.push_back(vert.Position[1]);
-        vertices_colored.push_back(vert.Position[2]);
-        vertices_colored.push_back(vert.Color[0]);
-        vertices_colored.push_back(vert.Color[1]);
-        vertices_colored.push_back(vert.Color[2]);
-    }
-
-    this->vertices = vertices_colored;
-    this->indices  = indices;
-
-
-    //this->Update(vertices_colored, indices);
+    this->UpdateColored(vertices, indices);
 }
 
 Mesh::~Mesh() {
@@ -50,25 +20,26 @@ Mesh::~Mesh() {
     glDeleteBuffers(1, &this->vbo);
 }
 
-void Mesh::Update(std::vector<float> vertices, std::vector<unsigned int> indices) {
+void Mesh::UpdateColored(std::vector<Vertex> vertices_colored, std::vector<unsigned int> indices) {
 
-    std::vector<float> vertices_colored;
-    for(int i = 0; i < vertices.size(); i++) {
-        if(i % 3 == 0 && i != 0) {
-            vertices_colored.push_back(1.0f);
-            vertices_colored.push_back(0.0f);
-            vertices_colored.push_back(0.0f);
-            vertices_colored.push_back(vertices[i]);
-        } else {
-            vertices_colored.push_back(vertices[i]);
+    // if indices is empty then generate them
+    if(indices.size() <= 0) {
+        for(int i = 0; i < vertices_colored.size(); i++) {
+            indices.push_back(i);
         }
     }
 
-    vertices_colored.push_back(1.0f);
-    vertices_colored.push_back(0.0f);
-    vertices_colored.push_back(0.0f);
+    std::vector<float> vertices;
+    for(Vertex vert : vertices_colored) {
+        vertices.push_back(vert.Pos.x);
+        vertices.push_back(vert.Pos.y);
+        vertices.push_back(vert.Pos.z);
+        vertices.push_back(vert.Col.r);
+        vertices.push_back(vert.Col.g);
+        vertices.push_back(vert.Col.b);
+    }
 
-    this->vertices = vertices_colored;
+    this->vertices = vertices;
     this->indices  = indices;
 }
 

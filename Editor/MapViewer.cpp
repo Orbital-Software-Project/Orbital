@@ -46,14 +46,10 @@ namespace Orb {
 MapViewer::MapViewer() {
 
     this->shader = std::make_shared<Shader>("Shaders/MapViewer.vs", "Shaders/MapViewer.fs");
-
-    static std::vector<float> vertices;
-    static std::vector<unsigned int> indices;
-
-    this->pointCloud = std::make_shared<Mesh>(vertices, indices);
-    this->pointCloud->SetPolygonMode(GL_POINTS);
-
     this->renderer = std::make_unique<SceneRenderer>();
+
+    this->pointCloud = std::make_shared<Mesh>();
+    this->pointCloud->SetPolygonMode(GL_POINTS);
     this->renderer->AddMesh(this->pointCloud);
 
     this->camera = std::make_shared<Camera>();
@@ -195,22 +191,34 @@ void MapViewer::updateKeyFrames() {
     std::vector<openvslam::data::keyframe*> keyFrames;
     Global::MapPublisher->get_keyframes(keyFrames);
 
-    std::vector<float> vertices;
-    std::vector<unsigned int> indices;
+    std::vector<Vertex> vertices;
 
     const auto draw_edge = [&](const openvslam::Vec3_t& cam_center_1, const openvslam::Vec3_t& cam_center_2) {
         //glVertex3fv(cam_center_1.cast<float>().eval().data());
         //glVertex3fv(cam_center_2.cast<float>().eval().data());
 
-        vertices.push_back(cam_center_1.cast<float>().x());
-        vertices.push_back(cam_center_1.cast<float>().y());
-        vertices.push_back(cam_center_1.cast<float>().z());
-        indices.push_back(indices.size());
 
-        vertices.push_back(cam_center_2.cast<float>().x());
-        vertices.push_back(cam_center_2.cast<float>().y());
-        vertices.push_back(cam_center_2.cast<float>().z());
-        indices.push_back(indices.size());
+        vertices.push_back(
+                    Vertex(
+        {cam_center_1.cast<float>().x(),
+         cam_center_1.cast<float>().y(),
+         cam_center_1.cast<float>().z()},
+        {0.0f, 1.0f, 1.0f}
+                        )
+                    );
+
+        //vertices.push_back(cam_center_1.cast<float>().y());
+        //vertices.push_back(cam_center_1.cast<float>().z());
+        //indices.push_back(indices.size());
+
+        vertices.push_back(
+                    Vertex(
+        {cam_center_2.cast<float>().x(),
+         cam_center_2.cast<float>().y(),
+         cam_center_2.cast<float>().z()},
+        {0.0f, 1.0f, 1.0f}
+                        )
+                    );
     };
 
     for (const auto keyFrame : keyFrames) {
@@ -256,7 +264,7 @@ void MapViewer::updateKeyFrames() {
         }
     }
 
-    this->keyframes->Update(vertices, indices);
+    this->keyframes->UpdateColored(vertices);
 
 }
 
@@ -267,32 +275,76 @@ void MapViewer::initGridMesh() {
     constexpr float grid_min       = -100.0f * interval_ratio;
     constexpr float grid_max       = 100.0f  * interval_ratio;
 
+
+    std::vector<Vertex> gridVertices_color;
+
     for (int x = -10; x <= 10; x += 1) {
-        gridVerticies.push_back(x * 10.0f * interval_ratio);
-        gridVerticies.push_back(0);
-        gridVerticies.push_back(grid_min);
+        Vertex vertex(
+        {
+                        x * 10.0f * interval_ratio,
+                        0.0f,
+                        grid_min
+                    },
+        {
+                        0.0f,
+                        1.0f,
+                        0.0f
+                    }
+                    );
 
-        gridVerticies.push_back(x * 10.0f * interval_ratio);
-        gridVerticies.push_back(0);
-        gridVerticies.push_back(grid_max);
+        gridVertices_color.push_back(vertex);
+
+
+        Vertex vertex1(
+        {
+                        x * 10.0f * interval_ratio,
+                        0.0f,
+                        grid_max
+                    },
+        {
+                        0.0f,
+                        1.0f,
+                        0.0f
+                    }
+                    );
+
+
+        gridVertices_color.push_back(vertex1);
     }
 
-    for (int y = -10; y <= 10; y += 1) {
-        gridVerticies.push_back(grid_min );
-        gridVerticies.push_back(0);
-        gridVerticies.push_back(y * 10.0f * interval_ratio);
+    for (int z = -10; z <= 10; z += 1) {
 
-        gridVerticies.push_back(grid_max);
-        gridVerticies.push_back(0);
-        gridVerticies.push_back(y * 10.0f * interval_ratio);
+        //Vertex vert1;
+        Vertex vertex(
+        {
+                        grid_min,
+                        0.0f,
+                        z * 10.0f * interval_ratio},
+        {
+                        0.0f,
+                        1.0f,
+                        0.0f
+                    }
+                    );
+
+
+        gridVertices_color.push_back(vertex);
+
+        Vertex vertex2({
+                           grid_max,
+                           0.0f,
+                           z * 10.0f * interval_ratio
+                       }, {
+                           0.0f,
+                           1.0f,
+                           0.0f
+                       });
+
+        gridVertices_color.push_back(vertex2);
+
     }
 
-    std::vector<unsigned int> indices;
-    for(unsigned int i = 0; i < gridVerticies.size(); i++) {
-        indices.push_back(i);
-    }
-
-    this->gridMesh = std::make_shared<Mesh>(gridVerticies, indices);
+    this->gridMesh = std::make_shared<Mesh>(gridVertices_color);
     this->gridMesh->SetPolygonMode(GL_LINES);
 
     this->renderer->AddMesh(this->gridMesh);
@@ -311,8 +363,35 @@ void MapViewer::updatePointCloudMesh() {
         return;
     }
 
-    std::vector<float> vertices;
-    std::vector<unsigned int> indices;
+    std::vector<Vertex> vertices;
+    //std::vector<unsigned int> indices;
+
+     for(openvslam::data::landmark* currLandMark : allLandmarks) {
+         if (!currLandMark || currLandMark->will_be_erased()) {
+             continue;
+         }
+         if (localLandmarks.count(currLandMark)) {
+                    continue;
+         }
+
+
+         Eigen::Vector3d pos = currLandMark->get_pos_in_world();
+
+         Vertex vertLandmarks({
+                           pos.cast<float>().eval().x(),
+                           pos.cast<float>().eval().y(),
+                           pos.cast<float>().eval().z()
+                       }, {
+                           1.0f,
+                           1.0f,
+                           0.0f  }
+                       );
+
+         vertices.push_back(vertLandmarks);
+
+
+     }
+
 
     for(openvslam::data::landmark* currLandMark : allLandmarks) {
         if (!currLandMark || currLandMark->will_be_erased()) {
@@ -321,22 +400,24 @@ void MapViewer::updatePointCloudMesh() {
 
         Eigen::Vector3d pos = currLandMark->get_pos_in_world();
 
-        auto x = pos.cast<float>().eval().x();
-        auto y = pos.cast<float>().eval().y();
-        auto z = pos.cast<float>().eval().z();
+        Vertex vertAllLandmarks({
+                          pos.cast<float>().eval().x(),
+                          pos.cast<float>().eval().y(),
+                          pos.cast<float>().eval().z()
+                      }, {
+                          0.0f,
+                          0.0f,
+                          1.0f  }
+                      );
 
-        vertices.push_back(x);
-        indices.push_back(indices.size());
+        vertices.push_back(vertAllLandmarks);
 
-        vertices.push_back(y);
-        indices.push_back(indices.size());
 
-        vertices.push_back(z);
-        indices.push_back(indices.size());
+
+
     }
 
-
-    this->pointCloud->Update(vertices, indices);
+    this->pointCloud->UpdateColored(vertices);
 }
 
 }

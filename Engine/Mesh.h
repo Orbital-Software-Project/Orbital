@@ -10,18 +10,12 @@ namespace Orb {
 
 
 struct Vertex {
-    Vertex() {
-        this->Color[0] = 255.0f;
-        this->Color[1] = 0.0f;
-        this->Color[2] = 0.0f;
-
-        this->Position[0] = 0.0f;
-        this->Position[1] = 0.0f;
-        this->Position[2] = 0.0f;
+    Vertex(glm::vec3 pos, glm::vec3 col) {
+        this->Pos = pos;
+        this->Col = col;
     }
-    float Position[3];
-
-    float Color[3];
+    glm::vec3 Pos;
+    glm::vec3 Col;
 };
 
 class Mesh {
@@ -29,13 +23,11 @@ class Mesh {
 public:
     Mesh();
 
-    Mesh(std::vector<float> vertices, std::vector<unsigned int> indices);
-
-    Mesh(std::vector<Vertex> vertices);
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices = {});
 
     ~Mesh();
 
-    void Update(std::vector<float> vertices, std::vector<unsigned int> indices);
+    void UpdateColored(std::vector<Vertex> vertices_colored, std::vector<unsigned int> indices = {});
 
     void Draw(std::shared_ptr<Shader> shader);
 

@@ -7,11 +7,11 @@ Camera::Camera()  {
     // Init view matrix
     this->view = glm::mat4(1.0f);
 
-     std::vector<float> vertices = {
-         0.5f,  0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        -0.5f,  0.5f, 0.0f
+    std::vector<Vertex> cam_vertices = {
+        Vertex({0.5f,  0.5f, 0.0f},  {1.0f, 1.0f, 1.0f}),
+        Vertex({0.5f, -0.5f, 0.0f},  {1.0f, 1.0f, 1.0f}),
+        Vertex({-0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}),
+        Vertex({-0.5f,  0.5f, 0.0f}, {1.0f, 1.0f, 1.0f})
     };
 
     std::vector<unsigned int> indices = {
@@ -23,7 +23,8 @@ Camera::Camera()  {
         3
     };
 
-    this->mesh = std::make_shared<Mesh>(vertices, indices);
+
+    this->mesh = std::make_shared<Mesh>(cam_vertices, indices);
 }
 
 Camera::~Camera() {
