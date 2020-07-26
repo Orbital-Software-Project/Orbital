@@ -40,7 +40,8 @@ void Mesh::UpdateColored(std::vector<Vertex> vertices_colored, std::vector<unsig
     }
 
     this->vertices = vertices;
-    this->indices  = indices;
+    this->vertices_colors = vertices_colored;
+    this->indices = indices;
 }
 
 void Mesh::Draw(std::shared_ptr<Shader> shader) {
@@ -83,6 +84,13 @@ void Mesh::SetModel(glm::mat4 model) {
     this->model = model;
 }
 
+std::vector<Vertex> Mesh::GetVertices() {
+    this->vertices_colors;
+}
+
+std::vector<unsigned int> Mesh::GetIndices() {
+    this->indices;
+}
 
 void Mesh::init() {
     glGenBuffers(1, &this->ebo);

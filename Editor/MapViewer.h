@@ -21,6 +21,8 @@ public:
 
     void OnRender();
 
+
+
 private:
     void updatePointCloudMesh();
     void updateCameraPos();

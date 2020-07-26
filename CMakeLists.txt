@@ -18,9 +18,7 @@ find_package(glfw3 CONFIG REQUIRED)
 
 find_package(OpenCV REQUIRED)
 find_package(unofficial-nativefiledialog CONFIG REQUIRED)
-
 find_package(glm CONFIG REQUIRED)
-
 
 
 Set(IMGUI_VERSION "imgui-1.77")
@@ -58,6 +56,8 @@ Set(ENGINE_SRC
         Engine/Shader.cpp
         Engine/Mesh.h
         Engine/Mesh.cpp
+        Engine/MeshExporter.h
+        Engine/MeshExporter.cpp
         Engine/SceneRenderer.h
         Engine/SceneRenderer.cpp
         Engine/Camera.h
@@ -72,7 +72,6 @@ Set(SHADERS
 add_library(Engine ${ENGINE_SRC} ${SHADERS})
 target_include_directories(Engine PUBLIC Engine/)
 target_link_libraries(Engine PRIVATE GLEW::GLEW glm)
-
 
 
 Set(SRC

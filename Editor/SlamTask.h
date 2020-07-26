@@ -11,6 +11,9 @@
 #include <mutex>
 #include <memory>
 
+#include "Mesh.h"
+#include "MeshExporter.h"
+
 namespace Orb {
 
     enum class TaskStatus {

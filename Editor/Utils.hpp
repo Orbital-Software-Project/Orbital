@@ -65,6 +65,25 @@ public:
         return file;
     }
 
+    static std::string SaveFile() {
+        std::string file = "";
+        nfdchar_t *outPath = NULL;
+        nfdresult_t result = NFD_SaveDialog(NULL, NULL, &outPath );
+
+        if ( result == NFD_OKAY ) {
+            puts("Success!");
+            file = outPath;
+            puts(outPath);
+            free(outPath);
+        }
+        else if ( result == NFD_CANCEL ) {
+            puts("User pressed cancel.");
+        }
+        else {
+            printf("Error: %s\n", NFD_GetError() );
+        }
+        return file;
+    }
 
 };
 

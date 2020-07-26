@@ -50,15 +50,15 @@ std::shared_ptr<openvslam::publish::frame_publisher> SlamTask::GetFramePublisher
     return this->framePublisher;
 }
 
-
 void SlamTask::doSlamAsync() {
+
     cv::VideoCapture video(this->videoFile);
     unsigned int frameCount = video.get(cv::CAP_PROP_FRAME_COUNT);
 
     std::vector<double> track_times;
     cv::Mat frame;
     double timestamp = 0.0;
-    int frame_skip = 5;
+    int frame_skip = 1;
     unsigned int num_frame = 0;
     bool is_not_end = true;
 
@@ -74,8 +74,6 @@ void SlamTask::doSlamAsync() {
         if (!frame.empty() && (num_frame % frame_skip == 0)) {
             // input the current frame and estimate the camera pose
             SLAM->feed_monocular_frame(frame, timestamp, cv::Mat());
-
-
         }
 
         const auto tp_2 = std::chrono::steady_clock::now();

@@ -13,30 +13,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-
-// TODO:
-// - Draw camera mesh [done]
-// - Draw camera trajectory [done]
-// - Improve viewport navigation
-// - Draw local landmarks -> needs vertex colors
-// - Filter view (show grid, landmarks, keyframes etc.)
-// - Draw keyframes
-// - Export via assimp
-// - Fix crash when cancel and make restart of slam possible
-// -! optional docking
-// -! Windows support
-
-
-// Design:
-// (UI)MapViewer -> SceneRenderer -> Mesh
-//                               ^-> Shader
-//                               ^-> Camera
-// SceneRenderer
-// This classes contains all the entities
-// Active camera is selectet to render from the cameras view
-// Only one shader can be the active shader
-//
-
 namespace Orb {
 
 // https://stackoverflow.com/questions/9742840/what-are-the-steps-necessary-to-render-my-scene-to-a-framebuffer-objectfbo-and
@@ -63,7 +39,9 @@ MapViewer::MapViewer() {
     this->initGridMesh();
 }
 
-MapViewer::~MapViewer() {}
+MapViewer::~MapViewer() {
+
+}
 
 void MapViewer::OnRender() {
     ImGui::Begin("Map viewer");
@@ -74,6 +52,12 @@ void MapViewer::OnRender() {
 
     // get current size of the imgui window
     ImVec2 vSize = ImVec2(vMax.x - vMin.x, vMax.y - vMin.y);
+
+    // when the window is to small the framebuffer throws errors
+    if(vSize.x < 50 || vSize.y < 50) {
+        vSize = ImVec2(800, 600);
+        ImGui::SetWindowSize(vSize);
+    }
 
     // Update points
     this->updatePointCloudMesh();

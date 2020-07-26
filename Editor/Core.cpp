@@ -121,9 +121,9 @@ void Core::Run() {
     ImGui_ImplOpenGL3_Init(glsl_version.c_str());
 
     // Default example paths
-    std::string videoFile = "/home/celvin/Documents/Projects/Orbital/Content/aist_living_lab_1/video.mp4";
+    std::string videoFile = "/home/celvin/Documents/Projects/Orbital/Content/bata-park/video.mp4";
     std::string vocabFile = "/home/celvin/Documents/Projects/Orbital/Content/orb_vocab/orb_vocab.dbow2";
-    std::string cfgFile   = "/home/celvin/Documents/Projects/Orbital/Content/aist_living_lab_1/config.yaml";
+    std::string cfgFile   = "/home/celvin/Documents/Projects/Orbital/Content/bata-park/config.yaml";
 
     VideoPreview preview;
     MapViewer mapViewer;
@@ -146,6 +146,23 @@ void Core::Run() {
         preview.OnRender();
         mapViewer.OnRender();
 
+        // Main menubar
+        {
+            ImGui::BeginMainMenuBar();
+            {
+                if(ImGui::BeginMenu("File")) {
+                    if(ImGui::MenuItem("Export")) {
+                        std::string file = Utils::SaveFile();
+
+                    }
+                    ImGui::EndMenu();
+                }
+            }
+            ImGui::EndMainMenuBar();
+        }
+
+
+        // Control Panel
         {
             ImGui::Begin("Panel");
 
@@ -176,9 +193,6 @@ void Core::Run() {
 
                     Global::FramePublisher = slamTask.GetFramePublisher();
                     Global::MapPublisher = slamTask.GetMapPublisher();
-
-
-
 
                 }
 

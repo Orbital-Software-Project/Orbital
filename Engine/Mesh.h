@@ -35,6 +35,9 @@ public:
 
     void SetModel(glm::mat4 model);
 
+    std::vector<Vertex> GetVertices();
+
+    std::vector<unsigned int> GetIndices();
 
 private:
     void init();
