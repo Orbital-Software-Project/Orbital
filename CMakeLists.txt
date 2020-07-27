@@ -20,6 +20,8 @@ find_package(OpenCV REQUIRED)
 find_package(unofficial-nativefiledialog CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 
+find_package(tinyobjloader CONFIG REQUIRED)
+
 
 Set(IMGUI_VERSION "imgui-1.77")
 Set(IMGUI_SRC
@@ -51,7 +53,8 @@ target_link_libraries(ImGui PRIVATE glfw GLEW::GLEW)
 
 
 Set(ENGINE_SRC
-	Engine/Texture.hpp
+        Engine/Texture.h
+        Engine/Texture.cpp
         Engine/Shader.h
         Engine/Shader.cpp
         Engine/Mesh.h
@@ -71,7 +74,7 @@ Set(SHADERS
 
 add_library(Engine ${ENGINE_SRC} ${SHADERS})
 target_include_directories(Engine PUBLIC Engine/)
-target_link_libraries(Engine PRIVATE GLEW::GLEW glm)
+target_link_libraries(Engine PRIVATE ${OpenCV_LIBS} GLEW::GLEW glm tinyobjloader::tinyobjloader)
 
 
 Set(SRC

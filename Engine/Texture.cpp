@@ -1,38 +1,32 @@
-#pragma once
-
-#include <opencv2/core.hpp>
-#include <GL/glew.h>
+#include "Texture.h"
 
 namespace Orb {
 
-class Texture {
-
-public:
-    Texture() {
+    Texture::Texture() {
         this->init();
     }
 
-    Texture(cv::Mat colorMap) {
+    Texture::Texture(cv::Mat colorMap) {
         this->init();
         this->UpdateColorMap(this->colorMap);
     }
 
-    ~Texture() {
+    Texture::~Texture() {
         if(this->initialized) {
             glDeleteTextures(1, &this->textureID);
         }
         this->colorMap.release();
     }
 
-    const cv::Mat GetColorMap() {
+    const cv::Mat Texture::GetColorMap() {
         return this->colorMap;
     }
 
-    const GLuint GetTextureID() {
+    const GLuint Texture::GetTextureID() {
         return this->textureID;
     }
 
-    void UpdateColorMap(cv::Mat newColorMap) {
+    void Texture::UpdateColorMap(cv::Mat newColorMap) {
         this->colorMap = newColorMap.clone();
 
         glBindTexture(GL_TEXTURE_2D, this->textureID);
@@ -55,18 +49,11 @@ public:
                      );
     }
 
-private:
-    void init() {
+    void Texture::init() {
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
         glGenTextures(1, &this->textureID);
         this->initialized = this->textureID > 0;
     }
 
-private:
-    cv::Mat colorMap = cv::Mat();
-    GLuint textureID = 0;
-    bool initialized = false;
-
-};
 
 }

@@ -153,13 +153,17 @@ void MapViewer::OnRender() {
     return;
 }
 
+void MapViewer::AddMesh(std::shared_ptr<Mesh> newMesh) {
+    this->renderer->AddMesh(newMesh);
+}
+
 void MapViewer::updateCameraPos() {
 
-    if(Global::MapPublisher.get() == nullptr) {
+    if(Global::getInstance().MapPublisher.get() == nullptr) {
         return;
     }
 
-    Eigen::Matrix4f camera_pos_wc = Global::MapPublisher->get_current_cam_pose().inverse().transpose().cast<float>().eval(); // inverse cw to wc;
+    Eigen::Matrix4f camera_pos_wc = Global::getInstance().MapPublisher->get_current_cam_pose().inverse().transpose().cast<float>().eval(); // inverse cw to wc;
     glm::mat4 converted = Utils::ToGLM_Mat4f(camera_pos_wc);
 
     this->camera->SetViewMat(converted);
@@ -168,12 +172,12 @@ void MapViewer::updateCameraPos() {
 
 void MapViewer::updateKeyFrames() {
 
-    if(Global::MapPublisher.get() == nullptr) {
+    if(Global::getInstance().MapPublisher.get() == nullptr) {
         return;
     }
 
     std::vector<openvslam::data::keyframe*> keyFrames;
-    Global::MapPublisher->get_keyframes(keyFrames);
+    Global::getInstance().MapPublisher->get_keyframes(keyFrames);
 
     std::vector<Vertex> vertices;
 
@@ -335,13 +339,13 @@ void MapViewer::initGridMesh() {
 }
 
 void MapViewer::updatePointCloudMesh() {
-    if(Global::MapPublisher.get() == nullptr) {
+    if(Global::getInstance().MapPublisher.get() == nullptr) {
         return;
     }
 
     std::vector<openvslam::data::landmark*> allLandmarks;
     std::set<openvslam::data::landmark*> localLandmarks;
-    Global::MapPublisher->get_landmarks(allLandmarks, localLandmarks);
+    Global::getInstance().MapPublisher->get_landmarks(allLandmarks, localLandmarks);
 
     if(allLandmarks.size() == 0) {
         return;

@@ -21,11 +21,11 @@ VideoPreview::~VideoPreview() {}
 void VideoPreview::OnRender(){
     ImGui::Begin("Video preview");
 
-    ImGui::Text("Frames %i / %i", Global::FramesProcessed, Global::NumFrames);
+    //ImGui::Text("Frames %i / %i", Global::getInstance().FramesProcessed, Global::getInstance().NumFrames);
 
-    if(Global::FramePublisher.get() != nullptr) {
+    if(Global::getInstance().FramePublisher.get() != nullptr) {
 
-        this->videoFrame.UpdateColorMap(Global::FramePublisher->draw_frame());
+        this->videoFrame.UpdateColorMap(Global::getInstance().FramePublisher->draw_frame());
 
         // Get content size of the imgui window
         ImVec2 vMin = ImGui::GetWindowContentRegionMin();
@@ -39,7 +39,7 @@ void VideoPreview::OnRender(){
 
 
     }
-    ImGui::Text(Global::CurrentVideoFile.c_str());
+    //ImGui::Text(Global::CurrentVideoFile.c_str());
 
     ImGui::End();
 }

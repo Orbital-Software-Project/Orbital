@@ -21,6 +21,8 @@ public:
 
     void OnRender();
 
+    void AddMesh(std::shared_ptr<Mesh> newMesh);
+
 
 
 private:

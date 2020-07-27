@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Texture.hpp"
+#include "Texture.h"
 
 #include <string>
 #include <opencv2/core.hpp>
@@ -16,18 +16,25 @@ namespace Orb {
 
 class Global {
 
+
+public: // Singleton
+    static Global& getInstance()
+    {
+        static Global instance;
+        return instance;
+    }
+private:
+    Global() {}
+
 public:
-    inline static cv::Mat VideoFrame;
+    Global(Global const&) = delete;
+    void operator=(Global const&) = delete;
 
-    inline static int NumFrames = 0;
 
-    inline static int FramesProcessed = 0;
+public:
+    std::shared_ptr<openvslam::publish::map_publisher> MapPublisher;
 
-    inline static std::string CurrentVideoFile = "";
-
-    inline static std::shared_ptr<openvslam::publish::map_publisher> MapPublisher;
-
-    inline static std::shared_ptr<openvslam::publish::frame_publisher> FramePublisher;
+    std::shared_ptr<openvslam::publish::frame_publisher> FramePublisher;
 
 };
 

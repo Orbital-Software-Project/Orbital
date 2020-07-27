@@ -85,11 +85,11 @@ void Mesh::SetModel(glm::mat4 model) {
 }
 
 std::vector<Vertex> Mesh::GetVertices() {
-    this->vertices_colors;
+    return this->vertices_colors;
 }
 
 std::vector<unsigned int> Mesh::GetIndices() {
-    this->indices;
+    return this->indices;
 }
 
 void Mesh::init() {

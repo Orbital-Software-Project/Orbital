@@ -6,7 +6,7 @@
 
 #include <GL/glew.h>
 
-#include "Texture.hpp"
+#include "Texture.h"
 
 namespace Orb {
 

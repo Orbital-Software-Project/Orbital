@@ -106,8 +106,6 @@ void Core::Run() {
         return;
     }
 
-
-
     int actualWindowWidth, actualWindowHeight;
     glfwGetWindowSize(window, &actualWindowWidth, &actualWindowHeight);
     glViewport(0, 0, actualWindowWidth, actualWindowHeight);
@@ -155,6 +153,11 @@ void Core::Run() {
                         std::string file = Utils::SaveFile();
 
                     }
+                    if(ImGui::MenuItem("Import")) {
+                        std::string file = Utils::PickFile();
+                        std::shared_ptr<Mesh> newMesh = MeshExporter::Import(file);
+                        mapViewer.AddMesh(newMesh);
+                    }
                     ImGui::EndMenu();
                 }
             }
@@ -191,8 +194,8 @@ void Core::Run() {
                 if(ImGui::Button("Run SLAM")) {
                     slamTask.Run();
 
-                    Global::FramePublisher = slamTask.GetFramePublisher();
-                    Global::MapPublisher = slamTask.GetMapPublisher();
+                    Global::getInstance().FramePublisher = slamTask.GetFramePublisher();
+                    Global::getInstance().MapPublisher = slamTask.GetMapPublisher();
 
                 }
 
