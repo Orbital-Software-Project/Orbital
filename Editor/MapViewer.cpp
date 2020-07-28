@@ -1,6 +1,7 @@
 #include "MapViewer.h"
 #include "Global.h"
 #include "Utils.hpp"
+#include "MeshExporter.h"
 
 #include <stdint.h>
 #include <iostream>
@@ -21,20 +22,26 @@ namespace Orb {
 
 MapViewer::MapViewer() {
 
-    this->shader = std::make_shared<Shader>("Shaders/MapViewer.vs", "Shaders/MapViewer.fs");
+    // Shader pointcloud
+    //this->shader = std::make_shared<Shader>("Shaders/MapViewer.vs", "Shaders/MapViewer.fs");
+
+    // Shader model
+    this->meshShader = std::make_shared<Shader>("Shaders/Mesh.vs", "Shaders/Mesh.fs");
+
     this->renderer = std::make_unique<SceneRenderer>();
 
-    this->pointCloud = std::make_shared<Mesh>();
+    this->pointCloud = std::make_shared<Mesh>(this->meshShader);
     this->pointCloud->SetPolygonMode(GL_POINTS);
+    this->pointCloud->DrawOnlyVertColors(true);
     this->renderer->AddMesh(this->pointCloud);
 
-    this->camera = std::make_shared<Camera>();
+    this->camera = std::make_shared<Camera>(this->meshShader);
     this->renderer->AddCamera(this->camera);
 
-    this->keyframes = std::make_shared<Mesh>();
+    this->keyframes = std::make_shared<Mesh>(this->meshShader);
+    this->keyframes->DrawOnlyVertColors(true);
     this->keyframes->SetPolygonMode(GL_LINE_STRIP);
     this->renderer->AddMesh(this->keyframes);
-
 
     this->initGridMesh();
 }
@@ -68,18 +75,14 @@ void MapViewer::OnRender() {
     // Update camera trajectory with its keyframes
     this->updateKeyFrames();
 
-    // Set fragment point colors to red
-    //this->shader->SetVec4("color", glm::vec4(0.0f, 0.0f, 255.0f, 1.0f));
-
-
-    this->shader->SetMat4("view", this->view);
-    this->shader->SetMat4("projection", glm::perspective(glm::radians(45.0f), vSize .x / vSize.y, 0.1f, 100.0f));
+    this->meshShader->SetMat4("view", this->view);
+    this->meshShader->SetMat4("projection", glm::perspective(glm::radians(45.0f), vSize .x / vSize.y, 0.1f, 100.0f));
 
     // Childframe to prevent movement of the window and enable viewport rotation
     ImGui::BeginChild("DragPanel", vSize, false, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
 
     // Draw opengl texture (viewport) as imgui image
-    ImGui::Image((void*)(intptr_t)this->renderer->Render(vSize.x, vSize.y, this->shader), vSize);
+    ImGui::Image((void*)(intptr_t)this->renderer->Render(vSize.x, vSize.y), vSize);
 
 
     // ImGui Viewport navigation
@@ -153,17 +156,18 @@ void MapViewer::OnRender() {
     return;
 }
 
-void MapViewer::AddMesh(std::shared_ptr<Mesh> newMesh) {
-    this->renderer->AddMesh(newMesh);
+void MapViewer::ImportMesh(std::string file) {
+    std::shared_ptr<MeshData> meshdata = MeshExporter::Import(file);
+
 }
 
 void MapViewer::updateCameraPos() {
 
-    if(Global::getInstance().MapPublisher.get() == nullptr) {
+    if(Global::GetInstance().MapPublisher.get() == nullptr) {
         return;
     }
 
-    Eigen::Matrix4f camera_pos_wc = Global::getInstance().MapPublisher->get_current_cam_pose().inverse().transpose().cast<float>().eval(); // inverse cw to wc;
+    Eigen::Matrix4f camera_pos_wc = Global::GetInstance().MapPublisher->get_current_cam_pose().inverse().transpose().cast<float>().eval(); // inverse cw to wc;
     glm::mat4 converted = Utils::ToGLM_Mat4f(camera_pos_wc);
 
     this->camera->SetViewMat(converted);
@@ -172,12 +176,12 @@ void MapViewer::updateCameraPos() {
 
 void MapViewer::updateKeyFrames() {
 
-    if(Global::getInstance().MapPublisher.get() == nullptr) {
+    if(Global::GetInstance().MapPublisher.get() == nullptr) {
         return;
     }
 
     std::vector<openvslam::data::keyframe*> keyFrames;
-    Global::getInstance().MapPublisher->get_keyframes(keyFrames);
+    Global::GetInstance().MapPublisher->get_keyframes(keyFrames);
 
     std::vector<Vertex> vertices;
 
@@ -252,7 +256,7 @@ void MapViewer::updateKeyFrames() {
         }
     }
 
-    this->keyframes->UpdateColored(vertices);
+    this->keyframes->UpdateColored(std::make_shared<MeshData>(vertices));
 
 }
 
@@ -332,53 +336,49 @@ void MapViewer::initGridMesh() {
 
     }
 
-    this->gridMesh = std::make_shared<Mesh>(gridVertices_color);
+    this->gridMesh = std::make_shared<Mesh>(this->meshShader, std::make_shared<MeshData>(gridVertices_color));
     this->gridMesh->SetPolygonMode(GL_LINES);
-
+    this->gridMesh->DrawOnlyVertColors(true);
     this->renderer->AddMesh(this->gridMesh);
 }
 
 void MapViewer::updatePointCloudMesh() {
-    if(Global::getInstance().MapPublisher.get() == nullptr) {
+    if(Global::GetInstance().MapPublisher.get() == nullptr) {
         return;
     }
 
     std::vector<openvslam::data::landmark*> allLandmarks;
     std::set<openvslam::data::landmark*> localLandmarks;
-    Global::getInstance().MapPublisher->get_landmarks(allLandmarks, localLandmarks);
+    Global::GetInstance().MapPublisher->get_landmarks(allLandmarks, localLandmarks);
 
     if(allLandmarks.size() == 0) {
         return;
     }
 
     std::vector<Vertex> vertices;
-    //std::vector<unsigned int> indices;
-
-     for(openvslam::data::landmark* currLandMark : allLandmarks) {
-         if (!currLandMark || currLandMark->will_be_erased()) {
-             continue;
-         }
-         if (localLandmarks.count(currLandMark)) {
-                    continue;
-         }
+    for(openvslam::data::landmark* currLandMark : allLandmarks) {
+        if (!currLandMark || currLandMark->will_be_erased()) {
+            continue;
+        }
+        if (localLandmarks.count(currLandMark)) {
+            continue;
+        }
 
 
-         Eigen::Vector3d pos = currLandMark->get_pos_in_world();
+        Eigen::Vector3d pos = currLandMark->get_pos_in_world();
 
-         Vertex vertLandmarks({
-                           pos.cast<float>().eval().x(),
-                           pos.cast<float>().eval().y(),
-                           pos.cast<float>().eval().z()
-                       }, {
-                           1.0f,
-                           1.0f,
-                           0.0f  }
-                       );
+        Vertex vertLandmarks({
+                                      pos.cast<float>().eval().x(),
+                                      pos.cast<float>().eval().y(),
+                                      pos.cast<float>().eval().z()
+                                  }, {
+                                      1.0f,
+                                      1.0f,
+                                      0.0f  }
+                                  );
 
-         vertices.push_back(vertLandmarks);
-
-
-     }
+        vertices.push_back(vertLandmarks);
+    }
 
 
     for(openvslam::data::landmark* currLandMark : allLandmarks) {
@@ -389,23 +389,19 @@ void MapViewer::updatePointCloudMesh() {
         Eigen::Vector3d pos = currLandMark->get_pos_in_world();
 
         Vertex vertAllLandmarks({
-                          pos.cast<float>().eval().x(),
-                          pos.cast<float>().eval().y(),
-                          pos.cast<float>().eval().z()
-                      }, {
-                          0.0f,
-                          0.0f,
-                          1.0f  }
-                      );
+                                         pos.cast<float>().eval().x(),
+                                         pos.cast<float>().eval().y(),
+                                         pos.cast<float>().eval().z()
+                                     }, {
+                                         0.0f,
+                                         0.0f,
+                                         1.0f  }
+                                     );
 
         vertices.push_back(vertAllLandmarks);
-
-
-
-
     }
 
-    this->pointCloud->UpdateColored(vertices);
+    this->pointCloud->UpdateColored(std::make_shared<MeshData>(vertices));
 }
 
 }

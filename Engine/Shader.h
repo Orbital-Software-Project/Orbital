@@ -18,6 +18,8 @@ public:
 
     void SetMat4(std::string uniform, glm::mat4 value);
 
+    void SetBool(std::string uniform, bool value);
+
 private:
     unsigned int programID;
 

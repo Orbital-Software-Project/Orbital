@@ -11,18 +11,19 @@
 #include <memory>
 
 #include <openvslam/publish/map_publisher.h>
+
 namespace Orb {
 
 class MapViewer {
 
 public:
     MapViewer();
+
     ~MapViewer();
 
     void OnRender();
 
-    void AddMesh(std::shared_ptr<Mesh> newMesh);
-
+    void ImportMesh(std::string file);
 
 
 private:
@@ -33,7 +34,9 @@ private:
 
 
 private:
-    std::shared_ptr<Shader> shader;
+    //std::shared_ptr<Shader> shader;
+    std::shared_ptr<Shader> meshShader;
+
     std::shared_ptr<Mesh> gridMesh;
     std::shared_ptr<Mesh> pointCloud;
     std::shared_ptr<Mesh> keyframes;

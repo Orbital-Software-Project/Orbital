@@ -5,13 +5,17 @@
 
 namespace Orb {
 
-Mesh::Mesh() {
+Mesh::Mesh(std::shared_ptr<Shader> shader) {
+    this->shader = shader;
+    this->meshData = std::make_shared<MeshData>();
+
     this->init();
 }
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
+Mesh::Mesh(std::shared_ptr<Shader> shader, std::shared_ptr<MeshData> meshData) {
+    this->shader = shader;
     this->init();
-    this->UpdateColored(vertices, indices);
+    this->UpdateColored(meshData);
 }
 
 Mesh::~Mesh() {
@@ -20,60 +24,60 @@ Mesh::~Mesh() {
     glDeleteBuffers(1, &this->vbo);
 }
 
-void Mesh::UpdateColored(std::vector<Vertex> vertices_colored, std::vector<unsigned int> indices) {
+void Mesh::UpdateColored(std::shared_ptr<MeshData> meshData) {
 
-    // if indices is empty then generate them
-    if(indices.size() <= 0) {
-        for(int i = 0; i < vertices_colored.size(); i++) {
-            indices.push_back(i);
-        }
-    }
-
-    std::vector<float> vertices;
-    for(Vertex vert : vertices_colored) {
-        vertices.push_back(vert.Pos.x);
-        vertices.push_back(vert.Pos.y);
-        vertices.push_back(vert.Pos.z);
-        vertices.push_back(vert.Col.r);
-        vertices.push_back(vert.Col.g);
-        vertices.push_back(vert.Col.b);
-    }
-
-    this->vertices = vertices;
-    this->vertices_colors = vertices_colored;
-    this->indices = indices;
-}
-
-void Mesh::Draw(std::shared_ptr<Shader> shader) {
+    this->meshData = meshData;
 
     // Bind vertex array object
     glBindVertexArray(this->vao);
+
     // Bind vertex buffer object
     glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
 
     // Set Data to draw
-    glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, this->meshData->Vertices.size() * sizeof(Vertex), this->meshData->Vertices.data(), GL_STATIC_DRAW);
 
-    // Set vertex attributes
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+
+    // vertex position
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+    // vertex color
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Col));
+
+    // vertex normal
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Nor));
+
+    // vertex texture coordinate
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, UV));
 
     // Bind element buffer for indices
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(float), indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->meshData->Indices.size() * sizeof(float), this->meshData->Indices.data(), GL_STATIC_DRAW);
 
-    shader->Use();
-    shader->SetMat4("model", this->model);
+}
+
+void Mesh::Draw() {
+    glBindVertexArray(this->vao);
 
     glPointSize(3.0f);
 
-    // Draw mesh
-    glDrawElements(this->polygonMode, indices.size(), GL_UNSIGNED_INT, 0);
+    this->shader->SetBool("OnlyVertColor", this->drawOnlyVertColors);
+    this->shader->Use();
+    this->shader->SetMat4("model", this->model);
 
+    // Draw mesh
+    glDrawElements(this->polygonMode, this->meshData->Indices.size(), GL_UNSIGNED_INT, 0);
+
+    glBindVertexArray(0);
+
+}
+
+void Mesh::DrawOnlyVertColors(bool option) {
+    this->drawOnlyVertColors = option;
 }
 
 void Mesh::SetPolygonMode(GLenum polygonMode) {
@@ -85,11 +89,11 @@ void Mesh::SetModel(glm::mat4 model) {
 }
 
 std::vector<Vertex> Mesh::GetVertices() {
-    return this->vertices_colors;
+    return this->meshData->Vertices;
 }
 
 std::vector<unsigned int> Mesh::GetIndices() {
-    return this->indices;
+    return this->meshData->Indices;
 }
 
 void Mesh::init() {

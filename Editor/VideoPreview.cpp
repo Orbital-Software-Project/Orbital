@@ -23,9 +23,9 @@ void VideoPreview::OnRender(){
 
     //ImGui::Text("Frames %i / %i", Global::getInstance().FramesProcessed, Global::getInstance().NumFrames);
 
-    if(Global::getInstance().FramePublisher.get() != nullptr) {
+    if(Global::GetInstance().FramePublisher.get() != nullptr) {
 
-        this->videoFrame.UpdateColorMap(Global::getInstance().FramePublisher->draw_frame());
+        this->videoFrame.UpdateColorMap(Global::GetInstance().FramePublisher->draw_frame());
 
         // Get content size of the imgui window
         ImVec2 vMin = ImGui::GetWindowContentRegionMin();

@@ -2,7 +2,7 @@
 
 namespace Orb {
 
-Camera::Camera()  {
+Camera::Camera(std::shared_ptr<Shader> shader)  {
 
     // Init view matrix
     this->view = glm::mat4(1.0f);
@@ -24,7 +24,7 @@ Camera::Camera()  {
     };
 
 
-    this->mesh = std::make_shared<Mesh>(cam_vertices, indices);
+    this->mesh = std::make_shared<Mesh>(shader, std::make_shared<MeshData>(cam_vertices, indices));
 }
 
 Camera::~Camera() {
@@ -40,12 +40,12 @@ void Camera::SetViewMat(glm::mat4 view) {
     this->view = view;
 }
 
-void Camera::Draw(std::shared_ptr<Shader> shader) {
+void Camera::Draw() {
 
     // Update pos of the camera
     this->mesh->SetModel(this->view);
-
-    this->mesh->Draw(shader);
+    this->mesh->DrawOnlyVertColors(true);
+    this->mesh->Draw();
 }
 
 }

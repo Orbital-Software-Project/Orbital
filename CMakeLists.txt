@@ -70,6 +70,8 @@ Set(ENGINE_SRC
 Set(SHADERS
         Shaders/MapViewer.vs
         Shaders/MapViewer.fs
+        Shaders/Mesh.vs
+        Shaders/Mesh.fs
 )
 
 add_library(Engine ${ENGINE_SRC} ${SHADERS})

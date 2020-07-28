@@ -16,7 +16,7 @@ public:
 
     ~SceneRenderer();
 
-    GLuint Render(int width, int height, std::shared_ptr<Shader> shader);
+    GLuint Render(int width, int height);
 
     void AddMesh(std::shared_ptr<Mesh> mesh);
 
@@ -33,7 +33,6 @@ private:
     int width = 800, height = 600;
 
     std::vector<std::shared_ptr<Mesh>> meshes;
-
     std::vector<std::shared_ptr<Camera>> cameras;
 
 };

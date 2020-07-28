@@ -23,16 +23,12 @@
 
 namespace Orb {
 
-
-
-
 Core::Core() {}
 
 Core::~Core() {}
 
 void Core::OnResize(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
-
 }
 
 void Core::Run() {
@@ -84,8 +80,6 @@ void Core::Run() {
     // to prevent 1200x800 from becoming 2400x1600
     glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
 #endif
-
-
 
     window = glfwCreateWindow(1280, 720, "Orbital", nullptr, nullptr);
     if (! window)
@@ -155,8 +149,7 @@ void Core::Run() {
                     }
                     if(ImGui::MenuItem("Import")) {
                         std::string file = Utils::PickFile();
-                        std::shared_ptr<Mesh> newMesh = MeshExporter::Import(file);
-                        mapViewer.AddMesh(newMesh);
+                        mapViewer.ImportMesh(file);
                     }
                     ImGui::EndMenu();
                 }
@@ -194,8 +187,8 @@ void Core::Run() {
                 if(ImGui::Button("Run SLAM")) {
                     slamTask.Run();
 
-                    Global::getInstance().FramePublisher = slamTask.GetFramePublisher();
-                    Global::getInstance().MapPublisher = slamTask.GetMapPublisher();
+                    Global::GetInstance().FramePublisher = slamTask.GetFramePublisher();
+                    Global::GetInstance().MapPublisher = slamTask.GetMapPublisher();
 
                 }
 

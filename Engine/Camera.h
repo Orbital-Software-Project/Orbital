@@ -11,7 +11,7 @@ namespace Orb {
 class Camera {
 
 public:
-    Camera();
+    Camera(std::shared_ptr<Shader> shader);
 
     ~Camera();
 
@@ -19,7 +19,7 @@ public:
 
     void SetViewMat(glm::mat4 view);
 
-    void Draw(std::shared_ptr<Shader> shader);
+    void Draw();
 
 private:
     glm::mat4 view;

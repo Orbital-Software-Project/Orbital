@@ -11,14 +11,12 @@
 #include <openvslam/publish/frame_publisher.h>
 #include <openvslam/publish/map_publisher.h>
 
-
 namespace Orb {
 
 class Global {
 
-
 public: // Singleton
-    static Global& getInstance()
+    static Global& GetInstance()
     {
         static Global instance;
         return instance;

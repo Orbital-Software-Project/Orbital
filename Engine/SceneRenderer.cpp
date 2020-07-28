@@ -19,13 +19,12 @@ SceneRenderer::SceneRenderer()  {
 
 SceneRenderer::~SceneRenderer() {}
 
-GLuint SceneRenderer::Render(int width, int height, std::shared_ptr<Shader> shader) {
+GLuint SceneRenderer::Render(int width, int height) {
 
     // Update framebuffer size when size has changed
     if(this->width != width || this->height != height) {
         this->setFBOSize(width, height);
     }
-
 
     glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
     {
@@ -45,16 +44,12 @@ GLuint SceneRenderer::Render(int width, int height, std::shared_ptr<Shader> shad
 
 
         for(std::shared_ptr<Mesh> mesh : this->meshes) {
-            mesh->Draw(shader);
+            mesh->Draw();
         }
 
         for(std::shared_ptr<Camera> camera : this->cameras) {
-            camera->Draw(shader);
+            camera->Draw();
         }
-
-
-
-
 
     }
 
