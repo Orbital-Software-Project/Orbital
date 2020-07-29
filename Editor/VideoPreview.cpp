@@ -21,8 +21,6 @@ VideoPreview::~VideoPreview() {}
 void VideoPreview::OnRender(){
     ImGui::Begin("Video preview");
 
-    //ImGui::Text("Frames %i / %i", Global::getInstance().FramesProcessed, Global::getInstance().NumFrames);
-
     if(Global::GetInstance().FramePublisher.get() != nullptr) {
 
         this->videoFrame.UpdateColorMap(Global::GetInstance().FramePublisher->draw_frame());
@@ -37,9 +35,7 @@ void VideoPreview::OnRender(){
 
         ImGui::Image((void*)(intptr_t)this->videoFrame.GetTextureID(), vSize);
 
-
     }
-    //ImGui::Text(Global::CurrentVideoFile.c_str());
 
     ImGui::End();
 }

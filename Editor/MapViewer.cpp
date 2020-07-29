@@ -157,7 +157,14 @@ void MapViewer::OnRender() {
 }
 
 void MapViewer::ImportMesh(std::string file) {
-    std::shared_ptr<MeshData> meshdata = MeshExporter::Import(file);
+    //std::vector<std::shared_ptr<MeshData>> meshdata = MeshExporter::Import(file);
+
+    for(std::shared_ptr<MeshData> meshdata : MeshExporter::Import(file)) {
+        std::shared_ptr<Mesh> newMesh = std::make_shared<Mesh>(this->meshShader, meshdata);
+        newMesh->DrawOnlyVertColors(true);
+        //newMesh->SetPolygonMode(GL_LINES);
+        this->renderer->AddMesh(newMesh);
+    }
 
 }
 

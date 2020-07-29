@@ -1,10 +1,15 @@
 cmake_minimum_required(VERSION 2.8.9)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # path to dependencies
 set(CMAKE_TOOLCHAIN_FILE ./ThirdParty/vcpkg-2020.06/scripts/buildsystems/vcpkg.cmake)
 set(openvslam_DIR ./ThirdParty/openvslam/lib/cmake/openvslam)
 set(g2o_DIR ./ThirdParty/g2o/lib/cmake/g2o)
 set(OpenCV_DIR ./ThirdParty/opencv/share/OpenCV)
+set(assimp_DIR ./ThirdParty/assimp/lib/cmake/assimp-5.0)
 
 project(Orbital)
 
@@ -19,9 +24,7 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(unofficial-nativefiledialog CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
-
-find_package(tinyobjloader CONFIG REQUIRED)
-
+find_package(assimp CONFIG REQUIRED)
 
 Set(IMGUI_VERSION "imgui-1.77")
 Set(IMGUI_SRC
@@ -76,7 +79,7 @@ Set(SHADERS
 
 add_library(Engine ${ENGINE_SRC} ${SHADERS})
 target_include_directories(Engine PUBLIC Engine/)
-target_link_libraries(Engine PRIVATE ${OpenCV_LIBS} GLEW::GLEW glm tinyobjloader::tinyobjloader)
+target_link_libraries(Engine PRIVATE ${OpenCV_LIBS} GLEW::GLEW glm assimp::assimp)
 
 
 Set(SRC

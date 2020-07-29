@@ -10,10 +10,6 @@ cd Scripts
 # Install vcpkg
 bash SetupVCPKG.sh
 
-# Install Eigen3
-# Atm vcpkg version is used
-#bash SetupEigen3.sh
-
 # Install OpenCV
 bash SetupOpenCV.sh
 
@@ -28,6 +24,9 @@ bash SetupOpenVSLAM.sh
 
 # Install ImGui
 bash SetupImGui.sh
+
+# Install Assimp
+bash SetupAssimp.sh
 
 # Setup Orbital
 bash SetupOrbital.sh

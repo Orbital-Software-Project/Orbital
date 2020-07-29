@@ -145,11 +145,12 @@ void Core::Run() {
                 if(ImGui::BeginMenu("File")) {
                     if(ImGui::MenuItem("Export")) {
                         std::string file = Utils::SaveFile();
-
                     }
                     if(ImGui::MenuItem("Import")) {
                         std::string file = Utils::PickFile();
-                        mapViewer.ImportMesh(file);
+                        if(file != "") {
+                            mapViewer.ImportMesh(file);
+                        }
                     }
                     ImGui::EndMenu();
                 }
