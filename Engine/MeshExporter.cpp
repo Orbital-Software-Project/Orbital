@@ -1,10 +1,12 @@
 #include "MeshExporter.h"
 
+
 #include <GL/glew.h>
 #include <iostream>
 #include <vector>
 
 #include <random>
+#include <opencv2/core.hpp>
 
 namespace Orb {
 
@@ -14,8 +16,72 @@ MeshExporter::MeshExporter(std::shared_ptr<MeshData> mesh) {
 
 MeshExporter::~MeshExporter() {}
 
-void MeshExporter::Export(std::string file) {
-    std::cout << file << std::endl;
+void MeshExporter::Export(std::string file, std::shared_ptr<Mesh> pointCloud, std::vector<CameraData> cameras) {
+    aiScene scene;
+
+    scene.mRootNode = new aiNode();
+
+    // Create material
+    scene.mMaterials = new aiMaterial*[ 1 ];
+    scene.mMaterials[ 0 ] = nullptr;
+    scene.mNumMaterials = 1;
+    scene.mMaterials[ 0 ] = new aiMaterial();
+
+    // Create mesh
+    scene.mMeshes = new aiMesh*[ 1 ];
+    scene.mMeshes[0] = nullptr;
+    scene.mNumMeshes = 1;
+    scene.mMeshes[0] = new aiMesh();
+    scene.mMeshes[0]->mMaterialIndex = 0;
+
+    // Add mesh to root node
+    scene.mRootNode->mMeshes = new unsigned int[ 1 ];
+    scene.mRootNode->mMeshes[0] = 0;
+    scene.mRootNode->mNumMeshes = 1;
+
+
+    auto pMesh = scene.mMeshes[0];
+
+    // Add vertices to mesh
+    const auto& vVertices = pointCloud->GetVertices();
+    pMesh->mVertices    = new aiVector3D[ vVertices.size() ];
+    pMesh->mNumVertices = vVertices.size();
+    for (auto itr = vVertices.begin(); itr != vVertices.end(); ++itr) {
+        const auto& v = itr->Pos;
+        pMesh->mVertices[ itr - vVertices.begin() ] = aiVector3D( v.x, v.y, v.z );
+    }
+
+    // Add cameras
+    scene.mCameras = new aiCamera*[cameras.size()];
+    scene.mNumCameras = cameras.size();
+    for(int i = 0; i < cameras.size(); i++ ) {
+        scene.mCameras[i] = nullptr;
+        scene.mCameras[i] = new aiCamera();
+
+        // Convert camera pos to position and lookat
+        scene.mCameras[i]->mPosition = aiVector3D(cameras[i].ModelViewMat[3].x, cameras[i].ModelViewMat[3].y, cameras[i].ModelViewMat[3].z);
+        scene.mCameras[i]->mName = std::to_string(i).c_str();
+
+        //find the transformation matrix corresponding to the camera node
+        aiNode* rootNode = scene.mRootNode;
+        aiNode* cameraNode = rootNode->FindNode(scene.mCameras[i]->mName);
+
+        // Assimp matrix is rowmajor whereas glm is column major
+        cameraNode->mTransformation = ;
+
+    }
+
+
+    Assimp::Exporter *exporter = new Assimp::Exporter();
+    exporter->Export(&scene, "obj", file.c_str());
+
+
+
+
+
+
+
+
 }
 
 std::vector<std::shared_ptr<MeshData>> MeshExporter::Import(std::string file) {
@@ -34,7 +100,6 @@ std::vector<std::shared_ptr<MeshData>> MeshExporter::Import(std::string file) {
     std::vector<MeshData> outMeshes;
     MeshExporter::processNode(scene->mRootNode, scene, outMeshes);
 
-
     for(MeshData mesh : outMeshes) {
         meshes.push_back(std::make_shared<MeshData>(mesh));
     }
@@ -48,7 +113,7 @@ void MeshExporter::processNode(aiNode *node, const aiScene *scene, std::vector<M
     for(unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        outMeshes.push_back(processMesh(mesh, scene));
+        outMeshes.push_back(MeshExporter::processMesh(mesh, scene));
     }
 
     // then do the same for each of its children
@@ -99,12 +164,57 @@ MeshData MeshExporter::processMesh(aiMesh *mesh, const aiScene *scene)
             indices.push_back(face.mIndices[j]);
     }
 
-    if(mesh->mMaterialIndex >= 0)
-    {
 
-    }
+    aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-    return MeshData(vertices, indices);
+    std::vector<Texture> textures;
+
+    // 1. diffuse maps
+    std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+
+    // 2. specular maps
+    std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
+    // 3. normal maps
+    std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+    textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+
+    // 4. height maps
+    std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+    textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+
+
+    return MeshData(vertices, indices, textures);
 }
+
+std::vector<Texture> MeshExporter::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
+{
+    std::vector<Texture> textures;
+    for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
+    {
+        aiString str;
+        mat->GetTexture(type, i, &str);
+        // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
+
+        if(true)
+        {   // if texture hasn't been loaded already, load it
+            Texture texture;
+
+            textures.push_back(texture);
+            //texture.UpdateColorMap()
+
+            //texture.id = TextureFromFile(str.C_Str(), this->directory);
+            //texture.type = typeName;
+            //texture.path = str.C_Str();
+            //textures.push_back(texture);
+            //textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+        }
+    }
+    return textures;
+}
+
+
 
 }

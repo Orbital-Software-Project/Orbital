@@ -168,6 +168,21 @@ void MapViewer::ImportMesh(std::string file) {
 
 }
 
+void MapViewer::Export(std::string file) {
+    std::vector<CameraData> cameras;
+
+    std::vector<openvslam::data::keyframe*> keyFrames;
+    Global::GetInstance().MapPublisher->get_keyframes(keyFrames);
+
+    for(openvslam::data::keyframe* kf : keyFrames) {
+        CameraData cam;
+        cam.ModelViewMat = Utils::ToGLM_Mat4f(kf->get_cam_pose_inv().transpose().cast<float>().eval());
+        cameras.push_back(cam);
+    }
+
+    MeshExporter::Export(file, this->pointCloud, cameras);
+}
+
 void MapViewer::updateCameraPos() {
 
     if(Global::GetInstance().MapPublisher.get() == nullptr) {

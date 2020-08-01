@@ -41,6 +41,8 @@ public:
         return res;
     }
 
+
+
     static glm::vec3 ToGLM_Vec3(Eigen::Vector3f vec3) {
         return glm::vec3(vec3(0), vec3(1), vec3(2));
     }

@@ -73,7 +73,6 @@ void Mesh::Draw() {
     glDrawElements(this->polygonMode, this->meshData->Indices.size(), GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
-
 }
 
 void Mesh::DrawOnlyVertColors(bool option) {

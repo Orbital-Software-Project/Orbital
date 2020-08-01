@@ -8,6 +8,10 @@
 
 namespace Orb {
 
+struct CameraData {
+    glm::mat4 ModelViewMat;
+};
+
 class Camera {
 
 public:
@@ -22,7 +26,7 @@ public:
     void Draw();
 
 private:
-    glm::mat4 view;
+    CameraData data;
     std::shared_ptr<Mesh> mesh;
     std::shared_ptr<Shader> shader;
 

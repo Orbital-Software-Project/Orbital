@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Shader.h"
+#include "Texture.h"
 
 #include <vector>
 #include <memory>
@@ -33,7 +34,7 @@ struct Vertex {
 };
 
 struct MeshData {
-    MeshData( std::vector<Vertex> vertices = {}, std::vector<unsigned int> indices = {}) {
+    MeshData( std::vector<Vertex> vertices = {}, std::vector<unsigned int> indices = {}, std::vector<Texture> textures = {}) {
 
         // if indices is empty then generate them
         if(indices.size() <= 0) {
@@ -44,11 +45,14 @@ struct MeshData {
 
         this->Vertices = vertices;
         this->Indices  = indices;
+        this->Textures = textures;
     }
 
     std::vector<Vertex> Vertices;
 
     std::vector<unsigned int> Indices;
+
+    std::vector<Texture> Textures;
 };
 
 class Mesh {
@@ -83,7 +87,6 @@ private:
     unsigned int vbo = 0, vao = 0, ebo = 0;
     GLenum polygonMode = GL_TRIANGLES;
     glm::mat4 model = glm::mat4(1.0f);
-    std::vector<float> uvCollection;
     std::shared_ptr<Shader> shader;
     bool drawOnlyVertColors = false;
 

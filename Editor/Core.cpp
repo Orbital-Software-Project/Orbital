@@ -145,6 +145,7 @@ void Core::Run() {
                 if(ImGui::BeginMenu("File")) {
                     if(ImGui::MenuItem("Export")) {
                         std::string file = Utils::SaveFile();
+                        mapViewer.Export(file);
                     }
                     if(ImGui::MenuItem("Import")) {
                         std::string file = Utils::PickFile();
