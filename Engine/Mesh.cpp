@@ -37,10 +37,9 @@ void Mesh::UpdateColored(std::shared_ptr<MeshData> meshData) {
     // Set Data to draw
     glBufferData(GL_ARRAY_BUFFER, this->meshData->Vertices.size() * sizeof(Vertex), this->meshData->Vertices.data(), GL_STATIC_DRAW);
 
-
     // vertex position
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
 
     // vertex color
     glEnableVertexAttribArray(1);
@@ -58,16 +57,27 @@ void Mesh::UpdateColored(std::shared_ptr<MeshData> meshData) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->meshData->Indices.size() * sizeof(float), this->meshData->Indices.data(), GL_STATIC_DRAW);
 
+    glBindVertexArray(0);
 }
 
 void Mesh::Draw() {
+    if(!this->visible) {
+        return;
+    }
+
     glBindVertexArray(this->vao);
 
+    // Vertex points size
     glPointSize(3.0f);
 
-    this->shader->SetBool("OnlyVertColor", this->drawOnlyVertColors);
     this->shader->Use();
+    this->shader->SetBool("OnlyVertColor", this->drawOnlyVertColors);
     this->shader->SetMat4("model", this->model);
+
+    // TODO: Bind Textures
+    for(std::shared_ptr<Texture> texture : this->meshData->Textures) {
+        texture->Bind();
+    }
 
     // Draw mesh
     glDrawElements(this->polygonMode, this->meshData->Indices.size(), GL_UNSIGNED_INT, 0);
@@ -93,6 +103,10 @@ std::vector<Vertex> Mesh::GetVertices() {
 
 std::vector<unsigned int> Mesh::GetIndices() {
     return this->meshData->Indices;
+}
+
+void Mesh::ToggleHide() {
+    this->visible = !this->visible;
 }
 
 void Mesh::init() {

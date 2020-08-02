@@ -25,11 +25,14 @@ public:
 
     void Draw();
 
+    void ToggleHide();
+
 private:
     CameraData data;
     std::shared_ptr<Mesh> mesh;
     std::shared_ptr<Shader> shader;
 
+    bool visible = true;
 };
 
 }

@@ -20,7 +20,15 @@ public:
 
     void AddMesh(std::shared_ptr<Mesh> mesh);
 
+    void RemoveMesh(std::shared_ptr<Mesh> mesh);
+
     void AddCamera(std::shared_ptr<Camera> camera);
+
+    void RemoveCamera(std::shared_ptr<Camera> camera);
+
+    std::vector<std::shared_ptr<Mesh>> GetMeshes();
+
+    std::vector<std::shared_ptr<Camera>> GetCameras();
 
 private:
     void setFBOSize(int widht, int height);

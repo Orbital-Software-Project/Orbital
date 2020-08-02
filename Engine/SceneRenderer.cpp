@@ -69,6 +69,15 @@ void SceneRenderer::AddCamera(std::shared_ptr<Camera> camera) {
     this->cameras.push_back(camera);
 }
 
+void SceneRenderer::RemoveMesh(std::shared_ptr<Mesh> mesh) {
+    this->meshes.erase(std::remove(this->meshes.begin(), this->meshes.end(), mesh), this->meshes.end());
+}
+
+void SceneRenderer::RemoveCamera(std::shared_ptr<Camera> camera) {
+    this->cameras.erase(std::remove(this->cameras.begin(), this->cameras.end(), camera), this->cameras.end());
+}
+
+
 void SceneRenderer::setFBOSize(int width, int height) {
 
     this->width = width;
@@ -110,6 +119,14 @@ void SceneRenderer::setFBOSize(int width, int height) {
         fputs("Framebuffer Error\n", stderr);
         exit(-1);
     }
+}
+
+std::vector<std::shared_ptr<Mesh>> SceneRenderer::GetMeshes() {
+    return this->meshes;
+}
+
+std::vector<std::shared_ptr<Camera>> SceneRenderer::GetCameras() {
+    return this->cameras;
 }
 
 

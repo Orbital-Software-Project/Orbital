@@ -34,7 +34,9 @@ struct Vertex {
 };
 
 struct MeshData {
-    MeshData( std::vector<Vertex> vertices = {}, std::vector<unsigned int> indices = {}, std::vector<Texture> textures = {}) {
+    MeshData(std::vector<Vertex> vertices = {},
+            std::vector<unsigned int> indices = {},
+            std::vector<std::shared_ptr<Texture>> textures = {}) {
 
         // if indices is empty then generate them
         if(indices.size() <= 0) {
@@ -52,7 +54,8 @@ struct MeshData {
 
     std::vector<unsigned int> Indices;
 
-    std::vector<Texture> Textures;
+    std::vector<std::shared_ptr<Texture>> Textures;
+
 };
 
 class Mesh {
@@ -78,6 +81,8 @@ public:
 
     void DrawOnlyVertColors(bool option);
 
+    void ToggleHide();
+
 
 private:
     void init();
@@ -89,6 +94,7 @@ private:
     glm::mat4 model = glm::mat4(1.0f);
     std::shared_ptr<Shader> shader;
     bool drawOnlyVertColors = false;
+    bool visible = true;
 
 
 };

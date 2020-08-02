@@ -12,59 +12,61 @@
 #include <memory>
 
 #include "Mesh.h"
-#include "MeshExporter.h"
+#include "MeshImporter.h"
 
 namespace Orb {
 
-    enum class TaskStatus {
-        Created,
-        Running,
-        Canceled,
-        Finished,
-        Errored
-    };
+enum class TaskStatus {
+    Created,
+    Running,
+    Canceled,
+    Finished,
+    Errored
+};
 
-    struct TaskReport {
-        TaskReport() : NumFrames(0), FramesProcessed(0), Status(TaskStatus::Created) {}
+struct TaskReport {
+    TaskReport() : NumFrames(0), FramesProcessed(0), Status(TaskStatus::Created) {}
 
-        unsigned int FramesProcessed;
+    unsigned int FramesProcessed;
 
-        unsigned int NumFrames;
+    unsigned int NumFrames;
 
-        TaskStatus Status;
-    };
+    TaskStatus Status;
+};
 
-    class SlamTask {
-        public:
-            SlamTask(std::string videoFile, std::string configFile, std::string vocabFile);
+class SlamTask {
+public:
+    SlamTask() {}
 
-            ~SlamTask();
+    SlamTask(std::string videoFile, std::string configFile, std::string vocabFile);
 
-            void Run();
+    ~SlamTask();
 
-            void Cancel();
+    void Run();
 
-            TaskReport GetReport();
+    void Cancel();
 
-            std::shared_ptr<openvslam::publish::map_publisher> GetMapPublisher();
+    TaskReport GetReport();
 
-            std::shared_ptr<openvslam::publish::frame_publisher> GetFramePublisher();
+    std::shared_ptr<openvslam::publish::map_publisher> GetMapPublisher();
 
-    private:
-            void doSlamAsync();
+    std::shared_ptr<openvslam::publish::frame_publisher> GetFramePublisher();
 
-    private:
-        TaskReport report;
-        std::string videoFile = "", configFile = "", vocabFile = "";
-        std::thread slamTask;
-        bool requestCancel = false;
-        std::mutex reportMutex;
+private:
+    void doSlamAsync();
 
-        std::shared_ptr<openvslam::config> cfg_ptr;
-        std::unique_ptr<openvslam::system> SLAM;
-        std::shared_ptr<openvslam::publish::map_publisher> mapPublisher;
-        std::shared_ptr<openvslam::publish::frame_publisher> framePublisher;
+private:
+    TaskReport report;
+    std::string videoFile = "", configFile = "", vocabFile = "";
+    std::thread slamTask;
+    bool requestCancel = false;
+    std::mutex reportMutex;
+
+    std::shared_ptr<openvslam::config> cfg_ptr;
+    std::unique_ptr<openvslam::system> SLAM;
+    std::shared_ptr<openvslam::publish::map_publisher> mapPublisher;
+    std::shared_ptr<openvslam::publish::frame_publisher> framePublisher;
 
 
-    };
+};
 }

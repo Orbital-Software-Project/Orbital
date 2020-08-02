@@ -20,6 +20,7 @@
 #include "Global.h"
 #include "Utils.hpp"
 #include "SlamTask.h"
+#include "Outliner.h"
 
 namespace Orb {
 
@@ -73,7 +74,7 @@ void Core::Run() {
     glfwGetMonitorContentScale(monitor, &xscale, &yscale);
     if (xscale > 1 || yscale > 1)
     {
-        highDPIscaleFactor = xscale;
+        //highDPIscaleFactor = xscale;
         glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
     }
 #elif __APPLE__
@@ -118,8 +119,13 @@ void Core::Run() {
     std::string cfgFile   = "/home/celvin/Documents/Projects/Orbital/Content/bata-park/config.yaml";
 
     VideoPreview preview;
-    MapViewer mapViewer;
-    SlamTask slamTask(videoFile, cfgFile, vocabFile);
+
+
+    std::shared_ptr<SceneRenderer> renderer = std::make_shared<SceneRenderer>();
+    Outliner outliner(renderer);
+    MapViewer mapViewer(renderer);
+
+    std::unique_ptr<SlamTask> slamTask = std::make_unique<SlamTask>();
 
     while (!glfwWindowShouldClose(window))
     {
@@ -135,8 +141,12 @@ void Core::Run() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+
         preview.OnRender();
+        outliner.OnRender();
         mapViewer.OnRender();
+
+
 
         // Main menubar
         {
@@ -187,19 +197,20 @@ void Core::Run() {
             // SLAM can only be started when files are present
             if(videoFile != "" && cfgFile != "" && vocabFile != "") {
                 if(ImGui::Button("Run SLAM")) {
-                    slamTask.Run();
+                    slamTask = std::make_unique<SlamTask>(videoFile, cfgFile, vocabFile);
+                    slamTask->Run();
 
-                    Global::GetInstance().FramePublisher = slamTask.GetFramePublisher();
-                    Global::GetInstance().MapPublisher = slamTask.GetMapPublisher();
+                    Global::GetInstance().FramePublisher = slamTask->GetFramePublisher();
+                    Global::GetInstance().MapPublisher = slamTask->GetMapPublisher();
 
                 }
 
-                TaskReport report = slamTask.GetReport();
+                TaskReport report = slamTask->GetReport();
                 // Show progressbar and cancel button only when slam is running
                 if(report.Status == TaskStatus::Running) {
                     ImGui::ProgressBar(static_cast<float>(report.FramesProcessed) / static_cast<float>(report.NumFrames));
                     if(ImGui::Button("Cancel")) {
-                        slamTask.Cancel();
+                        slamTask->Cancel();
                     }
                 }
             }

@@ -1,7 +1,7 @@
 #include "MapViewer.h"
 #include "Global.h"
 #include "Utils.hpp"
-#include "MeshExporter.h"
+#include "MeshImporter.h"
 
 #include <stdint.h>
 #include <iostream>
@@ -20,15 +20,15 @@ namespace Orb {
 // https://stackoverflow.com/questions/46541334/opengl-render-to-a-texture
 // https://learnopengl.com/Advanced-OpenGL/Framebuffers
 
-MapViewer::MapViewer() {
+MapViewer::MapViewer(std::shared_ptr<SceneRenderer> renderer) {
+
+    this->renderer = renderer;
 
     // Shader pointcloud
     //this->shader = std::make_shared<Shader>("Shaders/MapViewer.vs", "Shaders/MapViewer.fs");
 
     // Shader model
     this->meshShader = std::make_shared<Shader>("Shaders/Mesh.vs", "Shaders/Mesh.fs");
-
-    this->renderer = std::make_unique<SceneRenderer>();
 
     this->pointCloud = std::make_shared<Mesh>(this->meshShader);
     this->pointCloud->SetPolygonMode(GL_POINTS);
@@ -114,11 +114,26 @@ void MapViewer::OnRender() {
 
                     ImVec2 delta(p0.x - p1.x , p1.y - p0.y);
 
-                    // Rotate camera up or down
-                    this->view = glm::rotate(this->view, glm::radians(delta.y < 0 ? 1.0f : -1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-                    // Rotate left or right
-                    this->view = glm::rotate(this->view, glm::radians(delta.x < 0 ? 1.0f : -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    static float sensitivity = 0.01f;
+
+                    static float yaw = 0;
+                    yaw -= (delta.x * sensitivity);
+
+                    static float pitch = 0;
+                    pitch += (delta.y * sensitivity);
+
+                    if(pitch > 89.0f)
+                        pitch = 89.0f;
+                    if(pitch < -89.0f)
+                        pitch = -89.0f;
+
+                    glm::vec3 direction;
+                    direction.x = std::cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+                    direction.y = std::sin(glm::radians(pitch));
+                    direction.z = std::sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+                    this->cameraFront = glm::normalize(direction);
+
 
                     p1Old = p1;
 
@@ -128,23 +143,30 @@ void MapViewer::OnRender() {
                 dragging = false;
             }
 
+
+            static float cameraSpeed = 0.5f;
+
             // Handle viewport navigation with keys
             if(ImGui::IsKeyPressed(GLFW_KEY_W)) {
-                // Go forward
-                this->view = glm::translate(this->view, glm::vec3(0.0f, 0.0f, 1.0f));
+                this->cameraPos += cameraSpeed * this->cameraFront;
 
             } else if (ImGui::IsKeyPressed(GLFW_KEY_S)) {
-                // Go backward
-                this->view = glm::translate(this->view, glm::vec3(0.0f, 0.0f, -1.0f));
-
-            } else if (ImGui::IsKeyPressed(GLFW_KEY_D)) {
-                // Go left
-                this->view = glm::translate(this->view, glm::vec3(-1.0f, 0.0f, 0.0f));
+                this->cameraPos -= cameraSpeed * this->cameraFront;
 
             } else if (ImGui::IsKeyPressed(GLFW_KEY_A)) {
-                // Go right
-                this->view = glm::translate(this->view, glm::vec3(1.0f, 0.0f, 0.0f));
+                this->cameraPos -= glm::normalize(glm::cross(this->cameraFront, this->cameraUp)) * cameraSpeed;
+
+            } else if (ImGui::IsKeyPressed(GLFW_KEY_D)) {
+                this->cameraPos += glm::normalize(glm::cross(this->cameraFront, this->cameraUp)) * cameraSpeed;
+
+            } else if (ImGui::IsKeyPressed(GLFW_KEY_SPACE)) {
+                this->cameraPos -= glm::vec3(0.0f, 1.0f, 0.0f);
+
+            } else if (ImGui::IsKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
+                this->cameraPos += glm::vec3(0.0f, 1.0f, 0.0f);
             }
+
+            this->view = glm::lookAt(this->cameraPos, this->cameraPos + this->cameraFront, this->cameraUp);
 
         }
     }
@@ -157,11 +179,11 @@ void MapViewer::OnRender() {
 }
 
 void MapViewer::ImportMesh(std::string file) {
-    //std::vector<std::shared_ptr<MeshData>> meshdata = MeshExporter::Import(file);
 
-    for(std::shared_ptr<MeshData> meshdata : MeshExporter::Import(file)) {
+    MeshImporter exporter;
+    for(std::shared_ptr<MeshData> meshdata : exporter.Import(file)) {
         std::shared_ptr<Mesh> newMesh = std::make_shared<Mesh>(this->meshShader, meshdata);
-        newMesh->DrawOnlyVertColors(true);
+        newMesh->DrawOnlyVertColors(false);
         //newMesh->SetPolygonMode(GL_LINES);
         this->renderer->AddMesh(newMesh);
     }
@@ -180,7 +202,9 @@ void MapViewer::Export(std::string file) {
         cameras.push_back(cam);
     }
 
-    MeshExporter::Export(file, this->pointCloud, cameras);
+    MeshImporter exporter;
+
+    exporter.Export(file, this->pointCloud, cameras);
 }
 
 void MapViewer::updateCameraPos() {
@@ -390,14 +414,14 @@ void MapViewer::updatePointCloudMesh() {
         Eigen::Vector3d pos = currLandMark->get_pos_in_world();
 
         Vertex vertLandmarks({
-                                      pos.cast<float>().eval().x(),
-                                      pos.cast<float>().eval().y(),
-                                      pos.cast<float>().eval().z()
-                                  }, {
-                                      1.0f,
-                                      1.0f,
-                                      0.0f  }
-                                  );
+                                 pos.cast<float>().eval().x(),
+                                 pos.cast<float>().eval().y(),
+                                 pos.cast<float>().eval().z()
+                             }, {
+                                 1.0f,
+                                 1.0f,
+                                 0.0f  }
+                             );
 
         vertices.push_back(vertLandmarks);
     }
@@ -411,19 +435,20 @@ void MapViewer::updatePointCloudMesh() {
         Eigen::Vector3d pos = currLandMark->get_pos_in_world();
 
         Vertex vertAllLandmarks({
-                                         pos.cast<float>().eval().x(),
-                                         pos.cast<float>().eval().y(),
-                                         pos.cast<float>().eval().z()
-                                     }, {
-                                         0.0f,
-                                         0.0f,
-                                         1.0f  }
-                                     );
+                                    pos.cast<float>().eval().x(),
+                                    pos.cast<float>().eval().y(),
+                                    pos.cast<float>().eval().z()
+                                }, {
+                                    0.0f,
+                                    0.0f,
+                                    1.0f  }
+                                );
 
         vertices.push_back(vertAllLandmarks);
     }
 
     this->pointCloud->UpdateColored(std::make_shared<MeshData>(vertices));
 }
+
 
 }

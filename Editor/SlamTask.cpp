@@ -9,14 +9,15 @@ SlamTask::SlamTask(std::string videoFile, std::string configFile, std::string vo
     this->configFile = configFile;
     this->vocabFile = vocabFile;
 
-    this->cfg_ptr = std::make_shared<openvslam::config>(this->configFile);
+
 }
 
 SlamTask::~SlamTask() {}
 
 void SlamTask::Run() {
-    this->SLAM = std::make_unique<openvslam::system>(cfg_ptr, this->vocabFile);
+    this->cfg_ptr = std::make_shared<openvslam::config>(this->configFile);
 
+    this->SLAM = std::make_unique<openvslam::system>(cfg_ptr, this->vocabFile);
     this->SLAM->startup();
 
     this->framePublisher = this->SLAM->get_frame_publisher();
@@ -26,7 +27,6 @@ void SlamTask::Run() {
     this->report.Status = TaskStatus::Running;
     this->slamTask      = std::thread(&SlamTask::doSlamAsync, this);
     this->slamTask.detach();
-
 }
 
 void SlamTask::Cancel() {

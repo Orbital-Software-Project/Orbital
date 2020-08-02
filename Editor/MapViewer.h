@@ -17,7 +17,7 @@ namespace Orb {
 class MapViewer {
 
 public:
-    MapViewer();
+    MapViewer(std::shared_ptr<SceneRenderer> renderer);
 
     ~MapViewer();
 
@@ -44,8 +44,13 @@ private:
     std::shared_ptr<Mesh> keyframes;
     std::shared_ptr<Camera> camera;
 
-    std::unique_ptr<SceneRenderer> renderer;
+    std::shared_ptr<SceneRenderer> renderer = nullptr;
     glm::mat4 view = glm::mat4(1.0f);
+
+
+    glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
 };
 

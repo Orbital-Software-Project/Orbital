@@ -25,7 +25,9 @@ Camera::Camera(std::shared_ptr<Shader> shader)  {
     this->mesh = std::make_shared<Mesh>(shader, std::make_shared<MeshData>(cam_vertices, indices));
 }
 
-Camera::~Camera() {}
+Camera::~Camera() {
+
+}
 
 const glm::mat4 Camera::GetViewMat() {
     return data.ModelViewMat;
@@ -36,10 +38,19 @@ void Camera::SetViewMat(glm::mat4 view) {
 }
 
 void Camera::Draw() {
+    if(!this->visible) {
+        return;
+    }
+
     // Update pos of the camera
     this->mesh->SetModel(data.ModelViewMat);
     this->mesh->DrawOnlyVertColors(true);
     this->mesh->Draw();
+
+}
+
+void Camera::ToggleHide() {
+    this->visible = !this->visible;
 }
 
 }
