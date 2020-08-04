@@ -85,13 +85,11 @@ Shader::Shader(std::string vertexPath, std::string fragmentPath)  {
         std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
     };
 
-
-
     // shader Program
     this->programID = glCreateProgram();
     glAttachShader(this->programID, vertex);
     glAttachShader(this->programID, fragment);
-    glLinkProgram(this->programID );
+    glLinkProgram(this->programID);
 
     // print linking errors if any
     glGetProgramiv(this->programID, GL_LINK_STATUS, &success);
@@ -104,8 +102,6 @@ Shader::Shader(std::string vertexPath, std::string fragmentPath)  {
     // delete the shaders as they're linked into our program now and no longer necessary
     glDeleteShader(vertex);
     glDeleteShader(fragment);
-
-
 
 }
 
@@ -128,6 +124,11 @@ void Shader::SetMat4(std::string uniform, glm::mat4 value) {
 void Shader::SetBool(std::string uniform, bool value) {
     int uniformLoc = glGetUniformLocation(this->programID, uniform.c_str());
     glUniform1i(uniformLoc, static_cast<int>(value));
+}
+
+void Shader::SetInt(std::string uniform, int value) {
+    int uniformLoc = glGetUniformLocation(this->programID, uniform.c_str());
+    glUniform1i(uniformLoc, value);
 }
 
 

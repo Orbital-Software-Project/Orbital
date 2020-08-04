@@ -9,10 +9,6 @@ namespace Orb {
 
 MeshImporter::MeshImporter() {}
 
-MeshImporter::MeshImporter(std::shared_ptr<MeshData> mesh) {
-    this->mesh = mesh;
-}
-
 MeshImporter::~MeshImporter() {}
 
 void MeshImporter::Export(std::string file, std::shared_ptr<Mesh> pointCloud, std::vector<CameraData> cameras) {
@@ -72,11 +68,9 @@ void MeshImporter::Export(std::string file, std::shared_ptr<Mesh> pointCloud, st
 
 }
 
-std::vector<std::shared_ptr<MeshData>> MeshImporter::Import(std::string file) {
+std::vector<std::shared_ptr<Mesh>> MeshImporter::Import(std::string file) {
 
     this->currFile = file;
-
-    std::vector<std::shared_ptr<MeshData>> meshes;
 
     Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(file.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -84,26 +78,77 @@ std::vector<std::shared_ptr<MeshData>> MeshImporter::Import(std::string file) {
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-        return std::vector<std::shared_ptr<MeshData>>();
+        return std::vector<std::shared_ptr<Mesh>>();
     }
 
-    std::vector<std::shared_ptr<MeshData>> outMeshes;
+    std::vector<std::shared_ptr<Mesh>> outMeshes;
     MeshImporter::processNode(scene->mRootNode, scene, outMeshes);
 
-    for(std::shared_ptr<MeshData> mesh : outMeshes) {
-        meshes.push_back(mesh);
-    }
-
-    return meshes;
+    return outMeshes;
 }
 
-void MeshImporter::processNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<MeshData>> &outMeshes)
+void MeshImporter::processNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Mesh>> &outMeshes)
 {
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+    std::vector<std::shared_ptr<Texture>> textures;
+
     // process all the node's meshes (if any)
     for(unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        outMeshes.push_back(this->loadMesh(mesh, scene));
+
+        for(unsigned int i = 0; i < mesh->mNumVertices; i++)
+        {
+            vertices.push_back(Vertex({
+                                          mesh->mVertices[i].x,
+                                          mesh->mVertices[i].y,
+                                          mesh->mVertices[i].z
+                                      }, {
+                                          mesh->mColors[0] ? mesh->mColors[0][i].r : 1.0f,
+                                          mesh->mColors[0] ? mesh->mColors[0][i].g : 1.0f,
+                                          mesh->mColors[0] ? mesh->mColors[0][i].b : 1.0f
+                                      }, {
+                                          mesh->mNormals[i].x,
+                                          mesh->mNormals[i].y,
+                                          mesh->mNormals[i].z
+                                      }, {
+                                          mesh->mTextureCoords[0] ? mesh->mTextureCoords[0][i].x : 0.0f,
+                                          mesh->mTextureCoords[0] ? mesh->mTextureCoords[0][i].y : 0.0f
+                                      }
+                                      ));
+        }
+
+        // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
+        for(unsigned int i = 0; i < mesh->mNumFaces; i++)
+        {
+            aiFace face = mesh->mFaces[i];
+            // retrieve all indices of the face and store them in the indices vector
+            for(unsigned int j = 0; j < face.mNumIndices; j++) {
+                indices.push_back(face.mIndices[j]);
+            }
+        }
+
+        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+        // 1. diffuse maps
+        std::vector<std::shared_ptr<Texture>> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+
+        // 2. specular maps
+        std::vector<std::shared_ptr<Texture>> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
+        // 3. normal maps
+        std::vector<std::shared_ptr<Texture>> normalMaps = this->loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+        textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+
+        // 4. height maps
+        std::vector<std::shared_ptr<Texture>> heightMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+        textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+
+
+        outMeshes.push_back(std::make_shared<Mesh>(vertices, indices, textures));
     }
 
     // then do the same for each of its children
@@ -112,70 +157,8 @@ void MeshImporter::processNode(aiNode *node, const aiScene *scene, std::vector<s
         this->processNode(node->mChildren[i], scene, outMeshes);
     }
 
-}
-
-std::shared_ptr<MeshData> MeshImporter::loadMesh(aiMesh *mesh, const aiScene *scene)
-{
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
 
 
-    for(unsigned int i = 0; i < mesh->mNumVertices; i++)
-    {
-        vertices.push_back(Vertex({
-                                      mesh->mVertices[i].x,
-                                      mesh->mVertices[i].y,
-                                      mesh->mVertices[i].z
-                                  }, {
-                                      mesh->mColors[0] ? mesh->mColors[0][i].r : 1.0f,
-                                      mesh->mColors[0] ? mesh->mColors[0][i].g : 1.0f,
-                                      mesh->mColors[0] ? mesh->mColors[0][i].b : 1.0f
-                                  }, {
-                                      mesh->mNormals[i].x,
-                                      mesh->mNormals[i].y,
-                                      mesh->mNormals[i].z
-                                  }, {
-                                      mesh->mTextureCoords[0] ? mesh->mTextureCoords[0][i].x : 0.0f,
-                                      mesh->mTextureCoords[0] ? mesh->mTextureCoords[0][i].y : 0.0f
-                                  }
-                                  ));
-    }
-
-
-    // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
-    for(unsigned int i = 0; i < mesh->mNumFaces; i++)
-    {
-        aiFace face = mesh->mFaces[i];
-        // retrieve all indices of the face and store them in the indices vector
-        for(unsigned int j = 0; j < face.mNumIndices; j++) {
-            indices.push_back(face.mIndices[j]);
-        }
-    }
-
-
-    aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-
-    std::vector<std::shared_ptr<Texture>> textures;
-
-
-    // 1. diffuse maps
-    std::vector<std::shared_ptr<Texture>> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-
-    // 2. specular maps
-    std::vector<std::shared_ptr<Texture>> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-
-    // 3. normal maps
-    std::vector<std::shared_ptr<Texture>> normalMaps = this->loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
-    textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-
-    // 4. height maps
-    std::vector<std::shared_ptr<Texture>> heightMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
-    textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
-
-
-    return std::make_shared<MeshData>(vertices, indices, textures);
 }
 
 std::vector<std::shared_ptr<Texture>> MeshImporter::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
@@ -200,7 +183,7 @@ std::vector<std::shared_ptr<Texture>> MeshImporter::loadMaterialTextures(aiMater
                 // Check if texture is already loaded
                 bool exists = false;
                 for(std::shared_ptr<Texture> tex : textures) {
-                    std::string path = tex->GetFilePath();
+                    std::string path = tex->FilePath;
                     if(std::strcmp(path.c_str(), texturePath.c_str()) == 0) {
                         exists = true;
                         break;

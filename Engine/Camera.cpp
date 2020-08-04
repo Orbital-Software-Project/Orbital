@@ -1,28 +1,14 @@
 #include "Camera.h"
+#include "PrimitiveFactory.h"
 
 namespace Orb {
 
-Camera::Camera(std::shared_ptr<Shader> shader)  {
+Camera::Camera()  {
     // Init view matrix
     data.ModelViewMat = glm::mat4(1.0f);
 
-    std::vector<Vertex> cam_vertices = {
-        Vertex({0.5f,  0.5f, 0.0f},  {1.0f, 1.0f, 1.0f}),
-        Vertex({0.5f, -0.5f, 0.0f},  {1.0f, 1.0f, 1.0f}),
-        Vertex({-0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}),
-        Vertex({-0.5f,  0.5f, 0.0f}, {1.0f, 1.0f, 1.0f})
-    };
 
-    std::vector<unsigned int> indices = {
-        0,
-        1,
-        3,
-        1,
-        2,
-        3
-    };
-
-    this->mesh = std::make_shared<Mesh>(shader, std::make_shared<MeshData>(cam_vertices, indices));
+    this->mesh = PrimitiveFactory::Plane();
 }
 
 Camera::~Camera() {
@@ -37,7 +23,7 @@ void Camera::SetViewMat(glm::mat4 view) {
     data.ModelViewMat = view;
 }
 
-void Camera::Draw() {
+void Camera::Draw(std::shared_ptr<Shader> shader) {
     if(!this->visible) {
         return;
     }
@@ -45,7 +31,7 @@ void Camera::Draw() {
     // Update pos of the camera
     this->mesh->SetModel(data.ModelViewMat);
     this->mesh->DrawOnlyVertColors(true);
-    this->mesh->Draw();
+    this->mesh->Draw(shader);
 
 }
 

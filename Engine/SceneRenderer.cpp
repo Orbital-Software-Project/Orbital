@@ -19,7 +19,7 @@ SceneRenderer::SceneRenderer()  {
 
 SceneRenderer::~SceneRenderer() {}
 
-GLuint SceneRenderer::Render(int width, int height) {
+GLuint SceneRenderer::RenderToTexture(std::shared_ptr<Shader> shader, int width, int height) {
 
     // Update framebuffer size when size has changed
     if(this->width != width || this->height != height) {
@@ -28,29 +28,7 @@ GLuint SceneRenderer::Render(int width, int height) {
 
     glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
     {
-        glViewport(0, 0, width, height);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glEnable(GL_TEXTURE_2D);
-
-        glEnable(GL_DEPTH_TEST);
-
-        // TODO:
-        // - Render from active camera perspective
-        // - Render all meshes
-        // - Only one Shader instance can be used
-
-
-        for(std::shared_ptr<Mesh> mesh : this->meshes) {
-            mesh->Draw();
-        }
-
-        for(std::shared_ptr<Camera> camera : this->cameras) {
-            camera->Draw();
-        }
-
+        this->Render(shader, width, height);
     }
 
     // Switch back to default framebuffer
@@ -59,6 +37,26 @@ GLuint SceneRenderer::Render(int width, int height) {
 
 
     return this->mapTexture;
+}
+
+void SceneRenderer::Render(std::shared_ptr<Shader> shader, int width, int height) {
+    glViewport(0, 0, width, height);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glEnable(GL_TEXTURE_2D);
+
+    glEnable(GL_DEPTH_TEST);
+
+    for(std::shared_ptr<Mesh> mesh : this->meshes) {
+        mesh->Draw(shader);
+    }
+
+    for(std::shared_ptr<Camera> camera : this->cameras) {
+        camera->Draw(shader);
+    }
+
 }
 
 void SceneRenderer::AddMesh(std::shared_ptr<Mesh> mesh) {

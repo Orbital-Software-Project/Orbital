@@ -17,7 +17,7 @@ namespace Orb {
 class MapViewer {
 
 public:
-    MapViewer(std::shared_ptr<SceneRenderer> renderer);
+    MapViewer(std::shared_ptr<SceneRenderer> renderer, std::shared_ptr<Shader> shader);
 
     ~MapViewer();
 
@@ -27,13 +27,11 @@ public:
 
     void Export(std::string file);
 
-
 private:
     void updatePointCloudMesh();
     void updateCameraPos();
     void updateKeyFrames();
     void initGridMesh();
-
 
 private:
     //std::shared_ptr<Shader> shader;

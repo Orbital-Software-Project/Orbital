@@ -13,12 +13,13 @@ namespace Orb {
 class VideoPreview {
 public:
     VideoPreview();
+
     ~VideoPreview();
 
     void OnRender();
 
 private:
-    Texture videoFrame;
+    std::unique_ptr<Texture> videoFrame = nullptr;
 
 };
 

@@ -118,12 +118,14 @@ void Core::Run() {
     std::string vocabFile = "/home/celvin/Documents/Projects/Orbital/Content/orb_vocab/orb_vocab.dbow2";
     std::string cfgFile   = "/home/celvin/Documents/Projects/Orbital/Content/bata-park/config.yaml";
 
+    std::shared_ptr<Shader> shader = std::make_shared<Shader>("Shaders/Mesh.vs", "Shaders/Mesh.fs");
+    std::shared_ptr<SceneRenderer> renderer = std::make_shared<SceneRenderer>();
+
     VideoPreview preview;
 
 
-    std::shared_ptr<SceneRenderer> renderer = std::make_shared<SceneRenderer>();
     Outliner outliner(renderer);
-    MapViewer mapViewer(renderer);
+    MapViewer mapViewer(renderer, shader);
 
     std::unique_ptr<SlamTask> slamTask = std::make_unique<SlamTask>();
 

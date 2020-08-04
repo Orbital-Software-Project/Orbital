@@ -15,7 +15,7 @@ struct CameraData {
 class Camera {
 
 public:
-    Camera(std::shared_ptr<Shader> shader);
+    Camera();
 
     ~Camera();
 
@@ -23,14 +23,13 @@ public:
 
     void SetViewMat(glm::mat4 view);
 
-    void Draw();
+    void Draw(std::shared_ptr<Shader> shader);
 
     void ToggleHide();
 
 private:
     CameraData data;
     std::shared_ptr<Mesh> mesh;
-    std::shared_ptr<Shader> shader;
 
     bool visible = true;
 };

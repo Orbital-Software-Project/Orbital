@@ -14,7 +14,11 @@
 
 namespace Orb {
 
-VideoPreview::VideoPreview() {}
+VideoPreview::VideoPreview() {
+
+    this->videoFrame = std::make_unique<Texture>();
+
+}
 
 VideoPreview::~VideoPreview() {}
 
@@ -23,7 +27,7 @@ void VideoPreview::OnRender(){
 
     if(Global::GetInstance().FramePublisher.get() != nullptr) {
 
-        this->videoFrame.UpdateColorMap(Global::GetInstance().FramePublisher->draw_frame());
+        this->videoFrame->UpdateTexture(Global::GetInstance().FramePublisher->draw_frame());
 
         // Get content size of the imgui window
         ImVec2 vMin = ImGui::GetWindowContentRegionMin();
@@ -32,8 +36,7 @@ void VideoPreview::OnRender(){
         // get current size of the imgui window
         ImVec2 vSize = ImVec2(vMax.x - vMin.x, vMax.y - vMin.y - 50);
 
-
-        ImGui::Image((void*)(intptr_t)this->videoFrame.GetTextureID(), vSize);
+        ImGui::Image((void*)(intptr_t)this->videoFrame->GetTextureID(), vSize);
 
     }
 

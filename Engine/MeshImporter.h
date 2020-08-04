@@ -19,18 +19,14 @@ class MeshImporter {
 public:
     MeshImporter();
 
-    MeshImporter(std::shared_ptr<MeshData> mesh);
-
     ~MeshImporter();
 
     void Export(std::string file, std::shared_ptr<Mesh> pointCloud, std::vector<CameraData> cameras);
 
-    std::vector<std::shared_ptr<MeshData>> Import(std::string file);
+    std::vector<std::shared_ptr<Mesh>> Import(std::string file);
 
 private:
-    void processNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<MeshData>> &outMeshes);
-
-    std::shared_ptr<MeshData> loadMesh(aiMesh *mesh, const aiScene *scene);
+    void processNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Mesh>> &outMeshes);
 
     std::vector<std::shared_ptr<Texture>> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
 
@@ -42,7 +38,6 @@ private:
 
 private:
     std::string currFile = "";
-    std::shared_ptr<MeshData> mesh;
 };
 
 }

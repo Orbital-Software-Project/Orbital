@@ -3,6 +3,8 @@
 #include "Utils.hpp"
 #include "MeshImporter.h"
 
+#include "PrimitiveFactory.h"
+
 #include <stdint.h>
 #include <iostream>
 
@@ -20,7 +22,7 @@ namespace Orb {
 // https://stackoverflow.com/questions/46541334/opengl-render-to-a-texture
 // https://learnopengl.com/Advanced-OpenGL/Framebuffers
 
-MapViewer::MapViewer(std::shared_ptr<SceneRenderer> renderer) {
+MapViewer::MapViewer(std::shared_ptr<SceneRenderer> renderer, std::shared_ptr<Shader> shader) {
 
     this->renderer = renderer;
 
@@ -28,17 +30,17 @@ MapViewer::MapViewer(std::shared_ptr<SceneRenderer> renderer) {
     //this->shader = std::make_shared<Shader>("Shaders/MapViewer.vs", "Shaders/MapViewer.fs");
 
     // Shader model
-    this->meshShader = std::make_shared<Shader>("Shaders/Mesh.vs", "Shaders/Mesh.fs");
+    this->meshShader = shader;
 
-    this->pointCloud = std::make_shared<Mesh>(this->meshShader);
+    this->pointCloud = std::make_shared<Mesh>();
     this->pointCloud->SetPolygonMode(GL_POINTS);
     this->pointCloud->DrawOnlyVertColors(true);
     this->renderer->AddMesh(this->pointCloud);
 
-    this->camera = std::make_shared<Camera>(this->meshShader);
+    this->camera = std::make_shared<Camera>();
     this->renderer->AddCamera(this->camera);
 
-    this->keyframes = std::make_shared<Mesh>(this->meshShader);
+    this->keyframes = std::make_shared<Mesh>();
     this->keyframes->DrawOnlyVertColors(true);
     this->keyframes->SetPolygonMode(GL_LINE_STRIP);
     this->renderer->AddMesh(this->keyframes);
@@ -82,7 +84,7 @@ void MapViewer::OnRender() {
     ImGui::BeginChild("DragPanel", vSize, false, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
 
     // Draw opengl texture (viewport) as imgui image
-    ImGui::Image((void*)(intptr_t)this->renderer->Render(vSize.x, vSize.y), vSize);
+    ImGui::Image((void*)(intptr_t)this->renderer->RenderToTexture(this->meshShader, vSize.x, vSize.y), vSize);
 
 
     // ImGui Viewport navigation
@@ -123,10 +125,8 @@ void MapViewer::OnRender() {
                     static float pitch = 0;
                     pitch += (delta.y * sensitivity);
 
-                    if(pitch > 89.0f)
-                        pitch = 89.0f;
-                    if(pitch < -89.0f)
-                        pitch = -89.0f;
+                    if(pitch > 89.0f) { pitch = 89.0f; }
+                    if(pitch < -89.0f) { pitch = -89.0f; }
 
                     glm::vec3 direction;
                     direction.x = std::cos(glm::radians(yaw)) * cos(glm::radians(pitch));
@@ -144,7 +144,7 @@ void MapViewer::OnRender() {
             }
 
 
-            static float cameraSpeed = 0.5f;
+            static float cameraSpeed = 0.1f;
 
             // Handle viewport navigation with keys
             if(ImGui::IsKeyPressed(GLFW_KEY_W)) {
@@ -160,10 +160,10 @@ void MapViewer::OnRender() {
                 this->cameraPos += glm::normalize(glm::cross(this->cameraFront, this->cameraUp)) * cameraSpeed;
 
             } else if (ImGui::IsKeyPressed(GLFW_KEY_SPACE)) {
-                this->cameraPos -= glm::vec3(0.0f, 1.0f, 0.0f);
+                this->cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
 
             } else if (ImGui::IsKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
-                this->cameraPos += glm::vec3(0.0f, 1.0f, 0.0f);
+                this->cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
             }
 
             this->view = glm::lookAt(this->cameraPos, this->cameraPos + this->cameraFront, this->cameraUp);
@@ -181,11 +181,9 @@ void MapViewer::OnRender() {
 void MapViewer::ImportMesh(std::string file) {
 
     MeshImporter exporter;
-    for(std::shared_ptr<MeshData> meshdata : exporter.Import(file)) {
-        std::shared_ptr<Mesh> newMesh = std::make_shared<Mesh>(this->meshShader, meshdata);
-        newMesh->DrawOnlyVertColors(false);
-        //newMesh->SetPolygonMode(GL_LINES);
-        this->renderer->AddMesh(newMesh);
+    for(std::shared_ptr<Mesh> meshdata : exporter.Import(file)) {
+        meshdata->DrawOnlyVertColors(false);
+        this->renderer->AddMesh(std::move(meshdata));
     }
 
 }
@@ -208,7 +206,6 @@ void MapViewer::Export(std::string file) {
 }
 
 void MapViewer::updateCameraPos() {
-
     if(Global::GetInstance().MapPublisher.get() == nullptr) {
         return;
     }
@@ -217,7 +214,6 @@ void MapViewer::updateCameraPos() {
     glm::mat4 converted = Utils::ToGLM_Mat4f(camera_pos_wc);
 
     this->camera->SetViewMat(converted);
-
 }
 
 void MapViewer::updateKeyFrames() {
@@ -230,32 +226,25 @@ void MapViewer::updateKeyFrames() {
     Global::GetInstance().MapPublisher->get_keyframes(keyFrames);
 
     std::vector<Vertex> vertices;
-
     const auto draw_edge = [&](const openvslam::Vec3_t& cam_center_1, const openvslam::Vec3_t& cam_center_2) {
-        //glVertex3fv(cam_center_1.cast<float>().eval().data());
-        //glVertex3fv(cam_center_2.cast<float>().eval().data());
-
-
         vertices.push_back(
-                    Vertex(
-        {cam_center_1.cast<float>().x(),
-         cam_center_1.cast<float>().y(),
-         cam_center_1.cast<float>().z()},
-        {0.0f, 1.0f, 1.0f}
-                        )
+                    Vertex({
+                               cam_center_1.cast<float>().x(),
+                               cam_center_1.cast<float>().y(),
+                               cam_center_1.cast<float>().z()
+                           }, {
+                               0.0f, 1.0f, 1.0f
+                           })
                     );
 
-        //vertices.push_back(cam_center_1.cast<float>().y());
-        //vertices.push_back(cam_center_1.cast<float>().z());
-        //indices.push_back(indices.size());
-
         vertices.push_back(
-                    Vertex(
-        {cam_center_2.cast<float>().x(),
-         cam_center_2.cast<float>().y(),
-         cam_center_2.cast<float>().z()},
-        {0.0f, 1.0f, 1.0f}
-                        )
+                    Vertex({
+                               cam_center_2.cast<float>().x(),
+                               cam_center_2.cast<float>().y(),
+                               cam_center_2.cast<float>().z()
+                           },{
+                               0.0f, 1.0f, 1.0f
+                           })
                     );
     };
 
@@ -302,87 +291,16 @@ void MapViewer::updateKeyFrames() {
         }
     }
 
-    this->keyframes->UpdateColored(std::make_shared<MeshData>(vertices));
+    this->keyframes->UpdateColored(vertices);
 
 }
 
 void MapViewer::initGridMesh() {
     std::vector<float> gridVerticies;
 
-    constexpr float interval_ratio = 0.1;
-    constexpr float grid_min       = -100.0f * interval_ratio;
-    constexpr float grid_max       = 100.0f  * interval_ratio;
 
 
-    std::vector<Vertex> gridVertices_color;
-
-    for (int x = -10; x <= 10; x += 1) {
-        Vertex vertex(
-        {
-                        x * 10.0f * interval_ratio,
-                        0.0f,
-                        grid_min
-                    },
-        {
-                        0.0f,
-                        1.0f,
-                        0.0f
-                    }
-                    );
-
-        gridVertices_color.push_back(vertex);
-
-
-        Vertex vertex1(
-        {
-                        x * 10.0f * interval_ratio,
-                        0.0f,
-                        grid_max
-                    },
-        {
-                        0.0f,
-                        1.0f,
-                        0.0f
-                    }
-                    );
-
-
-        gridVertices_color.push_back(vertex1);
-    }
-
-    for (int z = -10; z <= 10; z += 1) {
-
-        //Vertex vert1;
-        Vertex vertex(
-        {
-                        grid_min,
-                        0.0f,
-                        z * 10.0f * interval_ratio},
-        {
-                        0.0f,
-                        1.0f,
-                        0.0f
-                    }
-                    );
-
-
-        gridVertices_color.push_back(vertex);
-
-        Vertex vertex2({
-                           grid_max,
-                           0.0f,
-                           z * 10.0f * interval_ratio
-                       }, {
-                           0.0f,
-                           1.0f,
-                           0.0f
-                       });
-
-        gridVertices_color.push_back(vertex2);
-
-    }
-
-    this->gridMesh = std::make_shared<Mesh>(this->meshShader, std::make_shared<MeshData>(gridVertices_color));
+    this->gridMesh = PrimitiveFactory::Grid();
     this->gridMesh->SetPolygonMode(GL_LINES);
     this->gridMesh->DrawOnlyVertColors(true);
     this->renderer->AddMesh(this->gridMesh);
@@ -447,7 +365,7 @@ void MapViewer::updatePointCloudMesh() {
         vertices.push_back(vertAllLandmarks);
     }
 
-    this->pointCloud->UpdateColored(std::make_shared<MeshData>(vertices));
+    this->pointCloud->UpdateColored(vertices);
 }
 
 

@@ -1,7 +1,13 @@
 #pragma once
 
 #include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+
 #include <GL/glew.h>
+
+#include "Shader.h"
+
+#include <iostream>
 
 namespace Orb {
 
@@ -22,18 +28,23 @@ public:
 
     std::string GetFilePath();
 
-    void UpdateColorMap(cv::Mat newColorMap);
+    void UpdateTexture(cv::Mat data);
 
-    void Bind();
+    void Bind(std::shared_ptr<Shader> shader);
+
+public:
+    GLuint ID = 0;
+
+    cv::Mat Data = cv::Mat();
+
+    std::string FilePath = "";
 
 private:
     void init();
 
 private:
-    std::string filePath = "";
-    cv::Mat colorMap = cv::Mat();
-    GLuint textureID = 0;
     bool initialized = false;
+
 
 };
 

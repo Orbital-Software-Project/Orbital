@@ -1,55 +1,55 @@
 #include "Texture.h"
 
-#include <opencv2/imgcodecs.hpp>
+
 #include <opencv2/imgproc.hpp>
 #include <iostream>
 
 namespace Orb {
 
 Texture::Texture() {
+
     this->init();
 }
 
-Texture::Texture(std::string file) {
-    this->filePath = file;
-
+Texture::Texture(std::string filepath) {
     this->init();
-    cv::Mat imageData = cv::imread(file.c_str());
-    this->UpdateColorMap(imageData);
+    this->FilePath = filepath;
+    this->UpdateTexture(cv::imread(filepath));
 }
 
 Texture::Texture(cv::Mat colorMap) {
 
     this->init();
-    this->UpdateColorMap(colorMap);
+    this->UpdateTexture(colorMap);
 }
 
 Texture::~Texture() {
     if(this->initialized) {
-        glDeleteTextures(1, &this->textureID);
+        glDeleteTextures(1, &this->ID);
     }
-    this->colorMap.release();
 }
 
 const cv::Mat Texture::GetColorMap() {
-    return this->colorMap;
+    return this->Data;
 }
 
 std::string Texture::GetFilePath() {
-    return this->filePath;
+    return this->FilePath;
 }
 
 GLuint Texture::GetTextureID() {
-    return this->textureID;
+    return this->ID;
 }
 
-void Texture::UpdateColorMap(cv::Mat newColorMap) {
+void Texture::UpdateTexture(cv::Mat data) {
     if(this->initialized) {
 
-        // Rotate texture
-        cv::rotate(newColorMap, this->colorMap, cv::ROTATE_90_CLOCKWISE);
+        this->Data = data.clone();
 
-        glBindTexture(GL_TEXTURE_2D, this->textureID);
+        // Rotate texture
+        // cv::rotate(textureData->Data, textureData->Data, cv::ROTATE_90_CLOCKWISE);
+
+        glBindTexture(GL_TEXTURE_2D, this->ID);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -59,10 +59,10 @@ void Texture::UpdateColorMap(cv::Mat newColorMap) {
 
         // Set image data alignment
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, this->colorMap.step / this->colorMap.elemSize());
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, this->Data.step / this->Data.elemSize());
 
-        int cols = this->colorMap.cols;
-        int rows = this->colorMap.rows;
+        int cols = this->Data.cols;
+        int rows = this->Data.rows;
 
         glTexImage2D(GL_TEXTURE_2D,       // Type of texture
                      0,                   // Pyramid level (for mip-mapping) - 0 is the top level
@@ -72,24 +72,26 @@ void Texture::UpdateColorMap(cv::Mat newColorMap) {
                      0,                   // Border width in pixels (can either be 1 or 0)
                      GL_BGR,              // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
                      GL_UNSIGNED_BYTE,    // Image data type
-                     this->colorMap.ptr() // The actual image data itself
+                     this->Data.ptr() // The actual image data itself
                      );
 
         glGenerateMipmap(GL_TEXTURE_2D);
     }
 }
 
-void Texture::Bind() {
+void Texture::Bind(std::shared_ptr<Shader> shader) {
     if(this->initialized) {
+        shader->SetInt("Texture", 0);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, this->textureID);
+
+        glBindTexture(GL_TEXTURE_2D, this->ID);
     }
 }
 
 void Texture::init() {
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    glGenTextures(1, &this->textureID);
-    this->initialized = this->textureID > 0;
+    glGenTextures(1, &this->ID);
+    this->initialized = this->ID > 0;
 }
 
 }

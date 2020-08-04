@@ -20,6 +20,8 @@ public:
 
     void SetBool(std::string uniform, bool value);
 
+    void SetInt(std::string uniform, int value);
+
 private:
     unsigned int programID;
 

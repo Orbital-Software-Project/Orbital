@@ -16,7 +16,9 @@ public:
 
     ~SceneRenderer();
 
-    GLuint Render(int width, int height);
+    GLuint RenderToTexture(std::shared_ptr<Shader> shader,int width, int height);
+
+    void Render(std::shared_ptr<Shader> shader, int width, int height);
 
     void AddMesh(std::shared_ptr<Mesh> mesh);
 
