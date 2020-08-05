@@ -73,7 +73,18 @@ std::vector<std::shared_ptr<Mesh>> MeshImporter::Import(std::string file) {
     this->currFile = file;
 
     Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(file.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene *scene = importer.ReadFile(file.c_str(),
+                                             aiProcess_Triangulate |
+                                             aiProcess_FlipUVs |
+                                             aiProcess_JoinIdenticalVertices |
+                                             aiProcess_ValidateDataStructure|
+                                             aiProcess_FixInfacingNormals |
+                                             aiProcess_FindDegenerates |
+                                             aiProcess_FindInvalidData |
+                                             aiProcess_GenNormals |
+                                             aiProcess_CalcTangentSpace |
+                                             aiProcess_PreTransformVertices
+                                             );
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -84,11 +95,13 @@ std::vector<std::shared_ptr<Mesh>> MeshImporter::Import(std::string file) {
     std::vector<std::shared_ptr<Mesh>> outMeshes;
     MeshImporter::processNode(scene->mRootNode, scene, outMeshes);
 
+
     return outMeshes;
 }
 
 void MeshImporter::processNode(aiNode *node, const aiScene *scene, std::vector<std::shared_ptr<Mesh>> &outMeshes)
 {
+
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     std::vector<std::shared_ptr<Texture>> textures;
@@ -97,6 +110,7 @@ void MeshImporter::processNode(aiNode *node, const aiScene *scene, std::vector<s
     for(unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+
 
         for(unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
@@ -147,8 +161,9 @@ void MeshImporter::processNode(aiNode *node, const aiScene *scene, std::vector<s
         std::vector<std::shared_ptr<Texture>> heightMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
+        std::shared_ptr<Mesh> orbMesh = std::make_shared<Mesh>(vertices, indices, textures);
 
-        outMeshes.push_back(std::make_shared<Mesh>(vertices, indices, textures));
+        outMeshes.push_back(std::move(orbMesh));
     }
 
     // then do the same for each of its children
@@ -167,7 +182,6 @@ std::vector<std::shared_ptr<Texture>> MeshImporter::loadMaterialTextures(aiMater
     std::vector<std::shared_ptr<Texture>> textures;
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
     {
-
         aiString fileName;
         auto res = aiGetMaterialTexture(mat, type, i, &fileName);
 
@@ -178,7 +192,6 @@ std::vector<std::shared_ptr<Texture>> MeshImporter::loadMaterialTextures(aiMater
 
             // For the moment only load color data/diffuse map: normal maps etc. are not supported
             if(type == aiTextureType_DIFFUSE) {
-
 
                 // Check if texture is already loaded
                 bool exists = false;

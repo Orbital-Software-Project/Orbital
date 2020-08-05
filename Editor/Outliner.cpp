@@ -2,6 +2,8 @@
 
 #include <imgui.h>
 
+#include "Global.h"
+
 namespace Orb {
 
 Outliner::Outliner(std::shared_ptr<SceneRenderer> renderer) {
@@ -35,6 +37,15 @@ void Outliner::OnRender(){
                 if(ImGui::Button("Hide")) {
                     mesh->ToggleHide();
                 }
+                ImGui::SameLine();
+                if(ImGui::Button("Properties")) {
+                    auto list = Global::GetInstance().MeshProperties;
+                    bool found = (std::find(list.begin(), list.end(), mesh) != list.end());
+                    if(!found) {
+                        Global::GetInstance().MeshProperties.push_back(mesh);
+                    }
+                }
+
 
                 ImGui::PopID();
             }

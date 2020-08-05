@@ -21,6 +21,7 @@
 #include "Utils.hpp"
 #include "SlamTask.h"
 #include "Outliner.h"
+#include "PropertyEditor.h"
 
 namespace Orb {
 
@@ -122,10 +123,11 @@ void Core::Run() {
     std::shared_ptr<SceneRenderer> renderer = std::make_shared<SceneRenderer>();
 
     VideoPreview preview;
-
-
     Outliner outliner(renderer);
     MapViewer mapViewer(renderer, shader);
+
+    PropertyEditor propertyEd;
+
 
     std::unique_ptr<SlamTask> slamTask = std::make_unique<SlamTask>();
 
@@ -137,7 +139,6 @@ void Core::Run() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-
         // feed inputs to dear imgui, start new frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -147,8 +148,7 @@ void Core::Run() {
         preview.OnRender();
         outliner.OnRender();
         mapViewer.OnRender();
-
-
+        propertyEd.OnRender();
 
         // Main menubar
         {

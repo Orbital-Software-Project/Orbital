@@ -101,6 +101,10 @@ void Mesh::SetModel(glm::mat4 model) {
     this->model = model;
 }
 
+glm::mat4 Mesh::GetModel() {
+    return this->model;
+}
+
 std::vector<Vertex> Mesh::GetVertices() {
     return this->Vertices;
 }

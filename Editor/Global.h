@@ -11,6 +11,8 @@
 #include <openvslam/publish/frame_publisher.h>
 #include <openvslam/publish/map_publisher.h>
 
+#include "Mesh.h"
+
 namespace Orb {
 
 class Global {
@@ -33,6 +35,8 @@ public:
     std::shared_ptr<openvslam::publish::map_publisher> MapPublisher;
 
     std::shared_ptr<openvslam::publish::frame_publisher> FramePublisher;
+
+    std::vector<std::shared_ptr<Mesh>> MeshProperties;
 
 };
 

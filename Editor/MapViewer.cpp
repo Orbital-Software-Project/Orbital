@@ -117,7 +117,7 @@ void MapViewer::OnRender() {
                     ImVec2 delta(p0.x - p1.x , p1.y - p0.y);
 
 
-                    static float sensitivity = 0.01f;
+                    static float sensitivity = 0.1f;
 
                     static float yaw = 0;
                     yaw -= (delta.x * sensitivity);
@@ -144,7 +144,7 @@ void MapViewer::OnRender() {
             }
 
 
-            static float cameraSpeed = 0.1f;
+            static float cameraSpeed = 0.5f;
 
             // Handle viewport navigation with keys
             if(ImGui::IsKeyPressed(GLFW_KEY_W)) {
