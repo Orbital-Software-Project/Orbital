@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Shader.h"
+#include "IEntity.h"
+
 #include "Texture.h"
 
 #include <vector>
@@ -34,7 +35,7 @@ struct Vertex {
 
 };
 
-class Mesh {
+class Mesh : public IEntity {
 
 public:
     Mesh();
@@ -45,13 +46,8 @@ public:
 
     void UpdateColored(std::vector<Vertex> vertices = {}, std::vector<unsigned int> indices = {}, std::vector<std::shared_ptr<Texture>> textures = {});
 
-    void Draw(std::shared_ptr<Shader> shader);
 
     void SetPolygonMode(GLenum polygonMode);
-
-    void SetModel(glm::mat4 model);
-
-    glm::mat4 GetModel();
 
     std::vector<Vertex> GetVertices();
 
@@ -59,7 +55,17 @@ public:
 
     void DrawOnlyVertColors(bool option);
 
-    void ToggleHide();
+
+    virtual void SetMatrix(glm::mat4 model);
+
+    virtual glm::mat4 GetMatrix();
+
+    virtual void Draw(std::shared_ptr<Shader> shader);
+
+    virtual void SetVisible(bool visible);
+
+    virtual bool IsVisible();
+
 
 public:
     std::vector<Vertex> Vertices;

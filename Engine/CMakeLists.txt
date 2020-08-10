@@ -29,6 +29,7 @@ target_include_directories(ImGui PUBLIC ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_V
 target_link_libraries(ImGui PRIVATE glfw GLEW::GLEW)
 
 Set(ENGINE_SRC
+        IEntity.h
         Texture.h
         Texture.cpp
         Shader.h

@@ -11,7 +11,7 @@
 #include <openvslam/publish/frame_publisher.h>
 #include <openvslam/publish/map_publisher.h>
 
-#include "Mesh.h"
+#include "IEntity.h"
 
 namespace Orb {
 
@@ -36,7 +36,7 @@ public:
 
     std::shared_ptr<openvslam::publish::frame_publisher> FramePublisher;
 
-    std::vector<std::shared_ptr<Mesh>> MeshProperties;
+    std::vector<std::shared_ptr<IEntity>> MeshProperties;
 
 };
 

@@ -149,6 +149,28 @@ std::shared_ptr<Mesh> PrimitiveFactory::Plane(){
     return std::make_shared<Mesh>(cam_vertices, indices);
 }
 
+
+std::shared_ptr<Mesh> PrimitiveFactory::SizedPlane(float width, float height) {
+
+    std::vector<Vertex> cam_vertices = {
+        Vertex({ width,  height, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f}),
+        Vertex({ width, -height, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f}),
+        Vertex({-width, -height, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f}),
+        Vertex({-width,  height, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f})
+    };
+
+    std::vector<unsigned int> indices = {
+        0,
+        1,
+        3,
+        1,
+        2,
+        3
+    };
+
+    return std::make_shared<Mesh>(cam_vertices, indices);
+}
+
 }
 
 

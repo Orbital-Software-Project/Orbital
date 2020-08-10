@@ -65,6 +65,22 @@ void Mesh::UpdateColored(std::vector<Vertex> vertices, std::vector<unsigned int>
     glBindVertexArray(0);
 }
 
+void Mesh::DrawOnlyVertColors(bool option) {
+    this->drawOnlyVertColors = option;
+}
+
+void Mesh::SetPolygonMode(GLenum polygonMode) {
+    this->polygonMode = polygonMode;
+}
+
+std::vector<Vertex> Mesh::GetVertices() {
+    return this->Vertices;
+}
+
+std::vector<unsigned int> Mesh::GetIndices() {
+    return this->Indices;
+}
+
 void Mesh::Draw(std::shared_ptr<Shader> shader) {
     if(!this->visible) {
         return;
@@ -89,32 +105,20 @@ void Mesh::Draw(std::shared_ptr<Shader> shader) {
     glBindVertexArray(0);
 }
 
-void Mesh::DrawOnlyVertColors(bool option) {
-    this->drawOnlyVertColors = option;
-}
-
-void Mesh::SetPolygonMode(GLenum polygonMode) {
-    this->polygonMode = polygonMode;
-}
-
-void Mesh::SetModel(glm::mat4 model) {
+void Mesh::SetMatrix(glm::mat4 model) {
     this->model = model;
 }
 
-glm::mat4 Mesh::GetModel() {
+glm::mat4 Mesh::GetMatrix() {
     return this->model;
 }
 
-std::vector<Vertex> Mesh::GetVertices() {
-    return this->Vertices;
+bool Mesh::IsVisible() {
+    return this->visible;
 }
 
-std::vector<unsigned int> Mesh::GetIndices() {
-    return this->Indices;
-}
-
-void Mesh::ToggleHide() {
-    this->visible = !this->visible;
+void Mesh::SetVisible(bool visible) {
+    this->visible = visible;
 }
 
 void Mesh::init() {

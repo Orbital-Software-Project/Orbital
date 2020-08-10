@@ -1,7 +1,7 @@
 #pragma once
 
+#include "IEntity.h"
 #include "Mesh.h"
-#include "Shader.h"
 
 #include <glm/glm.hpp>
 #include <memory>
@@ -12,26 +12,28 @@ struct CameraData {
     glm::mat4 ModelViewMat;
 };
 
-class Camera {
+class Camera : public IEntity {
 
 public:
     Camera();
 
     ~Camera();
 
-    const glm::mat4 GetViewMat();
+    virtual void Draw(std::shared_ptr<Shader> shader);
 
-    void SetViewMat(glm::mat4 view);
+    virtual void SetVisible(bool visible);
 
-    void Draw(std::shared_ptr<Shader> shader);
+    virtual bool IsVisible();
 
-    void ToggleHide();
+    virtual void SetMatrix(glm::mat4 matrix);
+
+    virtual glm::mat4 GetMatrix();
 
 private:
     CameraData data;
     std::shared_ptr<Mesh> mesh;
-
     bool visible = true;
+
 };
 
 }

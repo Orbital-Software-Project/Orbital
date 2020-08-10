@@ -3,8 +3,11 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "SceneRenderer.h"
 #include "Shader.h"
+#include "PrimitiveFactory.h"
 
 void OnResize(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -12,7 +15,6 @@ void OnResize(GLFWwindow *window, int width, int height) {
 
 int main(int argc, char *argv[]) {
 	std::cout << "Model viewer example" << std::endl;
-
 
     GLFWwindow* window = nullptr;
 
@@ -97,6 +99,13 @@ int main(int argc, char *argv[]) {
 
         GLint m_viewport[4];
         glGetIntegerv(GL_VIEWPORT, m_viewport);
+
+
+        std::shared_ptr<Orb::Mesh> cube = Orb::PrimitiveFactory::Cube();
+        renderer->AddEntity(cube);
+
+        //shader->SetMat4("projection", glm::perspective(45, ))
+
 
 
 

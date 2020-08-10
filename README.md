@@ -5,7 +5,7 @@
 
 
  TODO to first prototype:
- - individual model transformation (translation, rotation, scale)
+ - individual model transformation (translation, rotation, scale) [partially done]
  - Video background in mapviewer
  - View virtual camera
 

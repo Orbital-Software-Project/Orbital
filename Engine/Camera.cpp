@@ -7,20 +7,11 @@ Camera::Camera()  {
     // Init view matrix
     data.ModelViewMat = glm::mat4(1.0f);
 
-
     this->mesh = PrimitiveFactory::Plane();
 }
 
 Camera::~Camera() {
 
-}
-
-const glm::mat4 Camera::GetViewMat() {
-    return data.ModelViewMat;
-}
-
-void Camera::SetViewMat(glm::mat4 view) {
-    data.ModelViewMat = view;
 }
 
 void Camera::Draw(std::shared_ptr<Shader> shader) {
@@ -29,15 +20,27 @@ void Camera::Draw(std::shared_ptr<Shader> shader) {
     }
 
     // Update pos of the camera
-    this->mesh->SetModel(data.ModelViewMat);
+    this->mesh->SetMatrix(data.ModelViewMat);
     this->mesh->DrawOnlyVertColors(true);
     this->mesh->Draw(shader);
-
 }
 
-void Camera::ToggleHide() {
-    this->visible = !this->visible;
+void Camera::SetVisible(bool visible) {
+    this->visible = visible;
 }
+
+bool Camera::IsVisible() {
+    return this->visible;
+}
+
+
+void Camera::SetMatrix(glm::mat4 matrix) {
+    this->mesh->SetMatrix(matrix);
+}
+
+glm::mat4 Camera::GetMatrix() {
+    return this->mesh->GetMatrix();
+};
 
 }
 

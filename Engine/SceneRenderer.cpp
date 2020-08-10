@@ -49,32 +49,19 @@ void SceneRenderer::Render(std::shared_ptr<Shader> shader, int width, int height
 
     glEnable(GL_DEPTH_TEST);
 
-    for(std::shared_ptr<Mesh> mesh : this->meshes) {
-        mesh->Draw(shader);
-    }
-
-    for(std::shared_ptr<Camera> camera : this->cameras) {
-        camera->Draw(shader);
+    for(std::shared_ptr<IEntity> entity : this->entities) {
+        entity->Draw(shader);
     }
 
 }
 
-void SceneRenderer::AddMesh(std::shared_ptr<Mesh> mesh) {
-    this->meshes.push_back(mesh);
+void SceneRenderer::AddEntity(std::shared_ptr<IEntity> entity) {
+    this->entities.push_back(entity);
 }
 
-void SceneRenderer::AddCamera(std::shared_ptr<Camera> camera) {
-    this->cameras.push_back(camera);
+void SceneRenderer::RemoveEntity(std::shared_ptr<IEntity> entity) {
+    this->entities.erase(std::remove(this->entities.begin(), this->entities.end(), entity), this->entities.end());
 }
-
-void SceneRenderer::RemoveMesh(std::shared_ptr<Mesh> mesh) {
-    this->meshes.erase(std::remove(this->meshes.begin(), this->meshes.end(), mesh), this->meshes.end());
-}
-
-void SceneRenderer::RemoveCamera(std::shared_ptr<Camera> camera) {
-    this->cameras.erase(std::remove(this->cameras.begin(), this->cameras.end(), camera), this->cameras.end());
-}
-
 
 void SceneRenderer::setFBOSize(int width, int height) {
 
@@ -119,12 +106,8 @@ void SceneRenderer::setFBOSize(int width, int height) {
     }
 }
 
-std::vector<std::shared_ptr<Mesh>> SceneRenderer::GetMeshes() {
-    return this->meshes;
-}
-
-std::vector<std::shared_ptr<Camera>> SceneRenderer::GetCameras() {
-    return this->cameras;
+std::vector<std::shared_ptr<IEntity>> SceneRenderer::GetEntities() {
+    return this->entities;
 }
 
 

@@ -35,17 +35,21 @@ MapViewer::MapViewer(std::shared_ptr<SceneRenderer> renderer, std::shared_ptr<Sh
     this->pointCloud = std::make_shared<Mesh>();
     this->pointCloud->SetPolygonMode(GL_POINTS);
     this->pointCloud->DrawOnlyVertColors(true);
-    this->renderer->AddMesh(this->pointCloud);
+    this->renderer->AddEntity(this->pointCloud);
+
 
     this->camera = std::make_shared<Camera>();
-    this->renderer->AddCamera(this->camera);
+    this->renderer->AddEntity(this->camera);
+
 
     this->keyframes = std::make_shared<Mesh>();
     this->keyframes->DrawOnlyVertColors(true);
     this->keyframes->SetPolygonMode(GL_LINE_STRIP);
-    this->renderer->AddMesh(this->keyframes);
+    this->renderer->AddEntity(this->keyframes);
 
     this->initGridMesh();
+
+    this->initVideoPlane();
 }
 
 MapViewer::~MapViewer() {
@@ -55,12 +59,14 @@ MapViewer::~MapViewer() {
 void MapViewer::OnRender() {
     ImGui::Begin("Map viewer");
 
+    this->drawToolbar();
+
     // Get content size of the imgui window
     ImVec2 vMin = ImGui::GetWindowContentRegionMin();
     ImVec2 vMax = ImGui::GetWindowContentRegionMax();
 
     // get current size of the imgui window
-    ImVec2 vSize = ImVec2(vMax.x - vMin.x, vMax.y - vMin.y);
+    ImVec2 vSize = ImVec2(vMax.x - vMin.x, vMax.y - (vMin.y + 30));
 
     // when the window is to small the framebuffer throws errors
     if(vSize.x < 50 || vSize.y < 50) {
@@ -77,14 +83,34 @@ void MapViewer::OnRender() {
     // Update camera trajectory with its keyframes
     this->updateKeyFrames();
 
+
+    // Focus virtual camera
+    if(this->viewVirtualCamera) {
+        this->view = this->camera->GetMatrix();
+    }
+
+    this->gridMesh->SetVisible(!this->viewVirtualCamera);
+    this->camera->SetVisible(!this->viewVirtualCamera);
+
+
+    // Background video in 3d viewport
+    if(this->showVideoBackground) {
+        this->updateVideoPlane(vSize.x, vSize.y, 3);
+    }
+
     this->meshShader->SetMat4("view", this->view);
+
+    // tmp to test fixed aspect ratio
     this->meshShader->SetMat4("projection", glm::perspective(glm::radians(45.0f), vSize .x / vSize.y, 0.1f, 100.0f));
+
 
     // Childframe to prevent movement of the window and enable viewport rotation
     ImGui::BeginChild("DragPanel", vSize, false, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
 
     // Draw opengl texture (viewport) as imgui image
     ImGui::Image((void*)(intptr_t)this->renderer->RenderToTexture(this->meshShader, vSize.x, vSize.y), vSize);
+
+
 
 
     // ImGui Viewport navigation
@@ -98,11 +124,14 @@ void MapViewer::OnRender() {
             auto *io = &ImGui::GetIO();
             // Dragging logic for Viewport rotation
             if(io->MouseDown[0]) {
+                static ImVec2 p1Old = ImVec2(0, 0);
+
                 // First position from first click
                 if(!dragging) {
                     // Get first mouse pos
                     p0 = io->MousePos;
                     p1 = io->MousePos;
+                    p1Old = ImVec2(0, 0);
                     dragging = true;
 
                 } else {
@@ -111,40 +140,36 @@ void MapViewer::OnRender() {
                 }
 
                 // Only apply rotation when cursor has moved
-                static ImVec2 p1Old = ImVec2(0, 0);
                 if(p1Old.x != p1.x || p1Old.y != p1.y) {
 
                     ImVec2 delta(p0.x - p1.x , p1.y - p0.y);
 
+                    float sensitivity = 0.1f;
 
-                    static float sensitivity = 0.1f;
+                    this->yaw -= (delta.x * sensitivity);
+                    this->pitch += (delta.y * sensitivity);
 
-                    static float yaw = 0;
-                    yaw -= (delta.x * sensitivity);
-
-                    static float pitch = 0;
-                    pitch += (delta.y * sensitivity);
-
-                    if(pitch > 89.0f) { pitch = 89.0f; }
-                    if(pitch < -89.0f) { pitch = -89.0f; }
+                    if(this->pitch > 89.0f) { pitch = 89.0f; }
+                    if(this->pitch < -89.0f) { pitch = -89.0f; }
 
                     glm::vec3 direction;
-                    direction.x = std::cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-                    direction.y = std::sin(glm::radians(pitch));
-                    direction.z = std::sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+                    direction.x = std::cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
+                    direction.y = std::sin(glm::radians(this->pitch));
+                    direction.z = std::sin(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
+
                     this->cameraFront = glm::normalize(direction);
-
-
-                    p1Old = p1;
-
                 }
+                p1Old = p1;
             } else {
                 // Reset dragging
                 dragging = false;
+
+                p0 = ImVec2(0, 0);
+                p1 = ImVec2(0, 0);
             }
 
 
-            static float cameraSpeed = 0.5f;
+            static float cameraSpeed = 0.1f;
 
             // Handle viewport navigation with keys
             if(ImGui::IsKeyPressed(GLFW_KEY_W)) {
@@ -166,8 +191,11 @@ void MapViewer::OnRender() {
                 this->cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
             }
 
-            this->view = glm::lookAt(this->cameraPos, this->cameraPos + this->cameraFront, this->cameraUp);
-
+            this->view = glm::lookAt(
+                        this->cameraPos,
+                        this->cameraPos + this->cameraFront,
+                        this->cameraUp
+                        );
         }
     }
 
@@ -179,11 +207,10 @@ void MapViewer::OnRender() {
 }
 
 void MapViewer::ImportMesh(std::string file) {
-
     MeshImporter exporter;
     for(std::shared_ptr<Mesh> meshdata : exporter.Import(file)) {
         meshdata->DrawOnlyVertColors(false);
-        this->renderer->AddMesh(std::move(meshdata));
+        this->renderer->AddEntity(std::move(meshdata));
     }
 
 }
@@ -205,6 +232,48 @@ void MapViewer::Export(std::string file) {
     exporter.Export(file, this->pointCloud, cameras);
 }
 
+void MapViewer::drawToolbar() {
+
+    if(ImGui::Button("[-]")) {
+
+        this->view = glm::mat4(1.0f);
+        this->pitch = 0;
+        this->yaw = 0;
+        this->cameraPos   = glm::vec3(0.0f, 0.0f, 0.0f);
+        this->cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
+        this->cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
+    }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Reset view");
+    ImGui::SameLine();
+
+    if(ImGui::Button("[x]")) {
+        this->viewVirtualCamera = !this->viewVirtualCamera;
+    }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Toggle virtual camera");
+    ImGui::SameLine();
+
+
+    if(ImGui::Button("V")) {
+        this->showVideoBackground = !this->showVideoBackground;
+    }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Toggle baground video");
+    ImGui::SameLine();
+
+    if(ImGui::Button("1080p")) {
+        ImGui::SetWindowSize(ImVec2(1920, 1080));
+    }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Set viewport to 1920x1080p");
+
+
+    ImGui::Separator();
+
+
+}
+
 void MapViewer::updateCameraPos() {
     if(Global::GetInstance().MapPublisher.get() == nullptr) {
         return;
@@ -213,7 +282,15 @@ void MapViewer::updateCameraPos() {
     Eigen::Matrix4f camera_pos_wc = Global::GetInstance().MapPublisher->get_current_cam_pose().inverse().transpose().cast<float>().eval(); // inverse cw to wc;
     glm::mat4 converted = Utils::ToGLM_Mat4f(camera_pos_wc);
 
-    this->camera->SetViewMat(converted);
+    // Add relative movement to camera
+    //converted = this->camera->GetViewMat() * converted;
+
+    // Openvslam reconstructs into +Z axis
+    // Rotate camera 180 degrees around the Y Axis because pointcloud is Z+
+    //converted = glm::rotate(converted, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    this->camera->SetMatrix(converted);
+
 }
 
 void MapViewer::updateKeyFrames() {
@@ -298,12 +375,12 @@ void MapViewer::updateKeyFrames() {
 void MapViewer::initGridMesh() {
     std::vector<float> gridVerticies;
 
-
-
     this->gridMesh = PrimitiveFactory::Grid();
     this->gridMesh->SetPolygonMode(GL_LINES);
     this->gridMesh->DrawOnlyVertColors(true);
-    this->renderer->AddMesh(this->gridMesh);
+
+    this->renderer->AddEntity(this->gridMesh);
+
 }
 
 void MapViewer::updatePointCloudMesh() {
@@ -324,10 +401,10 @@ void MapViewer::updatePointCloudMesh() {
         if (!currLandMark || currLandMark->will_be_erased()) {
             continue;
         }
+
         if (localLandmarks.count(currLandMark)) {
             continue;
         }
-
 
         Eigen::Vector3d pos = currLandMark->get_pos_in_world();
 
@@ -338,12 +415,11 @@ void MapViewer::updatePointCloudMesh() {
                              }, {
                                  1.0f,
                                  1.0f,
-                                 0.0f  }
-                             );
+                                 0.0f
+                             });
 
         vertices.push_back(vertLandmarks);
     }
-
 
     for(openvslam::data::landmark* currLandMark : allLandmarks) {
         if (!currLandMark || currLandMark->will_be_erased()) {
@@ -351,7 +427,6 @@ void MapViewer::updatePointCloudMesh() {
         }
 
         Eigen::Vector3d pos = currLandMark->get_pos_in_world();
-
         Vertex vertAllLandmarks({
                                     pos.cast<float>().eval().x(),
                                     pos.cast<float>().eval().y(),
@@ -359,14 +434,49 @@ void MapViewer::updatePointCloudMesh() {
                                 }, {
                                     0.0f,
                                     0.0f,
-                                    1.0f  }
-                                );
+                                    1.0f
+                                });
 
         vertices.push_back(vertAllLandmarks);
+
     }
 
     this->pointCloud->UpdateColored(vertices);
+
 }
 
+void MapViewer::initVideoPlane() {
+
+}
+
+void MapViewer::updateVideoPlane(float width, float height, float depth) {
+    // https://stackoverflow.com/questions/46578529/how-to-compute-the-size-of-the-rectangle-that-is-visible-to-the-camera-at-a-give
+
+    // calc box
+    float aspect    = width / height;
+
+    width = 1;
+    height = width / aspect;
+
+    float t         = std::tan(glm::radians(45.0f) / 2);
+    float newHeight = t * depth;
+    float newWidth  = newHeight * aspect;
+
+    if(this->videoPlane.get() == nullptr) {
+        this->videoPlane = PrimitiveFactory::SizedPlane(newWidth, newHeight);
+        this->videoTexture = std::make_shared<Texture>();
+        this->videoPlane->Textures.push_back(this->videoTexture);
+        this->renderer->AddEntity(this->videoPlane);
+    }
+
+    glm::mat4 newMat = glm::translate(this->camera->GetMatrix(), glm::vec3(0.0f, 0.0f, depth));
+    videoPlane->SetMatrix(newMat);
+
+    if(Global::GetInstance().FramePublisher.get() == nullptr) {
+        return;
+    }
+
+    this->videoTexture->UpdateTexture(Global::GetInstance().FramePublisher->draw_frame(false));
+}
 
 }

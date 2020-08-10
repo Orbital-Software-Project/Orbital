@@ -20,7 +20,7 @@ void PropertyEditor::OnRender() {
     ImGui::Begin("Property Editor");
     {
         auto &meshList = Global::GetInstance().MeshProperties;
-        std::shared_ptr<Mesh> meshToRemove = nullptr;
+        std::shared_ptr<IEntity> meshToRemove = nullptr;
 
 
         for(int i = 0; i < meshList.size(); i++) {
@@ -30,7 +30,7 @@ void PropertyEditor::OnRender() {
             {
 
                 auto currMesh = meshList[i];
-                glm::mat4 meshModelMat = currMesh->GetModel();
+                glm::mat4 meshModelMat = currMesh->GetMatrix();
 
                 ImGui::Text("Model Matrix");
                 ImGui::SameLine(ImGui::GetWindowWidth()-30);
@@ -61,7 +61,7 @@ void PropertyEditor::OnRender() {
                     static glm::vec3 translationPrevFrame;
                     if(translation != translationPrevFrame) {
                         meshModelMat = glm::translate(glm::mat4(1.0f), translation);
-                        currMesh->SetModel(meshModelMat);
+                        currMesh->SetMatrix(meshModelMat);
                     }
                     translationPrevFrame = translation;
                 }
@@ -81,7 +81,7 @@ void PropertyEditor::OnRender() {
                         meshModelMat = glm::rotate(meshModelMat, angles.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
                         //meshModelMat = meshModelMat * glm::toMat4(rotation);
-                        currMesh->SetModel(meshModelMat);
+                        currMesh->SetMatrix(meshModelMat);
                     }
                     rotationPrevFrame = angles;
                 }
@@ -93,7 +93,7 @@ void PropertyEditor::OnRender() {
                         static glm::vec3 scalePrevFrame;
                         if(scalePrevFrame != scale) {
                             meshModelMat = glm::scale(meshModelMat, scale);
-                            currMesh->SetModel(meshModelMat);
+                            currMesh->SetMatrix(meshModelMat);
                         }
                         scalePrevFrame = scale;
                     }

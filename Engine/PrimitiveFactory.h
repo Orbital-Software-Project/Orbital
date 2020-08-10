@@ -17,6 +17,8 @@ public:
 
     static std::shared_ptr<Mesh> Plane();
 
+    static std::shared_ptr<Mesh> SizedPlane(float width, float height);
+
 
 };
 

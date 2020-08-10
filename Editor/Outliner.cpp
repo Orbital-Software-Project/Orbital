@@ -18,31 +18,30 @@ void Outliner::OnRender(){
 
     ImGui::Begin("Outliner");
     {
-        auto meshes = renderer->GetMeshes();
-        auto cameras = renderer->GetCameras();
+        auto meshes = renderer->GetEntities();
         int i = 0;
         // Display all meshes
         {
 
-            std::shared_ptr<Mesh> meshToRemove = nullptr;
-            for(std::shared_ptr<Mesh> mesh : meshes) {
+            std::shared_ptr<IEntity> entityToRemove = nullptr;
+            for(std::shared_ptr<IEntity> entity : meshes) {
                 ImGui::PushID(std::to_string(i++).c_str());
 
                 ImGui::Text("Mesh");
                 ImGui::SameLine();
                 if(ImGui::Button("Remove")) {
-                    meshToRemove = mesh;
+                    entityToRemove = entity;
                 }
                 ImGui::SameLine();
                 if(ImGui::Button("Hide")) {
-                    mesh->ToggleHide();
+                    entity->SetVisible(!entity->IsVisible());
                 }
                 ImGui::SameLine();
                 if(ImGui::Button("Properties")) {
                     auto list = Global::GetInstance().MeshProperties;
-                    bool found = (std::find(list.begin(), list.end(), mesh) != list.end());
+                    bool found = (std::find(list.begin(), list.end(), entity) != list.end());
                     if(!found) {
-                        Global::GetInstance().MeshProperties.push_back(mesh);
+                        Global::GetInstance().MeshProperties.push_back(entity);
                     }
                 }
 
@@ -50,35 +49,9 @@ void Outliner::OnRender(){
                 ImGui::PopID();
             }
             // Remove mesh object
-            if(meshToRemove != nullptr) {
-                this->renderer->RemoveMesh(meshToRemove);
-                meshToRemove = nullptr;
-            }
-        }
-
-
-        // Display all cameras
-        {
-            std::shared_ptr<Camera> cameraToRemove = nullptr;
-            for(std::shared_ptr<Camera> camera : cameras) {
-
-                ImGui::PushID(std::to_string(i++).c_str());
-
-                ImGui::Text("Camera");
-                ImGui::SameLine();
-                if(ImGui::Button("Remove")) {
-                    cameraToRemove = camera;
-                }
-                ImGui::SameLine();
-                if(ImGui::Button("Hide")) {
-                    camera->ToggleHide();
-                }
-
-                ImGui::PopID();
-            }
-            if(cameraToRemove != nullptr) {
-                this->renderer->RemoveCamera(cameraToRemove);
-                cameraToRemove = nullptr;
+            if(entityToRemove != nullptr) {
+                this->renderer->RemoveEntity(entityToRemove);
+                entityToRemove = nullptr;
             }
         }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IEntity.h"
+
 #include "Mesh.h"
 #include "Camera.h"
 
@@ -20,17 +22,11 @@ public:
 
     void Render(std::shared_ptr<Shader> shader, int width, int height);
 
-    void AddMesh(std::shared_ptr<Mesh> mesh);
+    void RemoveEntity(std::shared_ptr<IEntity> entity);
 
-    void RemoveMesh(std::shared_ptr<Mesh> mesh);
+    void AddEntity(std::shared_ptr<IEntity> entity);
 
-    void AddCamera(std::shared_ptr<Camera> camera);
-
-    void RemoveCamera(std::shared_ptr<Camera> camera);
-
-    std::vector<std::shared_ptr<Mesh>> GetMeshes();
-
-    std::vector<std::shared_ptr<Camera>> GetCameras();
+    std::vector<std::shared_ptr<IEntity>> GetEntities();
 
 private:
     void setFBOSize(int widht, int height);
@@ -42,8 +38,7 @@ private:
     GLuint vbo = 0, vao = 0, ebo = 0;
     int width = 800, height = 600;
 
-    std::vector<std::shared_ptr<Mesh>> meshes;
-    std::vector<std::shared_ptr<Camera>> cameras;
+    std::vector<std::shared_ptr<IEntity>> entities;
 
 };
 
