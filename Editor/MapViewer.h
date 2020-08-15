@@ -25,8 +25,6 @@ public:
 
     void ImportMesh(std::string file);
 
-    void Export(std::string file);
-
 private:
     void drawToolbar();
 

@@ -2,6 +2,7 @@
 
 #include "Mesh.h"
 #include "Camera.h"
+#include "SceneRenderer.h"
 
 #include <memory>
 
@@ -10,7 +11,7 @@ namespace Orb {
 class PropertyEditor {
 
 public:
-    PropertyEditor();
+    PropertyEditor(std::shared_ptr<SceneRenderer> renderer);
 
     ~PropertyEditor();
 
@@ -18,6 +19,8 @@ public:
 
 private:
     void matrix4x4(glm::mat4 mat);
+
+    std::shared_ptr<SceneRenderer> renderer;
 
 };
 

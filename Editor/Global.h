@@ -36,8 +36,6 @@ public:
 
     std::shared_ptr<openvslam::publish::frame_publisher> FramePublisher;
 
-    std::vector<std::shared_ptr<IEntity>> MeshProperties;
-
 };
 
 }

@@ -126,7 +126,7 @@ void Core::Run() {
     Outliner outliner(renderer);
     MapViewer mapViewer(renderer, shader);
 
-    PropertyEditor propertyEd;
+    PropertyEditor propertyEd(renderer);
 
 
     std::unique_ptr<SlamTask> slamTask = std::make_unique<SlamTask>();
@@ -155,10 +155,6 @@ void Core::Run() {
             ImGui::BeginMainMenuBar();
             {
                 if(ImGui::BeginMenu("File")) {
-                    if(ImGui::MenuItem("Export")) {
-                        std::string file = Utils::SaveFile();
-                        mapViewer.Export(file);
-                    }
                     if(ImGui::MenuItem("Import")) {
                         std::string file = Utils::PickFile();
                         if(file != "") {

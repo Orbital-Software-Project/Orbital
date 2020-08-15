@@ -11,63 +11,6 @@ MeshImporter::MeshImporter() {}
 
 MeshImporter::~MeshImporter() {}
 
-void MeshImporter::Export(std::string file, std::shared_ptr<Mesh> pointCloud, std::vector<CameraData> cameras) {
-    aiScene scene;
-
-    scene.mRootNode = new aiNode();
-
-    // Create material
-    scene.mMaterials = new aiMaterial*[ 1 ];
-    scene.mMaterials[0] = nullptr;
-    scene.mNumMaterials = 1;
-    scene.mMaterials[0] = new aiMaterial();
-
-    // Create mesh
-    scene.mMeshes = new aiMesh*[ 1 ];
-    scene.mMeshes[0] = nullptr;
-    scene.mNumMeshes = 1;
-    scene.mMeshes[0] = new aiMesh();
-    scene.mMeshes[0]->mMaterialIndex = 0;
-
-    // Add mesh to root node
-    scene.mRootNode->mMeshes = new unsigned int[ 1 ];
-    scene.mRootNode->mMeshes[0] = 0;
-    scene.mRootNode->mNumMeshes = 1;
-
-
-    auto pMesh = scene.mMeshes[0];
-
-    // Add vertices to mesh
-    const auto& vVertices = pointCloud->GetVertices();
-    pMesh->mVertices    = new aiVector3D[ vVertices.size() ];
-    pMesh->mNumVertices = vVertices.size();
-    for (auto itr = vVertices.begin(); itr != vVertices.end(); ++itr) {
-        const auto& v = itr->Pos;
-        pMesh->mVertices[itr - vVertices.begin()] = aiVector3D( v.x, v.y, v.z );
-    }
-
-    // Add cameras
-    scene.mCameras = new aiCamera*[cameras.size()];
-    scene.mNumCameras = cameras.size();
-    for(int i = 0; i < cameras.size(); i++ ) {
-        scene.mCameras[i] = nullptr;
-        scene.mCameras[i] = new aiCamera();
-
-        // Convert camera pos to position and lookat
-        scene.mCameras[i]->mPosition = aiVector3D(cameras[i].ModelViewMat[3].x, cameras[i].ModelViewMat[3].y, cameras[i].ModelViewMat[3].z);
-        scene.mCameras[i]->mName = std::to_string(i).c_str();
-
-        //find the transformation matrix corresponding to the camera node
-        aiNode* rootNode = scene.mRootNode;
-        aiNode* cameraNode = rootNode->FindNode(scene.mCameras[i]->mName);
-
-    }
-
-    Assimp::Exporter *exporter = new Assimp::Exporter();
-    exporter->Export(&scene, "obj", file.c_str());
-
-}
-
 std::vector<std::shared_ptr<Mesh>> MeshImporter::Import(std::string file) {
 
     this->currFile = file;

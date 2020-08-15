@@ -21,8 +21,6 @@ public:
 
     ~MeshImporter();
 
-    void Export(std::string file, std::shared_ptr<Mesh> pointCloud, std::vector<CameraData> cameras);
-
     std::vector<std::shared_ptr<Mesh>> Import(std::string file);
 
 private:

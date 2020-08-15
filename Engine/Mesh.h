@@ -55,17 +55,7 @@ public:
 
     void DrawOnlyVertColors(bool option);
 
-
-    virtual void SetMatrix(glm::mat4 model);
-
-    virtual glm::mat4 GetMatrix();
-
     virtual void Draw(std::shared_ptr<Shader> shader);
-
-    virtual void SetVisible(bool visible);
-
-    virtual bool IsVisible();
-
 
 public:
     std::vector<Vertex> Vertices;
@@ -80,9 +70,7 @@ private:
 private:
     unsigned int vbo = 0, vao = 0, ebo = 0;
     GLenum polygonMode = GL_TRIANGLES;
-    glm::mat4 model = glm::mat4(1.0f);
     bool drawOnlyVertColors = false;
-    bool visible = true;
 
 
 };

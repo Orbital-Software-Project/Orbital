@@ -27,22 +27,25 @@ void Outliner::OnRender(){
             for(std::shared_ptr<IEntity> entity : meshes) {
                 ImGui::PushID(std::to_string(i++).c_str());
 
-                ImGui::Text("Mesh");
-                ImGui::SameLine();
+                ImGui::Text(entity->Name.c_str());
+                ImGui::SameLine(100);
                 if(ImGui::Button("Remove")) {
                     entityToRemove = entity;
                 }
                 ImGui::SameLine();
                 if(ImGui::Button("Hide")) {
-                    entity->SetVisible(!entity->IsVisible());
+                    entity->Visible = !entity->Visible;
                 }
                 ImGui::SameLine();
                 if(ImGui::Button("Properties")) {
-                    auto list = Global::GetInstance().MeshProperties;
-                    bool found = (std::find(list.begin(), list.end(), entity) != list.end());
-                    if(!found) {
-                        Global::GetInstance().MeshProperties.push_back(entity);
-                    }
+                    entity->Selected = true;
+
+                    //auto list = Global::GetInstance().MeshProperties;
+                    //bool found = (std::find(list.begin(), list.end(), entity) != list.end());
+                   // if(!found) {
+                    //    Global::GetInstance().MeshProperties.push_back(entity);
+                   // }
+
                 }
 
 

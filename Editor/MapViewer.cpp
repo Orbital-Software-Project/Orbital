@@ -86,11 +86,11 @@ void MapViewer::OnRender() {
 
     // Focus virtual camera
     if(this->viewVirtualCamera) {
-        this->view = this->camera->GetMatrix();
+        this->view = this->camera->Matrix;
     }
 
-    this->gridMesh->SetVisible(!this->viewVirtualCamera);
-    this->camera->SetVisible(!this->viewVirtualCamera);
+    this->gridMesh->Visible = !this->viewVirtualCamera;
+    this->camera->Visible =  !this->viewVirtualCamera;
 
 
     // Background video in 3d viewport
@@ -109,8 +109,6 @@ void MapViewer::OnRender() {
 
     // Draw opengl texture (viewport) as imgui image
     ImGui::Image((void*)(intptr_t)this->renderer->RenderToTexture(this->meshShader, vSize.x, vSize.y), vSize);
-
-
 
 
     // ImGui Viewport navigation
@@ -215,23 +213,6 @@ void MapViewer::ImportMesh(std::string file) {
 
 }
 
-void MapViewer::Export(std::string file) {
-    std::vector<CameraData> cameras;
-
-    std::vector<openvslam::data::keyframe*> keyFrames;
-    Global::GetInstance().MapPublisher->get_keyframes(keyFrames);
-
-    for(openvslam::data::keyframe* kf : keyFrames) {
-        CameraData cam;
-        cam.ModelViewMat = Utils::ToGLM_Mat4f(kf->get_cam_pose_inv().transpose().cast<float>().eval());
-        cameras.push_back(cam);
-    }
-
-    MeshImporter exporter;
-
-    exporter.Export(file, this->pointCloud, cameras);
-}
-
 void MapViewer::drawToolbar() {
 
     if(ImGui::Button("[-]")) {
@@ -289,7 +270,7 @@ void MapViewer::updateCameraPos() {
     // Rotate camera 180 degrees around the Y Axis because pointcloud is Z+
     //converted = glm::rotate(converted, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    this->camera->SetMatrix(converted);
+    this->camera->Matrix = converted;
 
 }
 
@@ -469,8 +450,8 @@ void MapViewer::updateVideoPlane(float width, float height, float depth) {
         this->renderer->AddEntity(this->videoPlane);
     }
 
-    glm::mat4 newMat = glm::translate(this->camera->GetMatrix(), glm::vec3(0.0f, 0.0f, depth));
-    videoPlane->SetMatrix(newMat);
+    glm::mat4 newMat = glm::translate(this->camera->Matrix, glm::vec3(0.0f, 0.0f, depth));
+    videoPlane->Matrix = newMat;
 
     if(Global::GetInstance().FramePublisher.get() == nullptr) {
         return;

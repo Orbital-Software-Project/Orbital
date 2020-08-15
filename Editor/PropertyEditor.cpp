@@ -7,11 +7,15 @@
 #include <glm/gtc/quaternion.hpp>
 #include<glm/gtx/quaternion.hpp>
 
+#include <glm/gtx/euler_angles.hpp>
+
 #include "Global.h"
 
 namespace Orb {
 
-PropertyEditor::PropertyEditor() {}
+PropertyEditor::PropertyEditor(std::shared_ptr<SceneRenderer> renderer) {
+    this->renderer = renderer;
+}
 
 PropertyEditor::~PropertyEditor() {}
 
@@ -19,97 +23,47 @@ void PropertyEditor::OnRender() {
 
     ImGui::Begin("Property Editor");
     {
-        auto &meshList = Global::GetInstance().MeshProperties;
-        std::shared_ptr<IEntity> meshToRemove = nullptr;
+        auto meshList = this->renderer->GetEntities();
 
 
         for(int i = 0; i < meshList.size(); i++) {
+            auto currMesh = meshList[i];
+            if(!currMesh->Selected) {
+                continue;
+            }
 
-
-            ImGui::PushID(std::to_string(i).c_str());
+            ImGui::PushID(i);
             {
 
-                auto currMesh = meshList[i];
-                glm::mat4 meshModelMat = currMesh->GetMatrix();
-
                 ImGui::Text("Model Matrix");
-                ImGui::SameLine(ImGui::GetWindowWidth()-30);
+                ImGui::SameLine(ImGui::GetWindowWidth() - 30);
 
                 if(ImGui::Button("X")) {
-                    meshToRemove = currMesh;
+                    currMesh->Selected = false;
                 }
 
-                static glm::vec3 translationPrevFrame;
-
-                glm::vec3 scale;
-                glm::quat rotation;
-                glm::vec3 translation;
-                glm::vec3 skew;
-                glm::vec4 perspective;
-
-                glm::decompose(meshModelMat, scale, rotation, translation, skew, perspective);
-
-                // conjugate rotation quaternion
-                rotation = glm::conjugate(rotation);
-
-                glm::vec3 angles = glm::eulerAngles(rotation);
+                // --------------------
 
 
+                ImGui::DragFloat3("Tr", glm::value_ptr(currMesh->Position), 0.01f);
+                ImGui::DragFloat3("Rt", glm::value_ptr(currMesh->Rotation), 0.01f);
+                ImGui::DragFloat3("Sc", glm::value_ptr(currMesh->Scale),    0.01f);
 
-                ImGui::InputFloat3("Tr", glm::value_ptr(translation), 3);
-                if(ImGui::IsItemEdited()) {
-                    static glm::vec3 translationPrevFrame;
-                    if(translation != translationPrevFrame) {
-                        meshModelMat = glm::translate(glm::mat4(1.0f), translation);
-                        currMesh->SetMatrix(meshModelMat);
-                    }
-                    translationPrevFrame = translation;
-                }
+                currMesh->Matrix =
+                        glm::translate(glm::mat4(1.0), currMesh->Position) *
+                        glm::yawPitchRoll(glm::radians(currMesh->Rotation.x), glm::radians(currMesh->Rotation.y), glm::radians(currMesh->Rotation.z)) *
+                        glm::scale(glm::mat4(1.0f), currMesh->Scale);
 
 
-
-                ImGui::InputFloat3("Rt", glm::value_ptr(angles), 3);
-                if(ImGui::IsItemEdited()) {
-                    static glm::vec3 rotationPrevFrame;
-                    if(rotationPrevFrame != angles) {
-
-                        // TODO: http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
-                        //glm::quat(angles);
-
-                        meshModelMat = glm::rotate(meshModelMat, angles.x, glm::vec3(1.0f, 0.0f, 0.0f));
-                        meshModelMat = glm::rotate(meshModelMat, angles.y, glm::vec3(0.0f, 1.0f, 0.0f));
-                        meshModelMat = glm::rotate(meshModelMat, angles.z, glm::vec3(0.0f, 0.0f, 1.0f));
-
-                        //meshModelMat = meshModelMat * glm::toMat4(rotation);
-                        currMesh->SetMatrix(meshModelMat);
-                    }
-                    rotationPrevFrame = angles;
-                }
-
-
-
-                if(ImGui::InputFloat3("Sc", glm::value_ptr(scale), 3)) {
-                    if(scale.x != 0 && scale.y != 0 && scale.z != 0) {
-                        static glm::vec3 scalePrevFrame;
-                        if(scalePrevFrame != scale) {
-                            meshModelMat = glm::scale(meshModelMat, scale);
-                            currMesh->SetMatrix(meshModelMat);
-                        }
-                        scalePrevFrame = scale;
-                    }
-                }
+                // --------------------
 
                 ImGui::Separator();
 
             }
+
             ImGui::PopID();
         }
 
-
-        if(meshToRemove != nullptr) {
-            meshList.erase(std::remove(meshList.begin(), meshList.end(), meshToRemove), meshList.end());
-            meshToRemove = nullptr;
-        }
 
     }
     ImGui::End();

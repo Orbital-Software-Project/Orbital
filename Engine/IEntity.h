@@ -17,13 +17,19 @@ public:
 public:
     virtual void Draw(std::shared_ptr<Shader> shader) = 0;
 
-    virtual void SetVisible(bool visible) = 0;
+    bool Selected = false;
 
-    virtual bool IsVisible() = 0;
+    bool Visible = true;
 
-    virtual glm::mat4 GetMatrix() = 0;
+    glm::mat4 Matrix = glm::mat4(1.0f);
 
-    virtual void SetMatrix(glm::mat4 matrix) = 0;
+    glm::vec3 Position = glm::vec4(0.0f);
+
+    glm::vec3 Rotation = glm::vec4(0.0f);
+
+    glm::vec3 Scale = glm::vec4(1.0f);
+
+    std::string Name = "IEntity";
 
 };
 

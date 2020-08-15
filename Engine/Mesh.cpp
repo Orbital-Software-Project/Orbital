@@ -6,7 +6,6 @@
 namespace Orb {
 
 Mesh::Mesh() {
-
     this->init();
 }
 
@@ -82,7 +81,7 @@ std::vector<unsigned int> Mesh::GetIndices() {
 }
 
 void Mesh::Draw(std::shared_ptr<Shader> shader) {
-    if(!this->visible) {
+    if(!this->Visible) {
         return;
     }
 
@@ -93,7 +92,7 @@ void Mesh::Draw(std::shared_ptr<Shader> shader) {
 
     shader->Use();
     shader->SetBool("OnlyVertColor", this->drawOnlyVertColors);
-    shader->SetMat4("model", this->model);
+    shader->SetMat4("model", this->Matrix);
 
     for(std::shared_ptr<Texture> texture : this->Textures) {
         texture->Bind(shader);
@@ -105,23 +104,9 @@ void Mesh::Draw(std::shared_ptr<Shader> shader) {
     glBindVertexArray(0);
 }
 
-void Mesh::SetMatrix(glm::mat4 model) {
-    this->model = model;
-}
-
-glm::mat4 Mesh::GetMatrix() {
-    return this->model;
-}
-
-bool Mesh::IsVisible() {
-    return this->visible;
-}
-
-void Mesh::SetVisible(bool visible) {
-    this->visible = visible;
-}
-
 void Mesh::init() {
+    this->Name = "Mesh";
+
     glGenBuffers(1, &this->ebo);
     glGenVertexArrays(1, &this->vao);
     glGenBuffers(1, &this->vbo);
