@@ -15,6 +15,7 @@
 #include <openvslam/data/landmark.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Orb {
 
@@ -26,9 +27,6 @@ MapViewer::MapViewer(std::shared_ptr<SceneRenderer> renderer, std::shared_ptr<Sh
 
     this->renderer = renderer;
 
-    // Shader pointcloud
-    //this->shader = std::make_shared<Shader>("Shaders/MapViewer.vs", "Shaders/MapViewer.fs");
-
     // Shader model
     this->meshShader = shader;
 
@@ -38,8 +36,13 @@ MapViewer::MapViewer(std::shared_ptr<SceneRenderer> renderer, std::shared_ptr<Sh
     this->renderer->AddEntity(this->pointCloud);
 
 
-    this->camera = std::make_shared<Camera>();
-    this->renderer->AddEntity(this->camera);
+    this->viewportCam = std::make_shared<Camera>();
+    this->viewportCam->Visible = false;
+    this->renderer->AddEntity(this->viewportCam);
+
+    this->slamCam = std::make_shared<Camera>();
+    this->renderer->AddEntity(this->slamCam);
+
 
 
     this->keyframes = std::make_shared<Mesh>();
@@ -77,28 +80,23 @@ void MapViewer::OnRender() {
     // Update points
     this->updatePointCloudMesh();
 
+
     // Update reconstructed camera
     this->updateCameraPos();
+
+    // Background video in 3d viewport
+    this->updateVideoPlane(vSize.x, vSize.y, 2.5);
+
 
     // Update camera trajectory with its keyframes
     this->updateKeyFrames();
 
 
-    // Focus virtual camera
-    if(this->viewVirtualCamera) {
-        this->view = this->camera->Matrix;
-    }
-
     this->gridMesh->Visible = !this->viewVirtualCamera;
-    this->camera->Visible =  !this->viewVirtualCamera;
+    this->slamCam->Visible =  !this->viewVirtualCamera;
 
 
-    // Background video in 3d viewport
-    if(this->showVideoBackground) {
-        this->updateVideoPlane(vSize.x, vSize.y, 3);
-    }
-
-    this->meshShader->SetMat4("view", this->view);
+    this->meshShader->SetMat4("view", this->viewportCam->Matrix);
 
     // tmp to test fixed aspect ratio
     this->meshShader->SetMat4("projection", glm::perspective(glm::radians(45.0f), vSize .x / vSize.y, 0.1f, 100.0f));
@@ -144,18 +142,18 @@ void MapViewer::OnRender() {
 
                     float sensitivity = 0.1f;
 
-                    this->yaw -= (delta.x * sensitivity);
-                    this->pitch += (delta.y * sensitivity);
+                    this->viewportCam->Yaw -= (delta.x * sensitivity);
+                    this->viewportCam->Pitch += (delta.y * sensitivity);
 
-                    if(this->pitch > 89.0f) { pitch = 89.0f; }
-                    if(this->pitch < -89.0f) { pitch = -89.0f; }
+                    if(this->viewportCam->Pitch > 89.0f) { this->viewportCam->Pitch = 89.0f; }
+                    if(this->viewportCam->Pitch < -89.0f) { this->viewportCam->Pitch = -89.0f; }
 
                     glm::vec3 direction;
-                    direction.x = std::cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
-                    direction.y = std::sin(glm::radians(this->pitch));
-                    direction.z = std::sin(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
+                    direction.x = std::cos(glm::radians(this->viewportCam->Yaw )) * cos(glm::radians(this->viewportCam->Pitch));
+                    direction.y = std::sin(glm::radians(this->viewportCam->Pitch));
+                    direction.z = std::sin(glm::radians(this->viewportCam->Yaw )) * cos(glm::radians(this->viewportCam->Pitch));
 
-                    this->cameraFront = glm::normalize(direction);
+                    this->viewportCam->CameraFront = glm::normalize(direction);
                 }
                 p1Old = p1;
             } else {
@@ -171,29 +169,33 @@ void MapViewer::OnRender() {
 
             // Handle viewport navigation with keys
             if(ImGui::IsKeyPressed(GLFW_KEY_W)) {
-                this->cameraPos += cameraSpeed * this->cameraFront;
+                this->viewportCam->Position += cameraSpeed * this->viewportCam->CameraFront;
 
             } else if (ImGui::IsKeyPressed(GLFW_KEY_S)) {
-                this->cameraPos -= cameraSpeed * this->cameraFront;
+                this->viewportCam->Position -= cameraSpeed * this->viewportCam->CameraFront;
 
             } else if (ImGui::IsKeyPressed(GLFW_KEY_A)) {
-                this->cameraPos -= glm::normalize(glm::cross(this->cameraFront, this->cameraUp)) * cameraSpeed;
+                this->viewportCam->Position -= glm::normalize(glm::cross(this->viewportCam->CameraFront, this->viewportCam->CameraUp)) * cameraSpeed;
 
             } else if (ImGui::IsKeyPressed(GLFW_KEY_D)) {
-                this->cameraPos += glm::normalize(glm::cross(this->cameraFront, this->cameraUp)) * cameraSpeed;
+                this->viewportCam->Position += glm::normalize(glm::cross(this->viewportCam->CameraFront, this->viewportCam->CameraUp)) * cameraSpeed;
 
             } else if (ImGui::IsKeyPressed(GLFW_KEY_SPACE)) {
-                this->cameraPos -= glm::vec3(0.0f, 0.1f, 0.0f);
+                this->viewportCam->Position -= glm::vec3(0.0f, 0.1f, 0.0f);
 
             } else if (ImGui::IsKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
-                this->cameraPos += glm::vec3(0.0f, 0.1f, 0.0f);
+                this->viewportCam->Position += glm::vec3(0.0f, 0.1f, 0.0f);
             }
 
-            this->view = glm::lookAt(
-                        this->cameraPos,
-                        this->cameraPos + this->cameraFront,
-                        this->cameraUp
-                        );
+
+            if(!this->viewVirtualCamera) {
+                this->viewportCam->Matrix = glm::lookAt(
+                            this->viewportCam->Position,
+                            this->viewportCam->Position + this->viewportCam->CameraFront,
+                            this->viewportCam->CameraUp
+                            );
+            }
+
         }
     }
 
@@ -217,12 +219,13 @@ void MapViewer::drawToolbar() {
 
     if(ImGui::Button("[-]")) {
 
-        this->view = glm::mat4(1.0f);
-        this->pitch = 0;
-        this->yaw = 0;
-        this->cameraPos   = glm::vec3(0.0f, 0.0f, 0.0f);
-        this->cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
-        this->cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
+        this->viewportCam->Matrix = glm::mat4(1.0f);
+        this->viewportCam->Pitch = 0;
+        this->viewportCam->Yaw = 0;
+        this->viewportCam->Position    = glm::vec3(0.0f, 0.0f, 0.0f);
+        this->viewportCam->CameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
+        this->viewportCam->CameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
+
     }
     if (ImGui::IsItemHovered())
         ImGui::SetTooltip("Reset view");
@@ -260,17 +263,34 @@ void MapViewer::updateCameraPos() {
         return;
     }
 
-    Eigen::Matrix4f camera_pos_wc = Global::GetInstance().MapPublisher->get_current_cam_pose().inverse().transpose().cast<float>().eval(); // inverse cw to wc;
-    glm::mat4 converted = Utils::ToGLM_Mat4f(camera_pos_wc);
+    //http://ogldev.atspace.co.uk/index.html
 
-    // Add relative movement to camera
-    //converted = this->camera->GetViewMat() * converted;
+    Eigen::Matrix4f camera_pos = Global::GetInstance().MapPublisher->get_current_cam_pose().inverse().transpose().cast<float>().eval();
+    glm::mat4 converted = Utils::ToGLM_Mat4f(camera_pos);
 
-    // Openvslam reconstructs into +Z axis
-    // Rotate camera 180 degrees around the Y Axis because pointcloud is Z+
-    //converted = glm::rotate(converted, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    this->camera->Matrix = converted;
+    // With inverse i get the correct pos, and
+
+
+    // Here is the fucking problem
+
+
+    // Translation is correct
+    // Rotation is fucked
+
+    //converted = glm::scale(glm::mat4(1.0f), glm::vec3(-1.0f, 1.0f, -1.0f)) * converted ;
+
+    // slamcam is correct
+    this->slamCam->Matrix = converted;
+
+    if(this->viewVirtualCamera) {
+        //TODO: Inverse and scale
+        this->viewportCam->Matrix = glm::inverse(this->slamCam->Matrix);
+
+        this->viewportCam->Matrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f)) * this->viewportCam->Matrix;
+
+        std::cout << glm::to_string(this->viewportCam->Matrix) << std::endl;
+    }
 
 }
 
@@ -282,6 +302,19 @@ void MapViewer::updateKeyFrames() {
 
     std::vector<openvslam::data::keyframe*> keyFrames;
     Global::GetInstance().MapPublisher->get_keyframes(keyFrames);
+
+
+
+    // Small performance optimization
+    // Do not update the pointcloud for every frame
+    static int keyFrameSize = 0;
+    int currSize = keyFrames.size();
+    if(currSize == keyFrameSize) {
+        return;
+    }
+    keyFrameSize = currSize;
+
+
 
     std::vector<Vertex> vertices;
     const auto draw_edge = [&](const openvslam::Vec3_t& cam_center_1, const openvslam::Vec3_t& cam_center_2) {
@@ -373,6 +406,18 @@ void MapViewer::updatePointCloudMesh() {
     std::set<openvslam::data::landmark*> localLandmarks;
     Global::GetInstance().MapPublisher->get_landmarks(allLandmarks, localLandmarks);
 
+
+    // Small performance optimization
+    // Do not update the pointcloud for every frame
+    static int allLandMarkSize = 0;
+    int currSize = allLandmarks.size();
+    if(currSize == allLandMarkSize) {
+        return;
+    }
+    allLandMarkSize = currSize;
+
+
+
     if(allLandmarks.size() == 0) {
         return;
     }
@@ -441,6 +486,12 @@ void MapViewer::updateVideoPlane(float width, float height, float depth) {
 
     float t         = std::tan(glm::radians(45.0f) / 2);
     float newHeight = t * depth;
+
+    // Prevent the image from flipping
+    if(newHeight > 0) {
+        newHeight *= -1;
+    }
+
     float newWidth  = newHeight * aspect;
 
     if(this->videoPlane.get() == nullptr) {
@@ -449,13 +500,27 @@ void MapViewer::updateVideoPlane(float width, float height, float depth) {
         this->videoPlane->Textures.push_back(this->videoTexture);
         this->renderer->AddEntity(this->videoPlane);
     }
+    this->videoPlane->Visible = this->showVideoBackground;
 
-    glm::mat4 newMat = glm::translate(this->camera->Matrix, glm::vec3(0.0f, 0.0f, depth));
+    if(!this->videoPlane->Visible) {
+        return;
+    }
+
+    glm::mat4 newMat = glm::translate(this->slamCam->Matrix, glm::vec3(0.0f, 0.0f, depth));
     videoPlane->Matrix = newMat;
+
+    //if(this->viewVirtualCamera) {
+    //    videoPlane->Matrix = glm::scale(glm::inverse(newMat), glm::vec3(1.0f, 1.0f, -1.0f));
+    //    //videoPlane->Matrix = newMat;
+    //} else {
+    //    videoPlane->Matrix = newMat;
+    //}
+
 
     if(Global::GetInstance().FramePublisher.get() == nullptr) {
         return;
     }
+
 
     this->videoTexture->UpdateTexture(Global::GetInstance().FramePublisher->draw_frame(false));
 }

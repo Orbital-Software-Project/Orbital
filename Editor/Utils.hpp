@@ -18,8 +18,20 @@ class Utils {
 public:
     static glm::mat4 ToGLM_Mat4f(Eigen::Matrix4f mat4) {
 
+        glm::mat4 res = glm::mat4(0.0f);
 
-        glm::mat4 res = glm::mat4(1.0f);
+        for (int i = 0; i < 4; ++i)
+        {
+            for (int j = 0; j < 4; ++j)
+            {
+                res[j][i] = mat4(j, i);
+            }
+        }
+        return res;
+
+
+
+
 
         res[0][0] = mat4(0, 0);
         res[0][1] = mat4(0, 1);

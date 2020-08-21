@@ -45,20 +45,14 @@ private:
     std::shared_ptr<Mesh> gridMesh = nullptr;
     std::shared_ptr<Mesh> pointCloud = nullptr;
     std::shared_ptr<Mesh> keyframes = nullptr;
-    std::shared_ptr<Camera> camera = nullptr;
+
+    std::shared_ptr<Camera> viewportCam = nullptr;
+    std::shared_ptr<Camera> slamCam = nullptr;
 
     std::shared_ptr<Texture> videoTexture = nullptr;
     std::shared_ptr<Mesh> videoPlane = nullptr;
 
     std::shared_ptr<SceneRenderer> renderer = nullptr;
-
-    glm::mat4 view = glm::mat4(1.0f);
-
-    float yaw = 0;
-    float pitch = 0;
-    glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  0.0f);
-    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f,  -1.0f);
-    glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
     bool viewVirtualCamera = false;
     bool showVideoBackground = false;

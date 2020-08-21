@@ -34,8 +34,6 @@ void PropertyEditor::OnRender() {
 
             ImGui::PushID(i);
             {
-
-                ImGui::Text("Model Matrix");
                 ImGui::SameLine(ImGui::GetWindowWidth() - 30);
 
                 if(ImGui::Button("X")) {
@@ -44,6 +42,14 @@ void PropertyEditor::OnRender() {
 
                 // --------------------
 
+                ImGui::Text("Entity Model Matrix");
+
+                ImGui::Text("%f %f %f %f", currMesh->Matrix[0][0], currMesh->Matrix[1][0], currMesh->Matrix[2][0], currMesh->Matrix[3][0]);
+                ImGui::Text("%f %f %f %f", currMesh->Matrix[0][1], currMesh->Matrix[1][1], currMesh->Matrix[2][1], currMesh->Matrix[3][1]);
+                ImGui::Text("%f %f %f %f", currMesh->Matrix[0][2], currMesh->Matrix[1][3], currMesh->Matrix[2][2], currMesh->Matrix[3][2]);
+                ImGui::Text("%f %f %f %f", currMesh->Matrix[0][3], currMesh->Matrix[1][3], currMesh->Matrix[2][3], currMesh->Matrix[3][3]);
+
+                // --------------------
 
                 ImGui::DragFloat3("Tr", glm::value_ptr(currMesh->Position), 0.01f);
                 ImGui::DragFloat3("Rt", glm::value_ptr(currMesh->Rotation), 0.01f);

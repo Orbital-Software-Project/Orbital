@@ -42,6 +42,8 @@ Set(ENGINE_SRC
         SceneRenderer.cpp
         Camera.h
         Camera.cpp
+        CameraController.h
+        CameraController.cpp
 	PrimitiveFactory.h
         PrimitiveFactory.cpp
 )
@@ -55,5 +57,5 @@ Set(SHADERS_SRC
 
 add_library(Engine ${ENGINE_SRC} ${SHADERS_SRC})
 target_include_directories(Engine PUBLIC .)
-target_link_libraries(Engine PRIVATE ${OpenCV_LIBS} GLEW::GLEW glm assimp::assimp)
+target_link_libraries(Engine PRIVATE ${OpenCV_LIBS} glfw GLEW::GLEW glm assimp::assimp)
 
