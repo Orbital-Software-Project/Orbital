@@ -287,9 +287,10 @@ void MapViewer::updateCameraPos() {
         //TODO: Inverse and scale
         this->viewportCam->Matrix = glm::inverse(this->slamCam->Matrix);
 
+        //this->viewportCam->Matrix = glm::scale(glm::mat4(1.0f), glm::vec3(-1.0f, 1.0f, -1.0f)) * this->viewportCam->Matrix;
         this->viewportCam->Matrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f)) * this->viewportCam->Matrix;
 
-        std::cout << glm::to_string(this->viewportCam->Matrix) << std::endl;
+        //std::cout << glm::to_string(this->viewportCam->Matrix) << std::endl;
     }
 
 }
@@ -508,14 +509,6 @@ void MapViewer::updateVideoPlane(float width, float height, float depth) {
 
     glm::mat4 newMat = glm::translate(this->slamCam->Matrix, glm::vec3(0.0f, 0.0f, depth));
     videoPlane->Matrix = newMat;
-
-    //if(this->viewVirtualCamera) {
-    //    videoPlane->Matrix = glm::scale(glm::inverse(newMat), glm::vec3(1.0f, 1.0f, -1.0f));
-    //    //videoPlane->Matrix = newMat;
-    //} else {
-    //    videoPlane->Matrix = newMat;
-    //}
-
 
     if(Global::GetInstance().FramePublisher.get() == nullptr) {
         return;
