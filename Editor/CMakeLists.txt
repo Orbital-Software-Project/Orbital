@@ -25,6 +25,17 @@ Set(SRC
         MapViewer.cpp
 )
 
+if(MSVC)
+    add_compile_options($<$<CONFIG:Debug>:/MTd> $<$<CONFIG:Release>:/MT>)
+endif()
+
 add_executable(Editor ${SRC})
-target_link_libraries(Editor PRIVATE Engine ImGui ${OpenCV_LIBS} openvslam unofficial::nativefiledialog::nfd)
+
+target_link_libraries(Editor PUBLIC 
+    Engine
+    ImGui
+    ${OpenCV_LIBS}
+    openvslam
+    unofficial::nativefiledialog::nfd
+)
 

@@ -1,4 +1,9 @@
 ThirdParty/
-Build/
+!ThirdParty/CMakeLists.txt
+/Build/
+.as/
+.vs/
+Scripts/Build/Build/obj/
+Scripts/Build/Build/bin/
 Content/
 CMakeLists.txt.user

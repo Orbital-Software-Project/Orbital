@@ -24,7 +24,11 @@ Set(IMGUI_SRC
     ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/examples/imgui_impl_opengl3.cpp
 )
 
-add_library(ImGui ${IMGUI_SRC})
+if(MSVC)
+    add_compile_options($<$<CONFIG:Debug>:/MTd> $<$<CONFIG:Release>:/MT>)
+endif()
+
+add_library(ImGui STATIC ${IMGUI_SRC} )
 target_include_directories(ImGui PUBLIC ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION})
 target_link_libraries(ImGui PRIVATE glfw GLEW::GLEW)
 
@@ -55,7 +59,11 @@ Set(SHADERS_SRC
         ${CMAKE_SOURCE_DIR}/Shaders/Mesh.fs
 )
 
-add_library(Engine ${ENGINE_SRC} ${SHADERS_SRC})
+if(MSVC)
+    add_compile_options($<$<CONFIG:Debug>:/MTd> $<$<CONFIG:Release>:/MT>)
+endif()
+
+add_library(Engine STATIC ${ENGINE_SRC} ${SHADERS_SRC})
 target_include_directories(Engine PUBLIC .)
-target_link_libraries(Engine PRIVATE ${OpenCV_LIBS} glfw GLEW::GLEW glm assimp::assimp)
+target_link_libraries(Engine PUBLIC ${OpenCV_LIBS} glfw GLEW::GLEW glm assimp::assimp)
 
