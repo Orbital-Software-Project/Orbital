@@ -17,6 +17,8 @@ namespace Build
         private string dbow2InstallDir = string.Empty;
         private string openvslamInstallDir = string.Empty;
         private string assimpInstallDir = string.Empty;
+        private string imguiNodeEditorInstallDir = string.Empty;
+
 
         public Setup()
         {
@@ -39,6 +41,7 @@ namespace Build
 
             this.setupVCPKG();
             this.setupImGui();
+            this.setupImGuiNodeEditor();
             this.setupDBoW2(this.vcpkgToolchainFile);
             this.setupG2O();
             this.setupOpenvslam();
@@ -47,6 +50,7 @@ namespace Build
 
             this.setupOrbital();
         }
+
 
         private void setupOrbital()
         {
@@ -158,56 +162,6 @@ namespace Build
 
             Process.Start(openvslam).WaitForExit();
 
-            return;
-
-            if (!Directory.Exists(this.openvslamInstallDir))
-            {
-
-                string ovsRootDir = Path.Combine(this.workDir, "openvslam");
-                string ovsBuildDir = Path.Combine(ovsRootDir, "Build");
-
-
-                StringBuilder cmakeArgs = new StringBuilder();
-                cmakeArgs.Append("-DCMAKE_TOOLCHAIN_FILE=" + this.vcpkgToolchainFile);
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DCMAKE_BUILD_TYPE=Release");
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DCMAKE_INSTALL_PREFIX=" + this.openvslamInstallDir);
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DBUILD_WITH_MARCH_NATIVE=OFF");
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DBUILD_EXAMPLES=OFF");
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DUSE_PANGOLIN_VIEWER=OFF");
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DUSE_SOCKET_PUBLISHER=OFF");
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DUSE_STACK_TRACE_LOGGER=ON");
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DBOW_FRAMEWORK=DBoW2");
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DBUILD_TESTS=OFF");
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-Dg2o_DIR=" + Path.Combine(this.g2oInstallDir, "lib", "cmake", "g2o"));
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DDBoW2_DIR=" + Path.Combine(this.dbow2InstallDir, "lib", "cmake", "DBoW2"));
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("..");
-
-                Directory.CreateDirectory(ovsBuildDir);
-
-                // cmake config
-                ProcessStartInfo cmakeConfig = new ProcessStartInfo("cmake", cmakeArgs.ToString());
-                cmakeConfig.WorkingDirectory = ovsBuildDir;
-                Process.Start(cmakeConfig).WaitForExit();
-
-                // Build and Install
-                ProcessStartInfo cmakeBuild = new ProcessStartInfo("cmake", "--build . --target install --config Release");
-                cmakeBuild.WorkingDirectory = ovsBuildDir;
-                Process.Start(cmakeBuild).WaitForExit();
-
-            }
-
          }
 
         private void setupImGui()
@@ -219,6 +173,21 @@ namespace Build
                 client.DownloadFile("https://github.com/ocornut/imgui/archive/v1.77.zip", zipFile);
 
                 ZipFile.ExtractToDirectory(zipFile, this.orbitalThirdPartyDir);
+            }
+        }
+
+        private void setupImGuiNodeEditor()
+        {
+            this.imguiNodeEditorInstallDir = Path.Combine(this.orbitalThirdPartyDir, "imgui-node-editor");
+
+            if (!File.Exists(this.imguiNodeEditorInstallDir))
+            {
+                ProcessStartInfo openvslam = new ProcessStartInfo("git", "clone https://github.com/thedmd/imgui-node-editor.git");
+                openvslam.WorkingDirectory = this.orbitalThirdPartyDir;
+                Process.Start(openvslam).WaitForExit();
+
+
+
             }
         }
 

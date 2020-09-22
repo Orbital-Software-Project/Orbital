@@ -23,6 +23,8 @@
 #include "Outliner.h"
 #include "PropertyEditor.h"
 
+#include "imgui_node_editor.h"
+
 namespace Orb {
 
 Core::Core() {}
@@ -131,6 +133,10 @@ void Core::Run() {
 
     std::unique_ptr<SlamTask> slamTask = std::make_unique<SlamTask>();
 
+    namespace ed = ax::NodeEditor;
+    ax::NodeEditor::EditorContext* g_Context = ax::NodeEditor::CreateEditor();
+    
+
     while (!glfwWindowShouldClose(window))
     {
 
@@ -216,6 +222,29 @@ void Core::Run() {
             ImGui::End();
         }
 
+        // Node ed test
+        {
+            ed::SetCurrentEditor(g_Context);
+
+            ed::Begin("My Editor");
+
+            int uniqueId = 1;
+
+            // Start drawing nodes.
+            ed::BeginNode(uniqueId++);
+            ImGui::Text("Node A");
+            ed::BeginPin(uniqueId++, ed::PinKind::Input);
+            ImGui::Text("-> In");
+            ed::EndPin();
+            ImGui::SameLine();
+            ed::BeginPin(uniqueId++, ed::PinKind::Output);
+            ImGui::Text("Out ->");
+            ed::EndPin();
+            ed::EndNode();
+
+            ed::End();
+        }
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -223,6 +252,7 @@ void Core::Run() {
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+    ax::NodeEditor::DestroyEditor(g_Context);
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
