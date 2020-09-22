@@ -25,7 +25,7 @@ Set(IMGUI_SRC
 )
 
 if(MSVC)
-    add_compile_options($<$<CONFIG:Debug>:/MTd> $<$<CONFIG:Release>:/MT>)
+    add_compile_options($<$<CONFIG:Debug>:/MDd> $<$<CONFIG:Release>:/MD>)
 endif()
 
 add_library(ImGui STATIC ${IMGUI_SRC} )
@@ -65,7 +65,7 @@ Set(SHADERS_SRC
 )
 
 if(MSVC)
-    add_compile_options($<$<CONFIG:Debug>:/MTd> $<$<CONFIG:Release>:/MT>)
+    add_compile_options($<$<CONFIG:Debug>:/MDd> $<$<CONFIG:Release>:/MD>)
 endif()
 
 add_library(Engine STATIC ${ENGINE_SRC} ${SHADERS_SRC})

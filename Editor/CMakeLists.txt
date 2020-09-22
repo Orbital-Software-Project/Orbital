@@ -26,7 +26,7 @@ Set(SRC
 )
 
 if(MSVC)
-    add_compile_options($<$<CONFIG:Debug>:/MTd> $<$<CONFIG:Release>:/MT>)
+    add_compile_options($<$<CONFIG:Debug>:/MDd> $<$<CONFIG:Release>:/MD>)
 endif()
 
 add_executable(Editor ${SRC})
