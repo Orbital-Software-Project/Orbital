@@ -32,6 +32,11 @@ add_library(ImGui STATIC ${IMGUI_SRC} )
 target_include_directories(ImGui PUBLIC ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION})
 target_link_libraries(ImGui PRIVATE glfw GLEW::GLEW)
 
+
+
+find_package(assimp CONFIG REQUIRED)
+
+
 Set(ENGINE_SRC
         IEntity.h
         Texture.h
@@ -65,5 +70,5 @@ endif()
 
 add_library(Engine STATIC ${ENGINE_SRC} ${SHADERS_SRC})
 target_include_directories(Engine PUBLIC .)
-target_link_libraries(Engine PUBLIC ${OpenCV_LIBS} glfw GLEW::GLEW glm assimp::assimp)
+target_link_libraries(Engine PRIVATE ${OpenCV_LIBS} glfw GLEW::GLEW glm assimp::assimp)
 

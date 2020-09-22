@@ -19,7 +19,6 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(unofficial-nativefiledialog CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
-find_package(assimp CONFIG REQUIRED)
 
 
 

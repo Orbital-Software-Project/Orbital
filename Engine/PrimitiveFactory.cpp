@@ -62,7 +62,7 @@ std::shared_ptr<Mesh> PrimitiveFactory::Cube() {
 
 std::shared_ptr<Mesh> PrimitiveFactory::Grid() {
 
-    constexpr float interval_ratio = 0.1;
+    constexpr float interval_ratio = 0.1f;
     constexpr float grid_min       = -100.0f * interval_ratio;
     constexpr float grid_max       = 100.0f  * interval_ratio;
 

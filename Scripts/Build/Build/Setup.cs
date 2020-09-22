@@ -54,7 +54,7 @@ namespace Build
 
             cmakeArgs.Append("-DCMAKE_TOOLCHAIN_FILE=" + this.vcpkgToolchainFile);
             cmakeArgs.Append(" ");
-            cmakeArgs.Append("-DVCPKG_TARGET_TRIPLET=x64-windows-static");
+            cmakeArgs.Append("-DVCPKG_TARGET_TRIPLET=x64-windows");
             cmakeArgs.Append(" ");
             cmakeArgs.Append("-DCMAKE_BUILD_TYPE=Debug");
             cmakeArgs.Append(" ");
@@ -98,7 +98,7 @@ namespace Build
             }
             
 
-            ProcessStartInfo vcpkgInstall = new ProcessStartInfo("cmd", "/C vcpkg.exe install assimp opencv eigen3 yaml-cpp glog suitesparse glfw3 glew nativefiledialog glm --triplet x64-windows-static");
+            ProcessStartInfo vcpkgInstall = new ProcessStartInfo("cmd", "/C vcpkg.exe install assimp opencv eigen3 yaml-cpp glog suitesparse glfw3 glew nativefiledialog glm --triplet x64-windows");
             vcpkgInstall.WorkingDirectory = vcpkgDir;
             Process.Start(vcpkgInstall).WaitForExit();
 
@@ -123,9 +123,9 @@ namespace Build
                 StringBuilder cmakeArgs = new StringBuilder();
                 cmakeArgs.Append("-DCMAKE_TOOLCHAIN_FILE=" + this.vcpkgToolchainFile);
                 cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DVCPKG_TARGET_TRIPLET=x64-windows-static");
+                cmakeArgs.Append("-DVCPKG_TARGET_TRIPLET=x64-windows");
                 cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DBUILD_SHARED_LIBS=OFF");
+                cmakeArgs.Append("-DBUILD_SHARED_LIBS=ON");
                 cmakeArgs.Append(" ");
                 cmakeArgs.Append("-DCMAKE_BUILD_TYPE=Debug");
                 cmakeArgs.Append(" ");
@@ -242,13 +242,13 @@ namespace Build
                 StringBuilder cmakeArgs = new StringBuilder();
                 cmakeArgs.Append("-DCMAKE_TOOLCHAIN_FILE=" + this.vcpkgToolchainFile);
                 cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DVCPKG_TARGET_TRIPLET=x64-windows-static");
+                cmakeArgs.Append("-DVCPKG_TARGET_TRIPLET=x64-windows");
                 cmakeArgs.Append(" ");
                 cmakeArgs.Append("-DCMAKE_BUILD_TYPE=Debug");
                 cmakeArgs.Append(" ");
                 cmakeArgs.Append("-DCMAKE_INSTALL_PREFIX=" + this.g2oInstallDir);
                 cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DBUILD_SHARED_LIBS=OFF");
+                cmakeArgs.Append("-DBUILD_SHARED_LIBS=ON");
                 cmakeArgs.Append(" ");
                 cmakeArgs.Append("-DBUILD_UNITTESTS=OFF");
                 cmakeArgs.Append(" ");
