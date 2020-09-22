@@ -40,28 +40,16 @@ target_link_libraries(Editor PRIVATE
 )
 
 
-
 set(DLL_FILES 
     "/ThirdParty/g2o/bin/g2o_core_d.dll"
     "/ThirdParty/g2o/bin/g2o_types_slam3d_d.dll"
-    "/ThirdParty/g2o/bin/g2o_core_d.dll"
     "/ThirdParty/g2o/bin/g2o_csparse_extension_d.dll"
-    "/ThirdParty/g2o/bin/g2o_hierarchical_d.dll"
     "/ThirdParty/g2o/bin/g2o_solver_csparse_d.dll"
     "/ThirdParty/g2o/bin/g2o_solver_dense_d.dll"
     "/ThirdParty/g2o/bin/g2o_solver_eigen_d.dll"
-    "/ThirdParty/g2o/bin/g2o_solver_pcg_d.dll"
-    "/ThirdParty/g2o/bin/g2o_solver_slam2d_linear_d.dll"
-    "/ThirdParty/g2o/bin/g2o_solver_structure_only_d.dll"
     "/ThirdParty/g2o/bin/g2o_stuff_d.dll"
-    "/ThirdParty/g2o/bin/g2o_types_data_d.dll"
-    "/ThirdParty/g2o/bin/g2o_types_icp_d.dll"
     "/ThirdParty/g2o/bin/g2o_types_sba_d.dll"
-    "/ThirdParty/g2o/bin/g2o_types_sclam2d_d.dll"
     "/ThirdParty/g2o/bin/g2o_types_sim3_d.dll"
-    "/ThirdParty/g2o/bin/g2o_types_slam2d_addons_d.dll"
-    "/ThirdParty/g2o/bin/g2o_types_slam2d_d.dll"
-    "/ThirdParty/g2o/bin/g2o_types_slam3d_addons_d.dll"
     "/ThirdParty/DBoW2/lib/dbow2.dll"
     "/ThirdParty/vcpkg-2020.06/installed/x64-windows/bin/libcxsparse.dll"
 )
@@ -70,5 +58,5 @@ set(DLL_FILES
 
 foreach(DLL_FILE ${DLL_FILES})
 file(COPY ${CMAKE_SOURCE_DIR}${DLL_FILE}
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
 endforeach()
