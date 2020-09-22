@@ -30,3 +30,4 @@ add_subdirectory(Editor)
 
 # Copy shaders
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Editor)
+
