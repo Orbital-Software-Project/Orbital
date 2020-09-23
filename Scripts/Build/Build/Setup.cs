@@ -19,7 +19,6 @@ namespace Build
         private string assimpInstallDir = string.Empty;
         private string imguiNodeEditorInstallDir = string.Empty;
 
-
         public Setup()
         {
 
@@ -35,27 +34,21 @@ namespace Build
             Directory.CreateDirectory(workDir);
         }
 
-
         public void Start()
         {
-
             this.setupVCPKG();
             this.setupImGui();
             this.setupImGuiNodeEditor();
-            this.setupDBoW2(this.vcpkgToolchainFile);
+            this.setupImGuizmoSequencer();
+            this.setupDBoW2();
             this.setupG2O();
             this.setupOpenvslam();
-
-            //this.setupAssimp();
-
             this.setupOrbital();
         }
-
 
         private void setupOrbital()
         {
             StringBuilder cmakeArgs = new StringBuilder();
-
             cmakeArgs.Append("-DCMAKE_TOOLCHAIN_FILE=" + this.vcpkgToolchainFile);
             cmakeArgs.Append(" ");
             cmakeArgs.Append("-DVCPKG_TARGET_TRIPLET=x64-windows");
@@ -68,11 +61,19 @@ namespace Build
             cmakeArgs.Append(" "); 
             cmakeArgs.Append("..");
 
-            // cmake config
-            ProcessStartInfo cmakeConfig = new ProcessStartInfo("cmake", cmakeArgs.ToString());
-            cmakeConfig.WorkingDirectory = Path.Combine(this.orbitalRootDir, "Build");
-            Process.Start(cmakeConfig).WaitForExit();
+            // CMake config
+            this.execCommand(
+                "cmake", 
+                cmakeArgs.ToString(), 
+                Path.Combine(this.orbitalRootDir, "Build")
+                );
 
+            // Build
+            this.execCommand(
+                "cmake",
+                "--build . --config Debug",
+                Path.Combine(this.orbitalRootDir, "Build")
+                );
 
         }
 
@@ -94,35 +95,58 @@ namespace Build
                 ZipFile.ExtractToDirectory(zipFile, this.orbitalThirdPartyDir);
             }
 
+
+
             if(!File.Exists(Path.Combine(vcpkgDir, "vcpkg.exe")))
             {
-                ProcessStartInfo vcpkgBootstrap = new ProcessStartInfo("cmd", "/C bootstrap-vcpkg.bat");
-                vcpkgBootstrap.WorkingDirectory = vcpkgDir;
-                Process.Start(vcpkgBootstrap).WaitForExit();
+                this.execCommand(
+                    "cmd", 
+                    "/C bootstrap-vcpkg.bat", 
+                    vcpkgDir
+                    );
             }
-            
 
-            ProcessStartInfo vcpkgInstall = new ProcessStartInfo("cmd", "/C vcpkg.exe install assimp opencv eigen3 yaml-cpp glog suitesparse glfw3 glew nativefiledialog glm --triplet x64-windows");
-            vcpkgInstall.WorkingDirectory = vcpkgDir;
-            Process.Start(vcpkgInstall).WaitForExit();
+            this.execCommand(
+                "cmd", 
+                "/C vcpkg.exe install assimp opencv eigen3 yaml-cpp glog suitesparse glfw3 glew nativefiledialog glm --triplet x64-windows", 
+                vcpkgDir
+                );
 
         }
 
-        private void setupDBoW2(string vcpkgToolchainFile)
+        private void setupDBoW2()
         {
             this.dbow2InstallDir = Path.Combine(this.orbitalThirdPartyDir, "DBoW2");
 
-
             if (!Directory.Exists(this.dbow2InstallDir))
             {
-                ProcessStartInfo gitClone = new ProcessStartInfo("git", "clone https://github.com/shinsumicco/DBoW2.git");
-                gitClone.WorkingDirectory = this.workDir;
-                Process.Start(gitClone).WaitForExit();
+                this.execCommand(
+                    "git",
+                    "clone https://github.com/shinsumicco/DBoW2.git",
+                    this.workDir
+                    );
+
+
+                /*
+                 commit e8cc74d24705d0ad61b68df4e1086d1deff67136 (HEAD -> master, origin/master, origin/HEAD)
+                 Author: Paul Lesur <12513150+lesurp@users.noreply.github.com>
+                 Date:   Fri Mar 13 02:38:12 2020 +0100
+                 
+                     match library name with the exported cmake name (#6)
+                 
+                     cmake's `find_library` is case sensitive, therefore we need to look for
+                     `dbow2` since we install `libdbow2.so`
+                 
+                     Co-authored-by: Paul Lesur <gitconfig@lesurpaul.fr>
+                 */
+                this.execCommand(
+                "git",
+                "checkout e8cc74d24705d0ad61b68df4e1086d1deff67136",
+                Path.Combine(this.workDir, "DBoW2")
+                );
 
                 // Configure Project
                 DirectoryInfo dirInfo = Directory.CreateDirectory(Path.Combine(this.workDir, "DBoW2", "Build"));
-
-
 
                 StringBuilder cmakeArgs = new StringBuilder();
                 cmakeArgs.Append("-DCMAKE_TOOLCHAIN_FILE=" + this.vcpkgToolchainFile);
@@ -137,16 +161,21 @@ namespace Build
                 cmakeArgs.Append(" ");
                 cmakeArgs.Append("..");
 
-                ProcessStartInfo cmakeConfig = new ProcessStartInfo("cmake", cmakeArgs.ToString());
-                cmakeConfig.WorkingDirectory = dirInfo.FullName;
 
-                Process.Start(cmakeConfig).WaitForExit();
+                // Config
+                this.execCommand(
+                    "cmake",
+                    cmakeArgs.ToString(),
+                    dirInfo.FullName
+                    );
+
 
                 // Build and Install
-                ProcessStartInfo cmakeBuild = new ProcessStartInfo("cmake", "--build . --target install --config Debug");
-                cmakeBuild.WorkingDirectory = dirInfo.FullName;
-                Process.Start(cmakeBuild).WaitForExit();
-
+                this.execCommand(
+                    "cmake",
+                    "--build . --target install --config Debug",
+                    dirInfo.FullName
+                    );
             }
 
         }
@@ -155,43 +184,59 @@ namespace Build
         {
             this.openvslamInstallDir = Path.Combine(this.orbitalThirdPartyDir, "openvslam");
 
+            this.execCommand("git",
+                "clone -b develop https://github.com/xdspacelab/openvslam.git",
+                this.orbitalThirdPartyDir
+                );
 
 
-            ProcessStartInfo openvslam = new ProcessStartInfo("git", "clone -b develop https://github.com/Cambloid/openvslam.git");
-            openvslam.WorkingDirectory = this.orbitalThirdPartyDir;
+            /*
+             commit 29435e14513a437719952ba916e5994e71ea6e55 (HEAD -> develop, origin/develop)
+             Author: shinsumicco <shinsumicco@gmail.com>
+             Date:   Wed Aug 19 01:42:00 2020 +0900
+             
+             Remove duplicated configuration in CMakeLists.txt
+            */
+            this.execCommand(
+                "git", 
+                "checkout 29435e14513a437719952ba916e5994e71ea6e55", 
+                Path.Combine(this.orbitalThirdPartyDir, "openvslam")
+                );
 
-            Process.Start(openvslam).WaitForExit();
+        }
 
-         }
-
-        private void setupImGui(bool dockingBranch = false)
+        private void setupImGui()
         {
-
-            if(dockingBranch)
-            {
-
-                ProcessStartInfo imguiDocking = new ProcessStartInfo("git", "clone -b docking https://github.com/ocornut/imgui.git");
-                imguiDocking.WorkingDirectory = this.orbitalThirdPartyDir;
-                Process.Start(imguiDocking).WaitForExit();
+            this.execCommand(
+                "git",
+                "clone -b docking https://github.com/ocornut/imgui.git",
+                this.orbitalThirdPartyDir
+                );
 
 
-                ProcessStartInfo imguiCheckout = new ProcessStartInfo("git", "checkout fa004ae79a287ad744772fcb6fa9d9c7dad7aeb4");
-                imguiCheckout.WorkingDirectory = Path.Combine(this.orbitalThirdPartyDir, "imgui");
-                Process.Start(imguiCheckout).WaitForExit();
-
-            }
-            else
-            {
-                string zipFile = Path.Combine(this.workDir, "v1.77.zip");
-                if (!File.Exists(zipFile))
-                {
-                    System.Net.WebClient client = new System.Net.WebClient();
-                    client.DownloadFile("https://github.com/ocornut/imgui/archive/v1.77.zip", zipFile);
-
-                    ZipFile.ExtractToDirectory(zipFile, this.orbitalThirdPartyDir);
-                }
-            }
-            
+            /*
+             commit fa004ae79a287ad744772fcb6fa9d9c7dad7aeb4 (HEAD -> docking, origin/docking)
+             Merge: 42575d4a 1ec464eb
+             Author: ocornut <omarcornut@gmail.com>
+             Date:   Tue Sep 22 17:00:57 2020 +0200
+             
+                 Merge branch 'master' into docking
+             
+                 # Conflicts:
+                 #       examples/imgui_examples.sln
+                 #       examples/imgui_impl_dx12.cpp
+                 #       examples/imgui_impl_dx12.h
+                 #       examples/imgui_impl_opengl3.cpp
+                 #       imgui.cpp
+                 #       imgui_demo.cpp
+                 #       imgui_internal.h
+                 #       imgui_widgets.cpp
+             */
+            this.execCommand(
+                "git",
+                "checkout fa004ae79a287ad744772fcb6fa9d9c7dad7aeb4",
+                Path.Combine(this.orbitalThirdPartyDir, "imgui")
+                );
         }
 
         private void setupImGuiNodeEditor()
@@ -200,15 +245,52 @@ namespace Build
 
             if (!File.Exists(this.imguiNodeEditorInstallDir))
             {
-                ProcessStartInfo imguiNodeEd = new ProcessStartInfo("git", "clone https://github.com/thedmd/imgui-node-editor.git");
-                imguiNodeEd.WorkingDirectory = this.orbitalThirdPartyDir;
-                Process.Start(imguiNodeEd).WaitForExit();
+                this.execCommand(
+                    "git", 
+                    "clone https://github.com/thedmd/imgui-node-editor.git", 
+                    this.orbitalThirdPartyDir
+                    );
 
-                ProcessStartInfo imguiNodeEdCheckout = new ProcessStartInfo("git", "beckout 687a72f940c76cf5064e13fe55fa0408c18fcbe4");
-                imguiNodeEdCheckout.WorkingDirectory = Path.Combine(this.orbitalThirdPartyDir, "imgui-node-editor");
-                Process.Start(imguiNodeEdCheckout).WaitForExit();
+                /*
+                 commit 687a72f940c76cf5064e13fe55fa0408c18fcbe4 (HEAD -> master, origin/master, origin/HEAD)
+                 Author: thedmd <michcic@gmail.com>
+                 Date:   Fri Sep 4 11:56:12 2020 +0200
+                 
+                 Convert GLuint to void* using intptr_t #62
+                 */
+                this.execCommand(
+                    "git", 
+                    "checkout 687a72f940c76cf5064e13fe55fa0408c18fcbe4", 
+                    Path.Combine(this.orbitalThirdPartyDir, "imgui-node-editor")
+                    );
 
             }
+        }
+
+        private void setupImGuizmoSequencer()
+        {
+            this.execCommand(
+                    "git",
+                    "clone https://github.com/CedricGuillemet/ImGuizmo.git",
+                    this.orbitalThirdPartyDir
+                    );
+
+
+            /*
+             commit 28c67f9f586aa83212ebbc057e6dc138b093fa35 (HEAD -> develop, origin/master, origin/HEAD, master)
+             Author: None <none@none.ch>
+             Date:   Wed Sep 23 10:59:46 2020 +0200
+             
+                 Add Docking WIP
+             
+                 + Checkout Git repo with specific commit id (latest)
+             */
+            this.execCommand(
+                "git",
+                "checkout 28c67f9f586aa83212ebbc057e6dc138b093fa35",
+                Path.Combine(this.orbitalThirdPartyDir, "ImGuizmo")
+                );
+
         }
 
         private void setupG2O()
@@ -218,11 +300,26 @@ namespace Build
             string g2oBuildDir = Path.Combine(g2oSrcDir, "Build");
             this.g2oInstallDir = Path.Combine(orbitalThirdPartyDir, "g2o");
 
-            if(!Directory.Exists(g2oSrcDir))
+            if (!Directory.Exists(g2oSrcDir))
             {
-                ProcessStartInfo g2o = new ProcessStartInfo("git", "clone https://github.com/RainerKuemmerle/g2o.git");
-                g2o.WorkingDirectory = this.workDir;
-                Process.Start(g2o).WaitForExit();
+                this.execCommand(
+                    "git",
+                    "clone https://github.com/RainerKuemmerle/g2o.git",
+                    this.workDir
+                    );
+
+                /*
+                 commit 31ea135f7d374c72568807520f522d2ab4543d39 (HEAD -> master, origin/master, origin/HEAD)
+                 Author: Rainer Kuemmerle <rainer.kuemmerle@gmail.com>
+                 Date:   Mon Sep 7 17:29:02 2020 +0200
+                 
+                 Implement IO test for slam3d_addons
+                 */
+                this.execCommand(
+                "git",
+                "checkout 31ea135f7d374c72568807520f522d2ab4543d39",
+                Path.Combine(this.workDir, "g2o")
+                );
             }
 
             if (!Directory.Exists(this.g2oInstallDir))
@@ -253,63 +350,30 @@ namespace Build
 
                 Directory.CreateDirectory(g2oBuildDir);
 
-                // cmake config
-                ProcessStartInfo cmakeConfig = new ProcessStartInfo("cmake", cmakeArgs.ToString());
-                cmakeConfig.WorkingDirectory = g2oBuildDir;
-                Process.Start(cmakeConfig).WaitForExit();
+                // CMake config
+                this.execCommand(
+                    "cmake", 
+                    cmakeArgs.ToString(), 
+                    g2oBuildDir
+                    );
 
 
                 // Build and Install
-                ProcessStartInfo cmakeBuild = new ProcessStartInfo("cmake", "--build . --target install --config Debug");
-                cmakeBuild.WorkingDirectory = g2oBuildDir;
-                Process.Start(cmakeBuild).WaitForExit();
+                this.execCommand(
+                    "cmake", 
+                    "--build . --target install --config Debug", 
+                    g2oBuildDir
+                    );
 
             }
         }
 
-        private void setupAssimp()
+        private void execCommand(string command, string arguments, string workdir)
         {
-            this.assimpInstallDir = Path.Combine(this.orbitalThirdPartyDir, "assimp");
-
-            if (!Directory.Exists(this.assimpInstallDir))
-            {
-
-                string zipFile        = Path.Combine(this.workDir, "v5.0.1.zip");
-                string assimpSrcDir   = Path.Combine(this.workDir, "assimp-5.0.1");
-                string assimpBuildDir = Path.Combine(assimpSrcDir, "Build");
-
-                if (!File.Exists(zipFile))
-                {
-                    System.Net.WebClient client = new System.Net.WebClient();
-                    client.DownloadFile("https://github.com/assimp/assimp/archive/v5.0.1.zip", zipFile);
-
-                    ZipFile.ExtractToDirectory(zipFile, this.workDir);
-                }
-
-                StringBuilder cmakeArgs = new StringBuilder();
-                cmakeArgs.Append("-DASSIMP_BUILD_TESTS=OFF");
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DCMAKE_BUILD_TYPE=Debug");
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DCMAKE_INSTALL_PREFIX=" + this.assimpInstallDir);
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("..");
-
-                Directory.CreateDirectory(assimpBuildDir);
-
-                // cmake config
-                ProcessStartInfo cmakeConfig = new ProcessStartInfo("cmake", cmakeArgs.ToString());
-                cmakeConfig.WorkingDirectory = assimpBuildDir;
-                Process.Start(cmakeConfig).WaitForExit();
-
-                // Build and Install
-                ProcessStartInfo cmakeBuild = new ProcessStartInfo("cmake", "--build . --target install --config Debug");
-                cmakeBuild.WorkingDirectory = assimpBuildDir;
-                Process.Start(cmakeBuild).WaitForExit();
-
-
-            }
+            ProcessStartInfo process = new ProcessStartInfo(command, arguments);
+            process.WorkingDirectory = workdir;
+            Process.Start(process).WaitForExit();
         }
-
+    
     }
 }
