@@ -19,8 +19,10 @@ Set(SRC
         VideoPreview.cpp
         Outliner.h
         Outliner.cpp
-	PropertyEditor.h
+	    PropertyEditor.h
         PropertyEditor.cpp
+	    NodeEditor.h
+        NodeEditor.cpp
         MapViewer.h
         MapViewer.cpp
 )
