@@ -164,16 +164,34 @@ namespace Build
 
          }
 
-        private void setupImGui()
+        private void setupImGui(bool dockingBranch = false)
         {
-            string zipFile = Path.Combine(this.workDir, "v1.77.zip");
-            if(!File.Exists(zipFile))
-            {
-                System.Net.WebClient client = new System.Net.WebClient();
-                client.DownloadFile("https://github.com/ocornut/imgui/archive/v1.77.zip", zipFile);
 
-                ZipFile.ExtractToDirectory(zipFile, this.orbitalThirdPartyDir);
+            if(dockingBranch)
+            {
+
+                ProcessStartInfo imguiDocking = new ProcessStartInfo("git", "clone -b docking https://github.com/ocornut/imgui.git");
+                imguiDocking.WorkingDirectory = this.orbitalThirdPartyDir;
+                Process.Start(imguiDocking).WaitForExit();
+
+
+                ProcessStartInfo imguiCheckout = new ProcessStartInfo("git", "checkout fa004ae79a287ad744772fcb6fa9d9c7dad7aeb4");
+                imguiCheckout.WorkingDirectory = Path.Combine(this.orbitalThirdPartyDir, "imgui");
+                Process.Start(imguiCheckout).WaitForExit();
+
             }
+            else
+            {
+                string zipFile = Path.Combine(this.workDir, "v1.77.zip");
+                if (!File.Exists(zipFile))
+                {
+                    System.Net.WebClient client = new System.Net.WebClient();
+                    client.DownloadFile("https://github.com/ocornut/imgui/archive/v1.77.zip", zipFile);
+
+                    ZipFile.ExtractToDirectory(zipFile, this.orbitalThirdPartyDir);
+                }
+            }
+            
         }
 
         private void setupImGuiNodeEditor()
@@ -182,11 +200,13 @@ namespace Build
 
             if (!File.Exists(this.imguiNodeEditorInstallDir))
             {
-                ProcessStartInfo openvslam = new ProcessStartInfo("git", "clone https://github.com/thedmd/imgui-node-editor.git");
-                openvslam.WorkingDirectory = this.orbitalThirdPartyDir;
-                Process.Start(openvslam).WaitForExit();
+                ProcessStartInfo imguiNodeEd = new ProcessStartInfo("git", "clone https://github.com/thedmd/imgui-node-editor.git");
+                imguiNodeEd.WorkingDirectory = this.orbitalThirdPartyDir;
+                Process.Start(imguiNodeEd).WaitForExit();
 
-
+                ProcessStartInfo imguiNodeEdCheckout = new ProcessStartInfo("git", "beckout 687a72f940c76cf5064e13fe55fa0408c18fcbe4");
+                imguiNodeEdCheckout.WorkingDirectory = Path.Combine(this.orbitalThirdPartyDir, "imgui-node-editor");
+                Process.Start(imguiNodeEdCheckout).WaitForExit();
 
             }
         }

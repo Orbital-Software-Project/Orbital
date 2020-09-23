@@ -31,6 +31,7 @@ namespace Orb {
 
             void UpdateVideoFrame(cv::Mat& image);
 
+            void ShowDockSpace(bool* p_open);
 
     };
 

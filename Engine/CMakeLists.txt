@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.9)
 
 project(Engine)
 
-Set(IMGUI_VERSION "imgui-1.77")
+Set(IMGUI_VERSION "imgui")
 Set(IMGUI_SRC
     ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/imgui.h
     ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/imgui.cpp
