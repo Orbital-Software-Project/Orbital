@@ -1,5 +1,10 @@
-ThirdParty/
-!ThirdParty/CMakeLists.txt
+ThirdParty/DBoW2
+ThirdParty/g2o
+ThirdParty/imgui
+ThirdParty/imgui-node-editor
+ThirdParty/ImGuizmo
+ThirdParty/openvslam
+ThirdParty/vcpkg-2020.06
 /Build/
 .as/
 .vs/
