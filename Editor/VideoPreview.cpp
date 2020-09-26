@@ -2,27 +2,24 @@
 #include "Global.h"
 
 
-#include <imgui.h>
-
-#include <stdint.h>
+#include <cstdint>
 #include <iostream>
-
-#include <GL/glew.h>
-
 #include <string>
-
+#include <GL/glew.h>
+#include <imgui.h>
 
 namespace Orb {
 
 VideoPreview::VideoPreview() {
-
     this->videoFrame = std::make_unique<Texture>();
+}
+
+VideoPreview::~VideoPreview() {
 
 }
 
-VideoPreview::~VideoPreview() {}
+void VideoPreview::OnRender() {
 
-void VideoPreview::OnRender(){
     ImGui::Begin("Video preview");
 
     if(Global::GetInstance().FramePublisher.get() != nullptr) {

@@ -91,15 +91,14 @@ void MapViewer::OnRender() {
     // Update camera trajectory with its keyframes
     this->updateKeyFrames();
 
-
     this->gridMesh->Visible = !this->viewVirtualCamera;
     this->slamCam->Visible =  !this->viewVirtualCamera;
 
-
+    // Set view matrix
     this->meshShader->SetMat4("view", this->viewportCam->Matrix);
 
     // tmp to test fixed aspect ratio
-    this->meshShader->SetMat4("projection", glm::perspective(glm::radians(45.0f), vSize .x / vSize.y, 0.1f, 100.0f));
+    this->meshShader->SetMat4("projection", glm::perspective(glm::radians(45.0f), -vSize .x / vSize.y, 0.1f, 100.0f));
 
 
     // Childframe to prevent movement of the window and enable viewport rotation
@@ -265,22 +264,24 @@ void MapViewer::updateCameraPos() {
 
     //http://ogldev.atspace.co.uk/index.html
 
-    Eigen::Matrix4f camera_pos = Global::GetInstance().MapPublisher->get_current_cam_pose().inverse().transpose().cast<float>().eval();
+    // Get camera pose and convert it to opengl conform matrix (glm)
+    Eigen::Matrix4f camera_pos = Eigen::Matrix4f::Identity();
+    camera_pos = Global::GetInstance().MapPublisher->get_current_cam_pose().inverse().eval().cast<float>();
     glm::mat4 converted = Utils::ToGLM_Mat4f(camera_pos);
 
 
     // With inverse i get the correct pos, and
 
 
-    // Here is the fucking problem
-
-
     // Translation is correct
-    // Rotation is fucked
 
     //converted = glm::scale(glm::mat4(1.0f), glm::vec3(-1.0f, 1.0f, -1.0f)) * converted ;
 
-    // slamcam is correct
+    // slamcam is correct except wrong rotation
+
+    // https://stackoverflow.com/questions/63429179/eigen-and-glm-products-produce-different-results
+    
+
     this->slamCam->Matrix = converted;
 
     if(this->viewVirtualCamera) {

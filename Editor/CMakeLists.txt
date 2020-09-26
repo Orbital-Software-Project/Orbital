@@ -28,7 +28,13 @@ Set(SRC
 )
 
 if(MSVC)
+    add_compile_options(/bigobj /MDd /source-charset:utf-8 /execution-charset:utf-8 /wd4996 /wd4275 /wd4251 /wd4244 /wd4305 /wd4267 /wd4127)
     add_compile_options($<$<CONFIG:Debug>:/MDd> $<$<CONFIG:Release>:/MD>)
+
+    # Set Editor as Visual Studio startup project
+    set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT Editor)
+
+    source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRC})
 endif()
 
 add_executable(Editor ${SRC})

@@ -12,7 +12,9 @@ SlamTask::SlamTask(std::string videoFile, std::string configFile, std::string vo
 
 }
 
-SlamTask::~SlamTask() {}
+SlamTask::~SlamTask() {
+    this->Cancel();
+}
 
 void SlamTask::Run() {
     this->cfg_ptr = std::make_shared<openvslam::config>(this->configFile);
@@ -26,13 +28,36 @@ void SlamTask::Run() {
     this->requestCancel = false;
     this->report.Status = TaskStatus::Running;
     this->slamTask      = std::thread(&SlamTask::doSlamAsync, this);
+
     this->slamTask.detach();
 }
 
+
+
 void SlamTask::Cancel() {
-    this->requestCancel = true;
-    this->report.Status = TaskStatus::Canceled;
-    this->SLAM->request_terminate();
+    if (this->report.Status == TaskStatus::Running) {
+
+        this->pauseTask = false;
+        this->requestCancel = true;
+
+        this->SLAM->request_terminate();
+
+        this->slamTask.join();
+        this->report.Status == TaskStatus::Canceled;
+
+    }
+}
+
+void  SlamTask::Pause() {
+    this->pauseTask = true;
+}
+
+bool SlamTask::IsPaused() {
+    return this->pauseTask;
+}
+
+void  SlamTask::Resume() {
+    this->pauseTask = false;
 }
 
 TaskReport SlamTask::GetReport() {
@@ -65,6 +90,10 @@ void SlamTask::doSlamAsync() {
     while (is_not_end) {
         if(this->requestCancel) {
             break;
+        }
+
+        while (this->pauseTask) {
+            std::this_thread::sleep_for(std::chrono::microseconds(5000));
         }
 
         is_not_end = video.read(frame);
@@ -116,8 +145,6 @@ void SlamTask::doSlamAsync() {
         this->report.Status = TaskStatus::Canceled;
         return;
     }
-
-
 
     if (false /*eval_log*/) {
         //output the trajectories for evaluation

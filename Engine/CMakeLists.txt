@@ -27,23 +27,6 @@ Set(IMGUI_SRC
 
 Set(IMGUI_NODE_ED_SRC 
 
-    #${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor/external/imgui/imgui_widgets.cpp
-    #${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor/external/imgui/imstb_rectpack.h
-    #${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor/external/imgui/imstb_textedit.h
-    #${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor/external/imgui/imstb_truetype.h
-    #${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor/external/imgui/imconfig.h
-    #${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor/external/imgui/imgui.cpp
-    #${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor/external/imgui/imgui.h
-    #${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor/external/imgui/imgui_demo.cpp
-    #${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor/external/imgui/imgui_draw.cpp
-    #${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor/external/imgui/imgui_internal.h
-    
-    #${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/examples/imgui_impl_glfw.h
-    #${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/examples/imgui_impl_glfw.cpp
-    #
-    #${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/examples/imgui_impl_opengl3.h
-    #${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/examples/imgui_impl_opengl3.cpp
-
     ${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor/imgui_bezier_math.h
     ${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor/imgui_bezier_math.inl
     ${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor/imgui_canvas.cpp
@@ -60,15 +43,27 @@ Set(IMGUI_NODE_ED_SRC
 
 )
 
+Set(IMGUI_SEQUENCER_GUIZMO_SRC
+    ${CMAKE_SOURCE_DIR}/ThirdParty/ImGuizmo/ImCurveEdit.cpp
+    ${CMAKE_SOURCE_DIR}/ThirdParty/ImGuizmo/ImCurveEdit.h
+    ${CMAKE_SOURCE_DIR}/ThirdParty/ImGuizmo/ImGradient.cpp
+    ${CMAKE_SOURCE_DIR}/ThirdParty/ImGuizmo/ImGradient.h
+    ${CMAKE_SOURCE_DIR}/ThirdParty/ImGuizmo/ImGuizmo.cpp
+    ${CMAKE_SOURCE_DIR}/ThirdParty/ImGuizmo/ImGuizmo.h
+    ${CMAKE_SOURCE_DIR}/ThirdParty/ImGuizmo/ImSequencer.cpp
+    ${CMAKE_SOURCE_DIR}/ThirdParty/ImGuizmo/ImSequencer.h
+)
+
 if(MSVC)
     add_compile_options($<$<CONFIG:Debug>:/MDd> $<$<CONFIG:Release>:/MD>)
 endif()
 
 
-add_library(ImGui STATIC ${IMGUI_SRC} ${IMGUI_NODE_ED_SRC})
+add_library(ImGui STATIC ${IMGUI_SRC} ${IMGUI_NODE_ED_SRC} ${IMGUI_SEQUENCER_GUIZMO_SRC})
 target_include_directories(ImGui PUBLIC
     ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}
     ${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor
+    ${CMAKE_SOURCE_DIR}/ThirdParty/ImGuizmo
 )
 
 target_link_libraries(ImGui PRIVATE glfw GLEW::GLEW)

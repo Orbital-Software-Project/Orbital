@@ -28,8 +28,6 @@ NodeEditor::~NodeEditor() {
 
 void NodeEditor::OnRender() {
 
-    
-
 
     ImGui::Begin("Node Editor");
     ed::SetCurrentEditor(g_Context);
@@ -41,18 +39,20 @@ void NodeEditor::OnRender() {
     // Start drawing nodes.
     ed::BeginNode(uniqueId++);
     {
-        ImGui::Text("Node A");
+        ImGui::Text("Video");
         {
-            ed::BeginPin(uniqueId++, ed::PinKind::Input);
-            ImGui::Text("-> In");
-            ed::EndPin();
-
             ImGui::SameLine();
             ed::BeginPin(uniqueId++, ed::PinKind::Output);
             ImGui::Text("Out ->");
             ed::EndPin();
 
-            ImGui::Button("test");
+            static char charBuf[255];
+            ImGui::SetNextItemWidth(100);
+            ImGui::InputText("", charBuf, 255);
+
+            ImGui::SameLine();
+
+            ImGui::Button("...");
         }
         ed::EndNode();
     }

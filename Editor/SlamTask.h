@@ -48,6 +48,12 @@ public:
 
     void Cancel();
 
+    void Pause();
+
+    bool IsPaused();
+
+    void Resume();
+
     TaskReport GetReport();
 
     std::shared_ptr<openvslam::publish::map_publisher> GetMapPublisher();
@@ -62,6 +68,7 @@ private:
     std::string videoFile = "", configFile = "", vocabFile = "";
     std::thread slamTask;
     bool requestCancel = false;
+    bool pauseTask = false;
     std::mutex reportMutex;
 
     std::shared_ptr<openvslam::config> cfg_ptr;
