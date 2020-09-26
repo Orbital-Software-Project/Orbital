@@ -52,7 +52,6 @@ MapViewer::MapViewer(std::shared_ptr<SceneRenderer> renderer, std::shared_ptr<Sh
 
     this->initGridMesh();
 
-    this->initVideoPlane();
 }
 
 MapViewer::~MapViewer() {
@@ -276,23 +275,17 @@ void MapViewer::updateCameraPos() {
 
     // Translation is correct
 
-    //converted = glm::scale(glm::mat4(1.0f), glm::vec3(-1.0f, 1.0f, -1.0f)) * converted ;
-
     // slamcam is correct except wrong rotation
 
     // https://stackoverflow.com/questions/63429179/eigen-and-glm-products-produce-different-results
-    
 
     this->slamCam->Matrix = converted;
 
     if(this->viewVirtualCamera) {
         //TODO: Inverse and scale
         this->viewportCam->Matrix = glm::inverse(this->slamCam->Matrix);
-
-        //this->viewportCam->Matrix = glm::scale(glm::mat4(1.0f), glm::vec3(-1.0f, 1.0f, -1.0f)) * this->viewportCam->Matrix;
-        this->viewportCam->Matrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f)) * this->viewportCam->Matrix;
-
-        //std::cout << glm::to_string(this->viewportCam->Matrix) << std::endl;
+        // Flip camera
+        this->viewportCam->Matrix = glm::scale(glm::mat4(1.0f), glm::vec3(-1.0f, 1.0f, -1.0f)) * this->viewportCam->Matrix;
     }
 
 }
@@ -474,9 +467,6 @@ void MapViewer::updatePointCloudMesh() {
 
 }
 
-void MapViewer::initVideoPlane() {
-
-}
 
 void MapViewer::updateVideoPlane(float width, float height, float depth) {
     // https://stackoverflow.com/questions/46578529/how-to-compute-the-size-of-the-rectangle-that-is-visible-to-the-camera-at-a-give
@@ -490,12 +480,14 @@ void MapViewer::updateVideoPlane(float width, float height, float depth) {
     float t         = std::tan(glm::radians(45.0f) / 2);
     float newHeight = t * depth;
 
+    
+    float newWidth  = newHeight * aspect;
+
     // Prevent the image from flipping
-    if(newHeight > 0) {
+    if (newHeight > 0) {
         newHeight *= -1;
     }
 
-    float newWidth  = newHeight * aspect;
 
     if(this->videoPlane.get() == nullptr) {
         this->videoPlane = PrimitiveFactory::SizedPlane(newWidth, newHeight);
