@@ -97,7 +97,8 @@ void MapViewer::OnRender() {
     // Set view matrix
     this->meshShader->SetMat4("view", this->viewportCam->Matrix);
 
-    // tmp to test fixed aspect ratio
+    // use negative apsect ration to flip viewport because of openvslam
+    // https://www.learnopengles.com/tag/aspect-ratio/
     this->meshShader->SetMat4("projection", glm::perspective(glm::radians(45.0f), -vSize .x / vSize.y, 0.1f, 100.0f));
 
 
@@ -141,7 +142,7 @@ void MapViewer::OnRender() {
 
                     float sensitivity = 0.1f;
 
-                    this->viewportCam->Yaw -= (delta.x * sensitivity);
+                    this->viewportCam->Yaw += (delta.x * sensitivity);
                     this->viewportCam->Pitch += (delta.y * sensitivity);
 
                     if(this->viewportCam->Pitch > 89.0f) { this->viewportCam->Pitch = 89.0f; }
@@ -174,10 +175,10 @@ void MapViewer::OnRender() {
                 this->viewportCam->Position -= cameraSpeed * this->viewportCam->CameraFront;
 
             } else if (ImGui::IsKeyPressed(GLFW_KEY_A)) {
-                this->viewportCam->Position -= glm::normalize(glm::cross(this->viewportCam->CameraFront, this->viewportCam->CameraUp)) * cameraSpeed;
+                this->viewportCam->Position += glm::normalize(glm::cross(this->viewportCam->CameraFront, this->viewportCam->CameraUp)) * cameraSpeed;
 
             } else if (ImGui::IsKeyPressed(GLFW_KEY_D)) {
-                this->viewportCam->Position += glm::normalize(glm::cross(this->viewportCam->CameraFront, this->viewportCam->CameraUp)) * cameraSpeed;
+                this->viewportCam->Position -= glm::normalize(glm::cross(this->viewportCam->CameraFront, this->viewportCam->CameraUp)) * cameraSpeed;
 
             } else if (ImGui::IsKeyPressed(GLFW_KEY_SPACE)) {
                 this->viewportCam->Position -= glm::vec3(0.0f, 0.1f, 0.0f);
