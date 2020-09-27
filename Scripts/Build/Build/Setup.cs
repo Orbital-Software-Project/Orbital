@@ -48,6 +48,12 @@ namespace Build
 
         private void setupOrbital()
         {
+            string orbitalBuildDir = Path.Combine(this.orbitalRootDir, "Build");
+            if (!Directory.Exists(orbitalBuildDir))
+            {
+                Directory.CreateDirectory(orbitalBuildDir);
+            }
+
             StringBuilder cmakeArgs = new StringBuilder();
             cmakeArgs.Append("-DCMAKE_TOOLCHAIN_FILE=" + this.vcpkgToolchainFile);
             cmakeArgs.Append(" ");
@@ -64,15 +70,15 @@ namespace Build
             // CMake config
             this.execCommand(
                 "cmake", 
-                cmakeArgs.ToString(), 
-                Path.Combine(this.orbitalRootDir, "Build")
+                cmakeArgs.ToString(),
+                orbitalBuildDir
                 );
 
             // Build
             this.execCommand(
                 "cmake",
                 "--build . --config Debug",
-                Path.Combine(this.orbitalRootDir, "Build")
+                orbitalBuildDir
                 );
 
         }
