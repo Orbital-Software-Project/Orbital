@@ -9,6 +9,7 @@ namespace Build
 {
     public class Setup
     {
+
         private string workDir = string.Empty;
         private string orbitalRootDir = string.Empty;
         private string orbitalThirdPartyDir = string.Empty;
@@ -24,12 +25,12 @@ namespace Build
 
             this.workDir = Path.Combine(Directory.GetCurrentDirectory(), "tmp");
             this.orbitalRootDir = "C:\\Users\\rphil\\Desktop\\Orbital";
-            this.orbitalThirdPartyDir = Path.Combine(orbitalRootDir, "ThirdParty");
+            this.orbitalThirdPartyDir = Path.Combine(this.orbitalRootDir, "ThirdParty");
 
             if (Directory.Exists(workDir))
             {
                 //Directory.Delete(workDir, true);
-            } 
+            }
 
             Directory.CreateDirectory(workDir);
         }
