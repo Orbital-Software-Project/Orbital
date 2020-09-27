@@ -5,29 +5,30 @@
 
 
  TODO to first prototype:
- - individual model transformation (translation, rotation, scale) [partially done]
- - Video background in mapviewer
- - View virtual camera
+ - individual model transformation (translation, rotation, scale) [done]
+ - Video background in mapviewer [done]
+ - View virtual camera [done]
 
 
 Nice to have:
  - Improve viewport navigation -> imgui guizmos
  - Filter view (show grid, landmarks, keyframes etc.)
- - Draw keyframes [done] - Points need to be visible
+ - Draw keyframes [done] - Points need to be visible 
  - Export via assimp (assimp is broken with vcpkg)
  - Add pause button
  - Add project system
  - Add ImGui Sequencer
  - Add ImGui nodes
  - Add Masking system
- -! optional docking -> imgui docking branch
- -! Windows support
+ -! optional docking -> imgui docking branch [done]
+ -! Windows support [done]
 
 
  Design:
  (UI)MapViewer -> SceneRenderer -> Mesh
                                ^-> Shader
                                ^-> Camera
+
  SceneRenderer
  This classes contains all the entities
  Active camera is selectet to render from the cameras view
