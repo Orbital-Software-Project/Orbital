@@ -41,12 +41,12 @@ endif()
 find_package(Threads REQUIRED)
 
 # OpenMP
-#find_package(OpenMP REQUIRED)
-#if(NOT TARGET OpenMP::OpenMP_CXX)
-#    add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
-#    set_property(TARGET OpenMP::OpenMP_CXX
-#                 PROPERTY INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
-#endif()
+find_package(OpenMP REQUIRED)
+if(NOT TARGET OpenMP::OpenMP_CXX)
+    add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
+    set_property(TARGET OpenMP::OpenMP_CXX
+                 PROPERTY INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
+endif()
 
 # Eigen
 find_package(Eigen3 3.3 REQUIRED)
@@ -101,7 +101,7 @@ endif()
 
 
 
-set(USE_SSE_ORB OFF CACHE BOOL "Enable SSE3 instruction for ORB extraction")
+set(USE_SSE_ORB ON CACHE BOOL "Enable SSE3 instruction for ORB extraction")
 if(USE_SSE_ORB)
     target_compile_options(openvslam PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-msse3>)
     target_compile_definitions(openvslam PUBLIC USE_SSE_ORB)
@@ -110,7 +110,7 @@ else()
     message(STATUS "SSE3 for ORB extraction: DISABLED")
 endif()
 
-set(USE_SSE_FP_MATH OFF CACHE BOOL "Enable SSE instruction for floating-point operation")
+set(USE_SSE_FP_MATH ON CACHE BOOL "Enable SSE instruction for floating-point operation")
 if(USE_SSE_FP_MATH)
     target_compile_options(openvslam PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-mfpmath=sse>)
     message(STATUS "SSE for floating-point operation: ENABLED")
@@ -311,7 +311,7 @@ target_include_directories(openvslam
 target_link_libraries(openvslam
                       PUBLIC
                       Threads::Threads
-                      #OpenMP::OpenMP_CXX
+                      OpenMP::OpenMP_CXX
                       Eigen3::Eigen
                       yaml-cpp
                       opencv_core
@@ -333,8 +333,7 @@ target_link_libraries(openvslam
 
 
 # OpenMP
-
-set(USE_OPENMP OFF CACHE BOOL "Use OpenMP")
+set(USE_OPENMP ON CACHE BOOL "Use OpenMP")
 if(USE_OPENMP)
     target_compile_options(openvslam PRIVATE ${OpenMP_CXX_FLAGS})
     target_compile_definitions(openvslam PUBLIC USE_OPENMP)

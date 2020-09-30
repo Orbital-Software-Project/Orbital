@@ -3,28 +3,36 @@ cmake_minimum_required(VERSION 2.8.9)
 project(Editor)
 
 Set(SRC
-        # Core
+
+    # Core
 	Main.cpp
-        Core.h
-        Core.cpp
-        Global.h
-        Utils.hpp
+    Core.h
+    Core.cpp
+    Global.h
+    Utils.hpp
 
-        # Tasks
-        SlamTask.h
-        SlamTask.cpp
+    # Tasks
+    SlamTask.h
+    SlamTask.cpp
 
-        # Editors
-        VideoPreview.h
-        VideoPreview.cpp
-        Outliner.h
-        Outliner.cpp
-	    PropertyEditor.h
-        PropertyEditor.cpp
-	    NodeEditor.h
-        NodeEditor.cpp
-        MapViewer.h
-        MapViewer.cpp
+    # Editors
+    VideoPreview.h
+    VideoPreview.cpp
+    Outliner.h
+    Outliner.cpp
+	PropertyEditor.h
+    PropertyEditor.cpp
+	NodeEditor.h
+    NodeEditor.cpp
+    MapViewer.h
+    MapViewer.cpp
+
+	# Nodes
+	Nodes/FileNode.h
+	Nodes/FileNode.cpp
+	Nodes/SlamNode.h
+	Nodes/SlamNode.cpp
+
 )
 
 if(MSVC)

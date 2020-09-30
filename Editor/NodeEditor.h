@@ -1,15 +1,25 @@
 #pragma once
 
 #include <memory>
-#include "SceneRenderer.h"
 
+#include <imgui.h>
+#include <imgui_node_editor.h>
 
-#include "imgui_node_editor.h"
-
+#include <vector>
 
 namespace Orb {
+    class SceneRenderer;
+    class INode;
+}
 
-namespace ed = ax::NodeEditor;
+namespace Orb {
+    
+    struct LinkInfo
+    {
+        ax::NodeEditor::LinkId Id;
+        ax::NodeEditor::PinId InputId;
+        ax::NodeEditor::PinId OutputId;
+    };
 
 
 class NodeEditor {
@@ -23,7 +33,10 @@ public:
 
 private:
     std::shared_ptr<SceneRenderer> renderer;
-    ax::NodeEditor::EditorContext* g_Context = nullptr;
+    ax::NodeEditor::EditorContext* context = nullptr;
+
+    ImVector<LinkInfo> links;
+    std::vector<std::shared_ptr<INode>> nodes;
 
 };
 
