@@ -5,6 +5,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 
+using System.Runtime.InteropServices;
+
 namespace Build
 {
     public class Setup
@@ -20,11 +22,13 @@ namespace Build
         private string assimpInstallDir = string.Empty;
         private string imguiNodeEditorInstallDir = string.Empty;
 
+        private bool isWindows = false;
+
         public Setup()
         {
 
             this.workDir = Path.Combine(Directory.GetCurrentDirectory(), "tmp");
-            this.orbitalRootDir = "C:\\Users\\rphil\\Desktop\\Orbital";
+            this.orbitalRootDir = "/home/celvin/Documents/Projects/Orbital";
             this.orbitalThirdPartyDir = Path.Combine(this.orbitalRootDir, "ThirdParty");
 
             if (Directory.Exists(workDir))
@@ -37,6 +41,8 @@ namespace Build
 
         public void Start()
         {
+            this.isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
             this.setupVCPKG();
             this.setupImGui();
             this.setupImGuiNodeEditor();
@@ -49,6 +55,11 @@ namespace Build
 
         private void setupOrbital()
         {
+            if(!this.isWindows) {
+                return;
+            }
+            
+
             string orbitalBuildDir = Path.Combine(this.orbitalRootDir, "Build");
             if (!Directory.Exists(orbitalBuildDir))
             {
@@ -58,8 +69,12 @@ namespace Build
             StringBuilder cmakeArgs = new StringBuilder();
             cmakeArgs.Append("-DCMAKE_TOOLCHAIN_FILE=" + this.vcpkgToolchainFile);
             cmakeArgs.Append(" ");
-            cmakeArgs.Append("-DVCPKG_TARGET_TRIPLET=x64-windows");
-            cmakeArgs.Append(" ");
+           
+            if(this.isWindows) {
+                cmakeArgs.Append("-DVCPKG_TARGET_TRIPLET=x64-windows");
+                cmakeArgs.Append(" ");
+            }
+            
             cmakeArgs.Append("-DCMAKE_BUILD_TYPE=Debug");
             cmakeArgs.Append(" ");
             cmakeArgs.Append("-Dg2o_DIR=" + Path.Combine(this.g2oInstallDir, "lib", "cmake", "g2o"));
@@ -102,23 +117,46 @@ namespace Build
                 ZipFile.ExtractToDirectory(zipFile, this.orbitalThirdPartyDir);
             }
 
+            
 
 
-            if(!File.Exists(Path.Combine(vcpkgDir, "vcpkg.exe")))
+            if(!File.Exists(Path.Combine(vcpkgDir, "vcpkg" + (this.isWindows ? ".exe" : ""))))
             {
-                this.execCommand(
-                    "cmd", 
-                    "/C bootstrap-vcpkg.bat", 
-                    vcpkgDir
+                if(this.isWindows) {
+                    this.execCommand(
+                        "cmd", 
+                        "/C bootstrap-vcpkg.bat", 
+                        vcpkgDir
                     );
+                } else {
+                    this.execCommand(
+                        "sh", 
+                        "bootstrap-vcpkg.sh", 
+                        vcpkgDir
+                    );
+                }
+                
             }
 
-            this.execCommand(
-                "cmd", 
-                "/C vcpkg.exe install assimp opencv eigen3 yaml-cpp glog suitesparse glfw3 glew nativefiledialog glm --triplet x64-windows", 
-                vcpkgDir
-                );
 
+
+            // HACK
+            if(this.isWindows)  {
+                this.execCommand(
+                    "vcpkg.exe", 
+                    "install assimp opencv eigen3 yaml-cpp glog suitesparse glfw3 glew nativefiledialog glm --triplet x64-windows", 
+                    vcpkgDir
+                );
+            } else {
+                this.execCommand(
+                    "bash", 
+                    "-c \"./vcpkg install assimp opencv eigen3 yaml-cpp glog suitesparse glfw3 glew nativefiledialog glm\"", 
+                    vcpkgDir
+                );
+            }
+            
+
+            
         }
 
         private void setupDBoW2()
@@ -157,8 +195,12 @@ namespace Build
 
                 StringBuilder cmakeArgs = new StringBuilder();
                 cmakeArgs.Append("-DCMAKE_TOOLCHAIN_FILE=" + this.vcpkgToolchainFile);
-                cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DVCPKG_TARGET_TRIPLET=x64-windows");
+                
+                if(this.isWindows) {
+                    cmakeArgs.Append(" ");
+                    cmakeArgs.Append("-DVCPKG_TARGET_TRIPLET=x64-windows");
+                }
+                
                 cmakeArgs.Append(" ");
                 cmakeArgs.Append("-DBUILD_SHARED_LIBS=ON");
                 cmakeArgs.Append(" ");
@@ -335,8 +377,12 @@ namespace Build
                 StringBuilder cmakeArgs = new StringBuilder();
                 cmakeArgs.Append("-DCMAKE_TOOLCHAIN_FILE=" + this.vcpkgToolchainFile);
                 cmakeArgs.Append(" ");
-                cmakeArgs.Append("-DVCPKG_TARGET_TRIPLET=x64-windows");
-                cmakeArgs.Append(" ");
+
+                if(this.isWindows)  {
+                    cmakeArgs.Append("-DVCPKG_TARGET_TRIPLET=x64-windows");
+                    cmakeArgs.Append(" ");
+                }
+                
                 cmakeArgs.Append("-DCMAKE_BUILD_TYPE=Debug");
                 cmakeArgs.Append(" ");
                 cmakeArgs.Append("-DCMAKE_INSTALL_PREFIX=" + this.g2oInstallDir);
@@ -377,7 +423,7 @@ namespace Build
 
         private void execCommand(string command, string arguments, string workdir)
         {
-            ProcessStartInfo process = new ProcessStartInfo(command, arguments);
+            ProcessStartInfo process = new ProcessStartInfo(command.Trim(), arguments);
             process.WorkingDirectory = workdir;
             Process.Start(process).WaitForExit();
         }

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 
-#set(g2o_DIR   ./g2o/lib/cmake/g2o)
-#set(DBoW2_DIR ./DBoW2/lib/cmake/DBoW2)
+set(g2o_DIR   ./g2o/lib/cmake/g2o)
+set(DBoW2_DIR ./DBoW2/lib/cmake/DBoW2)
 
 # spdlog
 set(spdlog_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/openvslam/3rd/spdlog/include)
