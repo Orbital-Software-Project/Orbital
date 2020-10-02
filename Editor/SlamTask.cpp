@@ -42,7 +42,10 @@ void SlamTask::Cancel() {
 
         this->SLAM->request_terminate();
 
-        this->slamTask.join();
+        if (this->slamTask.joinable()) {
+            this->slamTask.join();
+        }
+
         this->report.Status == TaskStatus::Canceled;
 
     }
