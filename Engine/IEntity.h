@@ -21,6 +21,8 @@ public:
 
     bool Visible = true;
 
+    bool VisibleInOutliner = true;
+
     glm::mat4 Matrix = glm::mat4(1.0f);
 
     glm::vec3 Position = glm::vec4(0.0f);

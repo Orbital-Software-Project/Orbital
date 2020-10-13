@@ -30,28 +30,33 @@ MapViewer::MapViewer(std::shared_ptr<SceneRenderer> renderer, std::shared_ptr<Sh
     // Shader model
     this->meshShader = shader;
 
+
     this->pointCloud = std::make_shared<Mesh>();
+    this->pointCloud->VisibleInOutliner = false;
     this->pointCloud->SetPolygonMode(GL_POINTS);
     this->pointCloud->DrawOnlyVertColors(true);
     this->renderer->AddEntity(this->pointCloud);
 
 
     this->viewportCam = std::make_shared<Camera>();
+    this->viewportCam->VisibleInOutliner = false;
     this->viewportCam->Visible = false;
     this->renderer->AddEntity(this->viewportCam);
 
+
     this->slamCam = std::make_shared<Camera>();
+    this->slamCam->VisibleInOutliner = false;
     this->renderer->AddEntity(this->slamCam);
 
 
-
     this->keyframes = std::make_shared<Mesh>();
+    this->keyframes->VisibleInOutliner = false;
     this->keyframes->DrawOnlyVertColors(true);
     this->keyframes->SetPolygonMode(GL_LINE_STRIP);
     this->renderer->AddEntity(this->keyframes);
 
-    this->initGridMesh();
 
+    this->initGridMesh();
 }
 
 MapViewer::~MapViewer() {
@@ -71,7 +76,7 @@ void MapViewer::OnRender() {
     ImVec2 vSize = ImVec2(vMax.x - vMin.x, vMax.y - (vMin.y + 30));
 
     // when the window is to small the framebuffer throws errors
-    if(vSize.x < 50 || vSize.y < 50) {
+    if (vSize.x < 50 || vSize.y < 50) {
         vSize = ImVec2(800, 600);
         ImGui::SetWindowSize(vSize);
     }
@@ -91,14 +96,14 @@ void MapViewer::OnRender() {
     this->updateKeyFrames();
 
     this->gridMesh->Visible = !this->viewVirtualCamera;
-    this->slamCam->Visible =  !this->viewVirtualCamera;
+    this->slamCam->Visible = !this->viewVirtualCamera;
 
     // Set view matrix
     this->meshShader->SetMat4("view", this->viewportCam->Matrix);
 
     // use negative apsect ration to flip viewport because of openvslam
     // https://www.learnopengles.com/tag/aspect-ratio/
-    this->meshShader->SetMat4("projection", glm::perspective(glm::radians(45.0f), -vSize .x / vSize.y, 0.1f, 100.0f));
+    this->meshShader->SetMat4("projection", glm::perspective(glm::radians(45.0f), -vSize.x / vSize.y, 0.1f, 100.0f));
 
 
     // Childframe to prevent movement of the window and enable viewport rotation
@@ -110,89 +115,110 @@ void MapViewer::OnRender() {
 
     // ImGui Viewport navigation
     {
-        if(ImGui::IsWindowFocused()) {
 
-            static bool dragging = false;
-            static ImVec2 p0 = ImVec2(0, 0);
-            static ImVec2 p1 = ImVec2(0, 0);
+        if (ImGui::IsWindowFocused()) {
 
-            auto *io = &ImGui::GetIO();
+            auto* io = &ImGui::GetIO();
+
             // Dragging logic for Viewport rotation
-            if(io->MouseDown[0]) {
-                static ImVec2 p1Old = ImVec2(0, 0);
+            if (io->MouseDown[0]) {
 
-                // First position from first click
-                if(!dragging) {
-                    // Get first mouse pos
-                    p0 = io->MousePos;
-                    p1 = io->MousePos;
-                    p1Old = ImVec2(0, 0);
-                    dragging = true;
+                bool mouseInViewportArea = false;
 
-                } else {
+                // Check if cursor is in Viewport area
+
+                ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+                ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+
+                vMin.x += ImGui::GetWindowPos().x;
+                vMin.y += ImGui::GetWindowPos().y;
+                vMax.x += ImGui::GetWindowPos().x;
+                vMax.y += ImGui::GetWindowPos().y;
+
+                mouseInViewportArea =
+                    io->MousePos.x >= vMin.x &&
+                    io->MousePos.y >= vMin.y &&
+                    io->MousePos.x <= vMax.x &&
+                    io->MousePos.y <= vMax.y;
+
+
+                static ImVec2 p0 = ImVec2(0, 0);
+                static ImVec2 p1 = ImVec2(0, 0);
+
+                if (mouseInViewportArea) {
+
+
                     // Update second mouse position to calc offset from p0
-                    p1 = io->MousePos;
+                    p0 = p1;
+                    p1 = ImVec2(io->MousePos.x - vMin.x, io->MousePos.y - vMin.y);
+
+
+                    // Only apply rotation when cursor has moved
+                    if (p0.x != p1.x || p0.y != p1.y) {
+
+                        ImVec2 delta(p0.x - p1.x, p1.y - p0.y);
+
+                        // filter delta so there are no camera rotation jumps in the viewport
+                        if ((delta.x < 50 && delta.x > -50) && (delta.y < 50 && delta.y > -50)) {
+
+                            float sensitivity = 0.1f;
+
+                            this->viewportCam->Yaw += (delta.x * sensitivity);
+                            this->viewportCam->Pitch += (delta.y * sensitivity);
+
+                            if (this->viewportCam->Pitch > 89.0f) { this->viewportCam->Pitch = 89.0f; }
+                            if (this->viewportCam->Pitch < -89.0f) { this->viewportCam->Pitch = -89.0f; }
+
+                            glm::vec3 direction;
+                            direction.x = std::cos(glm::radians(this->viewportCam->Yaw)) * std::cos(glm::radians(this->viewportCam->Pitch));
+                            direction.y = std::sin(glm::radians(this->viewportCam->Pitch));
+                            direction.z = std::sin(glm::radians(this->viewportCam->Yaw)) * std::cos(glm::radians(this->viewportCam->Pitch));
+
+                            this->viewportCam->CameraFront = glm::normalize(direction);
+
+                        }
+
+
+                    }
                 }
-
-                // Only apply rotation when cursor has moved
-                if(p1Old.x != p1.x || p1Old.y != p1.y) {
-
-                    ImVec2 delta(p0.x - p1.x , p1.y - p0.y);
-
-                    float sensitivity = 0.1f;
-
-                    this->viewportCam->Yaw += (delta.x * sensitivity);
-                    this->viewportCam->Pitch += (delta.y * sensitivity);
-
-                    if(this->viewportCam->Pitch > 89.0f) { this->viewportCam->Pitch = 89.0f; }
-                    if(this->viewportCam->Pitch < -89.0f) { this->viewportCam->Pitch = -89.0f; }
-
-                    glm::vec3 direction;
-                    direction.x = std::cos(glm::radians(this->viewportCam->Yaw )) * cos(glm::radians(this->viewportCam->Pitch));
-                    direction.y = std::sin(glm::radians(this->viewportCam->Pitch));
-                    direction.z = std::sin(glm::radians(this->viewportCam->Yaw )) * cos(glm::radians(this->viewportCam->Pitch));
-
-                    this->viewportCam->CameraFront = glm::normalize(direction);
-                }
-                p1Old = p1;
-            } else {
-                // Reset dragging
-                dragging = false;
-
-                p0 = ImVec2(0, 0);
-                p1 = ImVec2(0, 0);
             }
+
+
 
 
             static float cameraSpeed = 0.1f;
 
             // Handle viewport navigation with keys
-            if(ImGui::IsKeyPressed(GLFW_KEY_W)) {
+            if (ImGui::IsKeyPressed(GLFW_KEY_W)) {
                 this->viewportCam->Position += cameraSpeed * this->viewportCam->CameraFront;
 
-            } else if (ImGui::IsKeyPressed(GLFW_KEY_S)) {
+            }
+            else if (ImGui::IsKeyPressed(GLFW_KEY_S)) {
                 this->viewportCam->Position -= cameraSpeed * this->viewportCam->CameraFront;
 
-            } else if (ImGui::IsKeyPressed(GLFW_KEY_A)) {
+            }
+            else if (ImGui::IsKeyPressed(GLFW_KEY_A)) {
                 this->viewportCam->Position += glm::normalize(glm::cross(this->viewportCam->CameraFront, this->viewportCam->CameraUp)) * cameraSpeed;
 
-            } else if (ImGui::IsKeyPressed(GLFW_KEY_D)) {
+            }
+            else if (ImGui::IsKeyPressed(GLFW_KEY_D)) {
                 this->viewportCam->Position -= glm::normalize(glm::cross(this->viewportCam->CameraFront, this->viewportCam->CameraUp)) * cameraSpeed;
 
-            } else if (ImGui::IsKeyPressed(GLFW_KEY_SPACE)) {
+            }
+            else if (ImGui::IsKeyPressed(GLFW_KEY_SPACE)) {
                 this->viewportCam->Position -= glm::vec3(0.0f, 0.1f, 0.0f);
 
-            } else if (ImGui::IsKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
+            }
+            else if (ImGui::IsKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
                 this->viewportCam->Position += glm::vec3(0.0f, 0.1f, 0.0f);
             }
 
-
-            if(!this->viewVirtualCamera) {
+            if (!this->viewVirtualCamera) {
                 this->viewportCam->Matrix = glm::lookAt(
-                            this->viewportCam->Position,
-                            this->viewportCam->Position + this->viewportCam->CameraFront,
-                            this->viewportCam->CameraUp
-                            );
+                    this->viewportCam->Position,
+                    this->viewportCam->Position + this->viewportCam->CameraFront,
+                    this->viewportCam->CameraUp
+                );
             }
 
         }
@@ -386,6 +412,8 @@ void MapViewer::initGridMesh() {
     std::vector<float> gridVerticies;
 
     this->gridMesh = PrimitiveFactory::Grid();
+
+    this->gridMesh->VisibleInOutliner = false;
     this->gridMesh->SetPolygonMode(GL_LINES);
     this->gridMesh->DrawOnlyVertColors(true);
 
@@ -491,9 +519,12 @@ void MapViewer::updateVideoPlane(float width, float height, float depth) {
 
     if(this->videoPlane.get() == nullptr) {
         this->videoPlane = PrimitiveFactory::SizedPlane(newWidth, newHeight);
+
         this->videoTexture = std::make_shared<Texture>();
         this->videoPlane->Textures.push_back(this->videoTexture);
+        this->videoPlane->VisibleInOutliner = false;
         this->renderer->AddEntity(this->videoPlane);
+
     }
     this->videoPlane->Visible = this->showVideoBackground;
 

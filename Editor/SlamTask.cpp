@@ -46,7 +46,7 @@ void SlamTask::Cancel() {
             this->slamTask.join();
         }
 
-        this->report.Status == TaskStatus::Canceled;
+        this->report.Status = TaskStatus::Canceled;
 
     }
 }

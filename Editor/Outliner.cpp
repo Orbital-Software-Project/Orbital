@@ -18,13 +18,17 @@ void Outliner::OnRender(){
 
     ImGui::Begin("Outliner");
     {
-        auto meshes = renderer->GetEntities();
+        auto entities = renderer->GetEntities();
         int i = 0;
         // Display all meshes
         {
 
             std::shared_ptr<IEntity> entityToRemove = nullptr;
-            for(std::shared_ptr<IEntity> entity : meshes) {
+            for(std::shared_ptr<IEntity> entity : entities) {
+                if (!entity->VisibleInOutliner) {
+                    continue;
+                }
+
                 ImGui::PushID(std::to_string(i++).c_str());
 
                 ImGui::Text(entity->Name.c_str());

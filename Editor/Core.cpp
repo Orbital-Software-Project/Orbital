@@ -110,8 +110,10 @@ void Core::Run() {
     glViewport(0, 0, actualWindowWidth, actualWindowHeight);
 
     {
+
         // Init ImGui
         IMGUI_CHECKVERSION();
+
         ImGui::CreateContext();
 
         ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -119,14 +121,16 @@ void Core::Run() {
 
         ImGuiIO& io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
     }
     
 
 
     // Default example paths
-    std::string videoFile = "/home/celvin/Documents/Projects/Orbital/Content/bata-park/video.mp4";
-    std::string vocabFile = "/home/celvin/Documents/Projects/Orbital/Content/orb_vocab/orb_vocab.dbow2";
-    std::string cfgFile   = "/home/celvin/Documents/Projects/Orbital/Content/bata-park/config.yaml";
+    std::string videoFile = "";
+    std::string vocabFile = "";
+    std::string cfgFile   = "";
+
 
     std::shared_ptr<Shader> shader = std::make_shared<Shader>("Shaders/Mesh.vs", "Shaders/Mesh.fs");
     std::shared_ptr<SceneRenderer> renderer = std::make_shared<SceneRenderer>();
@@ -136,19 +140,13 @@ void Core::Run() {
     Outliner outliner(renderer);
     MapViewer mapViewer(renderer, shader);
     PropertyEditor propertyEd(renderer);
-    NodeEditor nodeEd(renderer);
 
+    //NodeEditor nodeEd(renderer);
 
     std::unique_ptr<SlamTask> slamTask = std::make_unique<SlamTask>();
 
-    
-    
-    
-
     while (!glfwWindowShouldClose(window))
     {
-
-
         glfwPollEvents();
         glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -162,12 +160,13 @@ void Core::Run() {
         static bool showDockSpace = true;
         this->ShowDockSpace(&showDockSpace);
 
-
         preview.OnRender();
         outliner.OnRender();
         mapViewer.OnRender();
         propertyEd.OnRender();
-        nodeEd.OnRender();
+
+
+        //nodeEd.OnRender();
 
         // Main menubar
         {
