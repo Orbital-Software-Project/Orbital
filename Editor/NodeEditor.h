@@ -13,7 +13,7 @@ namespace Orb {
 }
 
 namespace Orb {
-    
+
     struct LinkInfo
     {
         ax::NodeEditor::LinkId Id;
@@ -21,23 +21,29 @@ namespace Orb {
         ax::NodeEditor::PinId OutputId;
     };
 
+    // https://www.youtube.com/watch?v=xbTLhMJARrk&list=PLZSNHzwDCOggHLThIbCxUhWTgrKVemZkz
+    // https://www.blenderfreak.com/tutorials/node-editor-tutorial-series/
 
-class NodeEditor {
 
-public:
-    NodeEditor(std::shared_ptr<SceneRenderer> renderer);
+    class NodeEditor {
 
-    ~NodeEditor();
+    public:
+        NodeEditor(std::shared_ptr<SceneRenderer> renderer);
 
-    void OnRender();
+        ~NodeEditor();
 
-private:
-    std::shared_ptr<SceneRenderer> renderer;
-    ax::NodeEditor::EditorContext* context = nullptr;
+        void OnRender();
 
-    ImVector<LinkInfo> links;
-    std::vector<std::shared_ptr<INode>> nodes;
+    private:
+        void drawToolbar();
 
-};
+    private:
+        std::shared_ptr<SceneRenderer> renderer;
+        ax::NodeEditor::EditorContext* context = nullptr;
+
+        ImVector<LinkInfo> links;
+        std::vector<std::shared_ptr<INode>> nodes;
+
+    };
 
 }

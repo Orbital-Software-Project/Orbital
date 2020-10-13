@@ -5,10 +5,15 @@
 
 
  TODO to first prototype:
- - individual model transformation (translation, rotation, scale) [done]
- - Video background in mapviewer [done]
- - View virtual camera [done]
-
+ - [done] individual model transformation (translation, rotation, scale) 
+ - [done] Video background in mapviewer 
+ - [done] View virtual camera
+ - Improve performance
+ - Finish node system
+ - Video playback
+ - Track untracked frames
+ - Render to video
+ - Add Tasksystem (taskflow, imgui code style)
 
 Nice to have:
  - Improve viewport navigation -> imgui guizmos

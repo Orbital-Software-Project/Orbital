@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8.9)
 
 project(Editor)
 
+find_package(Cpp-Taskflow CONFIG REQUIRED)
+
 Set(SRC
 
     # Core
@@ -32,6 +34,10 @@ Set(SRC
 	Nodes/FileNode.cpp
 	Nodes/SlamNode.h
 	Nodes/SlamNode.cpp
+	Nodes/VideoPrevNode.h
+	Nodes/VideoPrevNode.cpp
+	Nodes/MapViewNode.h
+	Nodes/MapViewNode.cpp
 
 )
 
@@ -73,6 +79,7 @@ target_link_libraries(Editor PRIVATE
     ${OpenCV_LIBS}
     openvslam
     unofficial::nativefiledialog::nfd
+    Cpp-Taskflow::Cpp-Taskflow
 )
 
 

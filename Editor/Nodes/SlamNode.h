@@ -2,7 +2,11 @@
 
 #include "INode.h"
 
+#include <memory>
+
 namespace Orb {
+
+class SlamTask;
 
 class SlamNode : public INode {
 
@@ -13,6 +17,8 @@ public:
 
     void OnRender(int &id);
 
+private:
+    std::unique_ptr<SlamTask> slamTask = nullptr;
 };
 
 }

@@ -4,6 +4,8 @@
 #include "Nodes/INode.h"
 #include "Nodes/FileNode.h"
 #include "Nodes/SlamNode.h"
+#include "Nodes/VideoPrevNode.h"
+#include "Nodes/MapViewNode.h"
 
 namespace Orb {
 
@@ -13,7 +15,13 @@ NodeEditor::NodeEditor(std::shared_ptr<SceneRenderer> renderer) {
 
     // Default node setup
     this->nodes.push_back(std::make_shared<FileNode>());
+    this->nodes.push_back(std::make_shared<FileNode>());
+    this->nodes.push_back(std::make_shared<FileNode>());
+
+    this->nodes.push_back(std::make_shared<VideoPrevNode>());
     this->nodes.push_back(std::make_shared<SlamNode>());
+    this->nodes.push_back(std::make_shared<MapViewNode>());
+
 
 }
 
@@ -23,8 +31,11 @@ NodeEditor::~NodeEditor() {
 }
 
 void NodeEditor::OnRender() {
-
+    
     ImGui::Begin("Node Editor");
+
+    this->drawToolbar();
+
     {
         ax::NodeEditor::SetCurrentEditor(context);
         {
@@ -67,8 +78,9 @@ void NodeEditor::OnRender() {
                 }
                 ax::NodeEditor::Resume();*/
 
+
                 // Create link logic
-                int linkId = 100;
+                static int linkId = 0;
                 if (ax::NodeEditor::BeginCreate())
                 {
                     ax::NodeEditor::PinId inputPinId, outputPinId;
@@ -77,13 +89,11 @@ void NodeEditor::OnRender() {
 
                         if (ax::NodeEditor::AcceptNewItem())
                         {
-
                             // Since we accepted new link, lets add one to our list of links.
                             this->links.push_back({ ax::NodeEditor::LinkId(linkId++), inputPinId, outputPinId });
 
                             // Draw new link.
                             ax::NodeEditor::Link(this->links.back().Id, this->links.back().InputId, this->links.back().OutputId);
-
                         }
 
                     }
@@ -123,4 +133,53 @@ void NodeEditor::OnRender() {
 
 }
 
+
+void NodeEditor::drawToolbar() {
+    
+
+    const char* items[] = { 
+        "File Node", 
+        "Track and Map Tasknode",
+        "Map Viewer Node",
+        "Video preview Node",
+    };
+
+    static const char* current_item = NULL;
+
+    ImGui::SetNextItemWidth(200);
+    if (ImGui::BeginCombo("##combo", "Add Node")) {
+
+        for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+        {
+            bool is_selected = (current_item == items[n]);
+            if (ImGui::Selectable(items[n], is_selected)) {
+                current_item = items[n];
+                switch (n) {
+                case 0:
+                    this->nodes.push_back(std::make_shared<FileNode>());
+                    break;
+                case 1:
+                    this->nodes.push_back(std::make_shared<SlamNode>());
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                }
+
+            }
+
+            if (is_selected) {
+                ImGui::SetItemDefaultFocus();
+            }
+
+        }
+
+        ImGui::EndCombo();
+    }
+    
+
+    ImGui::Separator();
+
+}
 }
