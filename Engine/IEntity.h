@@ -7,7 +7,15 @@
 
 namespace Orb {
 
+    
 class IEntity {
+
+public:
+    enum class EntityType {
+        Camera,
+        Mesh
+    };
+
 
 public:
     IEntity() {};
@@ -16,6 +24,8 @@ public:
 
 public:
     virtual void Draw(std::shared_ptr<Shader> shader) = 0;
+
+    virtual EntityType GetEntityType() = 0;
 
     bool Selected = false;
 

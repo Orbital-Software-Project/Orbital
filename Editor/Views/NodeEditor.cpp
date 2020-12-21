@@ -1,11 +1,11 @@
 #include "NodeEditor.h"
 #include "SceneRenderer.h"
 
-#include "Nodes/INode.h"
-#include "Nodes/FileNode.h"
-#include "Nodes/SlamNode.h"
-#include "Nodes/VideoPrevNode.h"
-#include "Nodes/MapViewNode.h"
+#include "Editor/Nodes/INode.h"
+#include "Editor/Nodes/FileNode.h"
+#include "Editor/Nodes/SlamNode.h"
+#include "Editor/Nodes/VideoPrevNode.h"
+#include "Editor/Nodes/MapViewNode.h"
 
 namespace Orb {
 

@@ -15,7 +15,9 @@ public:
 
     ~Camera();
 
-    virtual void Draw(std::shared_ptr<Shader> shader);
+    void Draw(std::shared_ptr<Shader> shader);
+
+    IEntity::EntityType GetEntityType() { return  IEntity::EntityType::Camera; }
 
     glm::vec3 CameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
 

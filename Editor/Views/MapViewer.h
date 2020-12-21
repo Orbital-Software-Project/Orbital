@@ -28,34 +28,22 @@ public:
 private:
     void drawToolbar();
 
-    void updatePointCloudMesh();
-
-    void updateCameraPos();
-
-    void updateKeyFrames();
-
     void initGridMesh();
 
-    void initVideoPlane();
-
-    void updateVideoPlane(float width, float height, float depth);
+    void handleViewportNav(ImVec2 vMin, ImVec2 vMax);
 
 private:
     std::shared_ptr<Shader> meshShader = nullptr;
     std::shared_ptr<Mesh> gridMesh = nullptr;
-    std::shared_ptr<Mesh> pointCloud = nullptr;
-    std::shared_ptr<Mesh> keyframes = nullptr;
-
     std::shared_ptr<Camera> viewportCam = nullptr;
-    std::shared_ptr<Camera> slamCam = nullptr;
-
-    std::shared_ptr<Texture> videoTexture = nullptr;
-    std::shared_ptr<Mesh> videoPlane = nullptr;
-
     std::shared_ptr<SceneRenderer> renderer = nullptr;
 
-    bool viewVirtualCamera = false;
+    
     bool showVideoBackground = false;
+    float backVideoDistance = 2.5f;
+
+    int currCameraIdx = 0;
+    //std::map<int, std::shared_ptr<Camera>> cameraMap;
 
 };
 

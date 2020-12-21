@@ -1,6 +1,9 @@
 # project
 cmake_minimum_required (VERSION 2.6)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 project(libviso2)
 
 # directories
@@ -24,10 +27,7 @@ set(LIBVISO2_SRC_FILES
     "src/viso_stereo.cpp"
 )
 
-# make release version
-#set(CMAKE_BUILD_TYPE Release)
-
 # demo program
-add_library(viso2 ${LIBVISO2_SRC_FILES})
+add_library(libviso2 ${LIBVISO2_SRC_FILES})
 
-# target_link_libraries (viso2 png)
+target_include_directories(libviso2 PUBLIC "src/")

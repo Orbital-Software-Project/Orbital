@@ -2,7 +2,7 @@
 
 #include <imgui.h>
 
-#include "Global.h"
+#include "Editor/Global.h"
 
 namespace Orb {
 

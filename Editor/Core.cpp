@@ -11,18 +11,20 @@
 #include <nfd.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <memory>
 
-#include "VideoPreview.h"
-#include "MapViewer.h"
 
 #include "Global.h"
 #include "Utils.hpp"
-#include "SlamTask.h"
-#include "Outliner.h"
-#include "PropertyEditor.h"
-#include "NodeEditor.h"
+
+
+#include "Views/VideoPreview.h"
+#include "Views/MapViewer.h"
+#include "Views/Outliner.h"
+#include "Views/PropertyEditor.h"
+#include "Views/TaskPanel.h"
+
+// #include "Views/NodeEditor.h"
 
 #include "imgui_node_editor.h"
 
@@ -47,6 +49,7 @@ void Core::Run() {
     glfwWindowHint(GLFW_STENCIL_BITS, 8);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
     std::string glsl_version = "";
 #ifdef __APPLE__
@@ -124,26 +127,17 @@ void Core::Run() {
 
     }
     
-
-
-    // Default example paths
-    std::string videoFile = "";
-    std::string vocabFile = "";
-    std::string cfgFile   = "";
-
-
     std::shared_ptr<Shader> shader = std::make_shared<Shader>("Shaders/Mesh.vs", "Shaders/Mesh.fs");
-    std::shared_ptr<SceneRenderer> renderer = std::make_shared<SceneRenderer>();
+    
 
 
     VideoPreview preview;
-    Outliner outliner(renderer);
-    MapViewer mapViewer(renderer, shader);
-    PropertyEditor propertyEd(renderer);
+    Outliner outliner(Global::GetInstance().Renderer);
+    MapViewer mapViewer(Global::GetInstance().Renderer, shader);
+    PropertyEditor propertyEd(Global::GetInstance().Renderer);
+    TaskPanel taskPanel;
 
     //NodeEditor nodeEd(renderer);
-
-    std::unique_ptr<SlamTask> slamTask = std::make_unique<SlamTask>();
 
     while (!glfwWindowShouldClose(window))
     {
@@ -164,7 +158,9 @@ void Core::Run() {
         outliner.OnRender();
         mapViewer.OnRender();
         propertyEd.OnRender();
+        taskPanel.OnRender();
 
+        ImGui::ShowDemoWindow();
 
         //nodeEd.OnRender();
 
@@ -185,54 +181,6 @@ void Core::Run() {
             ImGui::EndMainMenuBar();
         }
 
-        // Control Panel
-        {
-            ImGui::Begin("Panel");
-
-            // Filepicker
-            if(ImGui::Button("Video")) {
-                videoFile = Utils::PickFile();
-            }
-
-            ImGui::Text("%s", videoFile.c_str());
-
-
-            if(ImGui::Button("Vocab")) {
-                vocabFile = Utils::PickFile();
-            }
-
-            ImGui::Text("%s", vocabFile.c_str());
-
-            if(ImGui::Button("Cfg")) {
-                cfgFile = Utils::PickFile();
-            }
-
-            ImGui::Text("%s", cfgFile.c_str());
-
-            // SLAM can only be started when files are present
-            if(videoFile != "" && cfgFile != "" && vocabFile != "") {
-                if(ImGui::Button("Run SLAM")) {
-                    slamTask = std::make_unique<SlamTask>(videoFile, cfgFile, vocabFile);
-                    slamTask->Run();
-
-                    Global::GetInstance().FramePublisher = slamTask->GetFramePublisher();
-                    Global::GetInstance().MapPublisher = slamTask->GetMapPublisher();
-
-                }
-
-                TaskReport report = slamTask->GetReport();
-                // Show progressbar and cancel button only when slam is running
-                if(report.Status == TaskStatus::Running) {
-                    ImGui::ProgressBar(static_cast<float>(report.FramesProcessed) / static_cast<float>(report.NumFrames));
-                    if(ImGui::Button("Cancel")) {
-                        slamTask->Cancel();
-                    }
-                }
-            }
-
-            ImGui::End();
-        }
-
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -241,7 +189,6 @@ void Core::Run() {
         glfwPollEvents();
     }
     
-
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

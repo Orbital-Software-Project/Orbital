@@ -1,9 +1,8 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.5)
 
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 
 set(CMAKE_TOOLCHAIN_FILE ./ThirdParty/vcpkg-2020.06/scripts/buildsystems/vcpkg.cmake)
 
@@ -22,10 +21,13 @@ find_package(unofficial-nativefiledialog CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 
 
+include_directories(.)
 
 add_subdirectory(ThirdParty)
+add_subdirectory(ThirdParty/libviso2)
+
 add_subdirectory(Engine)
-add_subdirectory(Examples)
+
 add_subdirectory(Editor)
 
 

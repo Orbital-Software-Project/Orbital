@@ -13,6 +13,10 @@
 
 #include "IEntity.h"
 
+#include <viso_mono.h>
+
+#include "Engine/SceneRenderer.h"
+
 namespace Orb {
 
 class Global {
@@ -21,20 +25,23 @@ public: // Singleton
     static Global& GetInstance()
     {
         static Global instance;
+
         return instance;
     }
 private:
-    Global() {}
+    Global() {
+        this->Renderer = std::make_shared<SceneRenderer>();
+    }
 
 public:
     Global(Global const&) = delete;
     void operator=(Global const&) = delete;
 
+    std::shared_ptr<SceneRenderer> Renderer;
 
-public:
-    std::shared_ptr<openvslam::publish::map_publisher> MapPublisher;
+    std::shared_ptr<Texture> VideoFrame;
 
-    std::shared_ptr<openvslam::publish::frame_publisher> FramePublisher;
+    std::mutex GlobalMutex;
 
 };
 

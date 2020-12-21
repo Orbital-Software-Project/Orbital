@@ -333,7 +333,7 @@ target_link_libraries(openvslam
 
 
 # OpenMP
-set(USE_OPENMP ON CACHE BOOL "Use OpenMP")
+set(USE_OPENMP OFF CACHE BOOL "Use OpenMP")
 if(USE_OPENMP)
     target_compile_options(openvslam PRIVATE ${OpenMP_CXX_FLAGS})
     target_compile_definitions(openvslam PUBLIC USE_OPENMP)

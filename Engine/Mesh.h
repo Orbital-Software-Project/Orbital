@@ -3,6 +3,7 @@
 #include "IEntity.h"
 
 #include "Texture.h"
+#include "Vertex.hpp"
 
 #include <vector>
 #include <memory>
@@ -13,27 +14,6 @@
 
 
 namespace Orb {
-
-
-struct Vertex {
-
-    Vertex(glm::vec3 pos = {0.0f, 0.0f, 0.0f}, glm::vec3 col = {0.0f, 0.0f, 0.0f}, glm::vec3 nor = {0.0f, 0.0f, 0.0f}, glm::vec2 uv = {0.0f, 0.0f})
-    {
-        this->Pos = pos;
-        this->Col = col;
-        this->Nor = nor;
-        this->UV  = uv;
-    }
-
-    glm::vec3 Pos;
-
-    glm::vec3 Col;
-
-    glm::vec3 Nor;
-
-    glm::vec2 UV;
-
-};
 
 class Mesh : public IEntity {
 
@@ -46,7 +26,6 @@ public:
 
     void UpdateColored(std::vector<Vertex> vertices = {}, std::vector<unsigned int> indices = {}, std::vector<std::shared_ptr<Texture>> textures = {});
 
-
     void SetPolygonMode(GLenum polygonMode);
 
     std::vector<Vertex> GetVertices();
@@ -55,22 +34,28 @@ public:
 
     void DrawOnlyVertColors(bool option);
 
-    virtual void Draw(std::shared_ptr<Shader> shader);
+    void Draw(std::shared_ptr<Shader> shader);
+
+    IEntity::EntityType GetEntityType() { return  IEntity::EntityType::Mesh; }
+
 
 public:
     std::vector<Vertex> Vertices;
-
     std::vector<unsigned int> Indices;
-
     std::vector<std::shared_ptr<Texture>> Textures;
 
 private:
     void init();
 
+    void updateOpenGLBuffer();
+
 private:
     unsigned int vbo = 0, vao = 0, ebo = 0;
     GLenum polygonMode = GL_TRIANGLES;
     bool drawOnlyVertColors = false;
+
+    bool isInit = true;
+    bool requireOpenGLBufferUpdate = false;
 
 
 };

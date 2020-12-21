@@ -9,7 +9,7 @@
 
 #include <glm/gtx/euler_angles.hpp>
 
-#include "Global.h"
+#include "Editor/Global.h"
 
 namespace Orb {
 

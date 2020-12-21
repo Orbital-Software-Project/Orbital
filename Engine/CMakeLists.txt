@@ -106,6 +106,12 @@ if(MSVC)
     add_compile_options($<$<CONFIG:Debug>:/MDd> $<$<CONFIG:Release>:/MD>)
 endif()
 
+
+#add_subdirectory(Examples)
+
+
+
+
 add_library(Engine STATIC ${ENGINE_SRC} ${SHADERS_SRC})
 target_include_directories(Engine PUBLIC .)
 target_link_libraries(Engine PRIVATE ${OpenCV_LIBS} glfw GLEW::GLEW glm assimp::assimp)

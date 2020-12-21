@@ -41,9 +41,11 @@ public:
 
 private:
     void init();
+    void updateOpenGLBuffer();
 
 private:
     bool initialized = false;
+    bool openglBufferUpdateRequired = false;
 
 
 };

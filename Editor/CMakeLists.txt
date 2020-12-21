@@ -7,37 +7,46 @@ find_package(Cpp-Taskflow CONFIG REQUIRED)
 Set(SRC
 
     # Core
-	Main.cpp
+    Main.cpp
     Core.h
     Core.cpp
-    Global.h
     Utils.hpp
+    Global.h
+
+    # Base
+    Base/Percentage.hpp
 
     # Tasks
-    SlamTask.h
-    SlamTask.cpp
+    Tasks/TaskWorker.h
+    Tasks/TaskWorker.cpp
+    Tasks/OpenVslamTask.h
+    Tasks/OpenVslamTask.cpp
+    Tasks/Viso2Task.h
+    Tasks/Viso2Task.cpp
 
-    # Editors
-    VideoPreview.h
-    VideoPreview.cpp
-    Outliner.h
-    Outliner.cpp
-	PropertyEditor.h
-    PropertyEditor.cpp
-	NodeEditor.h
-    NodeEditor.cpp
-    MapViewer.h
-    MapViewer.cpp
+    # Views
+    Views/VideoPreview.h
+    Views/VideoPreview.cpp
+    Views/Outliner.h
+    Views/Outliner.cpp
+    Views/PropertyEditor.h
+    Views/PropertyEditor.cpp
+    Views/NodeEditor.h
+    Views/NodeEditor.cpp
+    Views/MapViewer.h
+    Views/MapViewer.cpp
+    Views/TaskPanel.h
+    Views/TaskPanel.cpp
 
-	# Nodes
-	Nodes/FileNode.h
-	Nodes/FileNode.cpp
-	Nodes/SlamNode.h
-	Nodes/SlamNode.cpp
-	Nodes/VideoPrevNode.h
-	Nodes/VideoPrevNode.cpp
-	Nodes/MapViewNode.h
-	Nodes/MapViewNode.cpp
+    # Nodes
+    Nodes/FileNode.h
+    Nodes/FileNode.cpp
+    Nodes/SlamNode.h
+    Nodes/SlamNode.cpp
+    Nodes/VideoPrevNode.h
+    Nodes/VideoPrevNode.cpp
+    Nodes/MapViewNode.h
+    Nodes/MapViewNode.cpp
 
 )
 
@@ -80,6 +89,7 @@ target_link_libraries(Editor PRIVATE
     openvslam
     unofficial::nativefiledialog::nfd
     Cpp-Taskflow::Cpp-Taskflow
+    libviso2
 )
 
 

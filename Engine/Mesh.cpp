@@ -3,21 +3,26 @@
 #include <GL/glew.h>
 #include <iostream>
 
+#include "Vertex.hpp"
+
 namespace Orb {
 
 Mesh::Mesh() {
-    this->init();
+    this->isInit = true;
 }
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<std::shared_ptr<Texture>> textures) {
-    this->init();
+    this->isInit = true;
+    
     this->UpdateColored(vertices, indices, textures);
 }
 
 Mesh::~Mesh() {
-    glDeleteBuffers(1, &this->ebo);
-    glDeleteVertexArrays(1, &this->vao);
-    glDeleteBuffers(1, &this->vbo);
+    if (!this->isInit) {
+        glDeleteBuffers(1, &this->ebo);
+        glDeleteVertexArrays(1, &this->vao);
+        glDeleteBuffers(1, &this->vbo);
+    }
 }
 
 void Mesh::UpdateColored(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<std::shared_ptr<Texture>> textures) {
@@ -31,6 +36,72 @@ void Mesh::UpdateColored(std::vector<Vertex> vertices, std::vector<unsigned int>
     this->Vertices = vertices;
     this->Indices = indices;
     this->Textures = textures;
+
+    this->requireOpenGLBufferUpdate = true;
+
+}
+
+void Mesh::DrawOnlyVertColors(bool option) {
+    this->drawOnlyVertColors = option;
+}
+
+void Mesh::SetPolygonMode(GLenum polygonMode) {
+    this->polygonMode = polygonMode;
+}
+
+std::vector<Vertex> Mesh::GetVertices() {
+    return this->Vertices;
+}
+
+std::vector<unsigned int> Mesh::GetIndices() {
+    return this->Indices;
+}
+
+void Mesh::Draw(std::shared_ptr<Shader> shader) {
+    if(!this->Visible) {
+        return;
+    }
+
+    if (this->isInit) {
+        this->init();
+    }
+
+    if (this->requireOpenGLBufferUpdate) {
+        this->updateOpenGLBuffer();
+        this->requireOpenGLBufferUpdate = false;
+    }
+
+    glBindVertexArray(this->vao);
+
+    // Vertex points size
+    glPointSize(3.0f);
+
+    shader->Use();
+    shader->SetBool("OnlyVertColor", this->drawOnlyVertColors);
+    shader->SetMat4("model", this->Matrix);
+
+    for(std::shared_ptr<Texture> texture : this->Textures) {
+        texture->Bind(shader);
+    }
+
+    // Draw mesh
+    glDrawElements(this->polygonMode, this->Indices.size(), GL_UNSIGNED_INT, 0);
+
+    glBindVertexArray(0);
+}
+
+void Mesh::init() {
+    this->Name = "Mesh";
+
+    this->isInit = false;
+
+    glGenBuffers(1, &this->ebo);
+    glGenVertexArrays(1, &this->vao);
+    glGenBuffers(1, &this->vbo);
+}
+
+void Mesh::updateOpenGLBuffer() {
+
 
     // Bind vertex array object
     glBindVertexArray(this->vao);
@@ -62,56 +133,8 @@ void Mesh::UpdateColored(std::vector<Vertex> vertices, std::vector<unsigned int>
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->Indices.size() * sizeof(float), this->Indices.data(), GL_STATIC_DRAW);
 
     glBindVertexArray(0);
+
 }
-
-void Mesh::DrawOnlyVertColors(bool option) {
-    this->drawOnlyVertColors = option;
-}
-
-void Mesh::SetPolygonMode(GLenum polygonMode) {
-    this->polygonMode = polygonMode;
-}
-
-std::vector<Vertex> Mesh::GetVertices() {
-    return this->Vertices;
-}
-
-std::vector<unsigned int> Mesh::GetIndices() {
-    return this->Indices;
-}
-
-void Mesh::Draw(std::shared_ptr<Shader> shader) {
-    if(!this->Visible) {
-        return;
-    }
-
-    glBindVertexArray(this->vao);
-
-    // Vertex points size
-    glPointSize(3.0f);
-
-    shader->Use();
-    shader->SetBool("OnlyVertColor", this->drawOnlyVertColors);
-    shader->SetMat4("model", this->Matrix);
-
-    for(std::shared_ptr<Texture> texture : this->Textures) {
-        texture->Bind(shader);
-    }
-
-    // Draw mesh
-    glDrawElements(this->polygonMode, this->Indices.size(), GL_UNSIGNED_INT, 0);
-
-    glBindVertexArray(0);
-}
-
-void Mesh::init() {
-    this->Name = "Mesh";
-
-    glGenBuffers(1, &this->ebo);
-    glGenVertexArrays(1, &this->vao);
-    glGenBuffers(1, &this->vbo);
-}
-
 
 
 }
