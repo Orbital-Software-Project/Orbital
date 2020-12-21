@@ -38,12 +38,10 @@ private:
     std::shared_ptr<Camera> viewportCam = nullptr;
     std::shared_ptr<SceneRenderer> renderer = nullptr;
 
-    
     bool showVideoBackground = false;
     float backVideoDistance = 2.5f;
 
     int currCameraIdx = 0;
-    //std::map<int, std::shared_ptr<Camera>> cameraMap;
 
 };
 

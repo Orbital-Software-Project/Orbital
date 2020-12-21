@@ -88,7 +88,6 @@ namespace Orb {
                 break;
             }
 
-
             const auto tp_1 = std::chrono::steady_clock::now();
 
             if (!frame.empty() && (num_frame % frame_skip == 0)) {
@@ -96,10 +95,8 @@ namespace Orb {
                 SLAM->feed_monocular_frame(frame, timestamp, cv::Mat());
             }
 
-
             const auto tp_2 = std::chrono::steady_clock::now();
             const auto track_time = std::chrono::duration_cast<std::chrono::duration<double>>(tp_2 - tp_1).count();
-
 
             if (num_frame % frame_skip == 0) {
                 track_times.push_back(track_time);
@@ -121,7 +118,6 @@ namespace Orb {
             }
 
             this->updateReport(frameCount, num_frame);
-
         }
 
         // wait until the loop BA is finished

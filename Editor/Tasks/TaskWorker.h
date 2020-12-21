@@ -91,7 +91,11 @@ namespace Orb {
         ~TaskWorker() {
             this->running = false;
 
+            this->CancelAllTasks();
+
             this->taskWorker.join();
+
+
         }
 
         TaskWorker(TaskWorker const&) = delete;
@@ -113,6 +117,12 @@ namespace Orb {
 
         std::vector<std::shared_ptr<ITask>> GetRunningTasks() {
             return this->task_collection;
+        }
+
+        void CancelAllTasks() {
+            for (auto task : this->GetRunningTasks()) {
+                task->Cancel();
+            }
         }
 
     private:

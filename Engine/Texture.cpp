@@ -51,10 +51,8 @@ GLuint Texture::GetTextureID() {
 }
 
 void Texture::UpdateTexture(cv::Mat data) {
-    if (this->initialized) {
-        this->Data = data.clone();
-        this->openglBufferUpdateRequired = true;
-    }
+    this->Data = data.clone();
+    this->openglBufferUpdateRequired = true;
 }
 
 void Texture::Bind(std::shared_ptr<Shader> shader) {
@@ -99,15 +97,15 @@ void Texture::updateOpenGLBuffer() {
     int cols = this->Data.cols;
     int rows = this->Data.rows;
 
-    glTexImage2D(GL_TEXTURE_2D,       // Type of texture
-        0,                   // Pyramid level (for mip-mapping) - 0 is the top level
-        GL_RGB,              // Internal colour format to convert to
-        cols,                // Image width  i.e. 640 for Kinect in standard mode
-        rows,                // Image height i.e. 480 for Kinect in standard mode
-        0,                   // Border width in pixels (can either be 1 or 0)
-        GL_BGR,              // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
-        GL_UNSIGNED_BYTE,    // Image data type
-        this->Data.ptr() // The actual image data itself
+    glTexImage2D(GL_TEXTURE_2D, // Type of texture
+        0,                      // Pyramid level (for mip-mapping) - 0 is the top level
+        GL_RGB,                 // Internal colour format to convert to
+        cols,                   // Image width  i.e. 640 for Kinect in standard mode
+        rows,                   // Image height i.e. 480 for Kinect in standard mode
+        0,                      // Border width in pixels (can either be 1 or 0)
+        GL_BGR,                 // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
+        GL_UNSIGNED_BYTE,       // Image data type
+        this->Data.ptr()        // The actual image data itself
     );
 
     glGenerateMipmap(GL_TEXTURE_2D);

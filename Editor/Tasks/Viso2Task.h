@@ -7,6 +7,10 @@
 
 #include "TaskWorker.h"
 
+#include "Engine/Texture.h"
+#include "Engine/Mesh.h"
+#include "Engine/Camera.h"
+
 namespace Orb {
 
     struct Viso2TaskParam {
@@ -46,6 +50,10 @@ namespace Orb {
         bool pauseTask = false;
         
         std::vector<Matrix> cameraPoses;
+
+        std::shared_ptr<Texture> videoTexture = nullptr;
+        std::shared_ptr<Mesh> videoPlane      = nullptr;
+        std::shared_ptr<Camera> slamCam       = nullptr;
 
         Viso2TaskParam param;
 

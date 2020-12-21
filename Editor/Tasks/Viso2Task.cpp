@@ -7,11 +7,23 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/imgproc.hpp>
 
+#include "Editor/Global.h"
+#include "Engine/PrimitiveFactory.h"
+
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 namespace Orb {
 
 Viso2Task::Viso2Task(Viso2TaskParam param) {
     this->param = param;
+
+    this->slamCam = std::make_shared<Camera>();
+    this->slamCam->Name = "Slam camera";
+    this->slamCam->VisibleInOutliner = true;
+    Global::GetInstance().Renderer->AddEntity(this->slamCam);
+
+
 }
 
 Viso2Task::~Viso2Task() {
@@ -48,6 +60,7 @@ void Viso2Task::Run() {
     Matrix currPose = Matrix::eye(4);
 
     this->frameCount = videoCapture.get(cv::CAP_PROP_FRAME_COUNT);
+    cv::Mat frameConverted;
 
     while (videoCapture.read(currFrame)) {
 
@@ -62,7 +75,7 @@ void Viso2Task::Run() {
             break; // get out of loop
         }
 
-        cv::Mat frameConverted;
+        
         cv::cvtColor(currFrame, frameConverted, cv::COLOR_RGB2GRAY);
 
         if (img_data == nullptr) {
@@ -84,8 +97,31 @@ void Viso2Task::Run() {
 
             this->cameraPoses.push_back(currPose);
 
-        }
-        else {
+            {
+                ScopeMutexLock lock(Global::GetInstance().GlobalMutex);
+
+                if (Global::GetInstance().VideoFrame == nullptr) {
+                    Global::GetInstance().VideoFrame = std::make_shared<Texture>();
+                }
+
+                Global::GetInstance().VideoFrame->UpdateTexture(currFrame);
+
+                std::cout << currPose << std::endl;
+                for (int m = 0; m < 4; m++) {
+                    for (int n = 0; n < 4; n++) {
+                        this->slamCam->Matrix[n][m] = currPose.val[m][n];
+                    }
+                }
+
+            }
+
+
+            std::cout << glm::to_string(this->slamCam->Matrix) << std::endl;
+
+            this->slamCam->Matrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f)) * this->slamCam->Matrix;
+
+
+        } else {
 
         }
 

@@ -36,22 +36,16 @@ void Outliner::OnRender(){
                 if(ImGui::Button("Remove")) {
                     entityToRemove = entity;
                 }
+
                 ImGui::SameLine();
-                if(ImGui::Button("Hide")) {
+                if(ImGui::Button(entity->Visible ? "Hide" : "Show")) {
                     entity->Visible = !entity->Visible;
                 }
+
                 ImGui::SameLine();
                 if(ImGui::Button("Properties")) {
                     entity->Selected = true;
-
-                    //auto list = Global::GetInstance().MeshProperties;
-                    //bool found = (std::find(list.begin(), list.end(), entity) != list.end());
-                   // if(!found) {
-                    //    Global::GetInstance().MeshProperties.push_back(entity);
-                   // }
-
                 }
-
 
                 ImGui::PopID();
             }
