@@ -16,7 +16,6 @@ public:
         Mesh
     };
 
-
 public:
     IEntity() {};
 
@@ -42,6 +41,8 @@ public:
     glm::vec3 Scale = glm::vec4(1.0f);
 
     std::string Name = "IEntity";
+
+    std::shared_ptr<void> Data;
 
 };
 

@@ -9,6 +9,8 @@ Set(SRC
     # Core
     Main.cpp
     Core.h
+    Window.h
+    Window.cpp
     Core.cpp
     Utils.hpp
     Global.h
@@ -23,8 +25,12 @@ Set(SRC
     Tasks/OpenVslamTask.cpp
     Tasks/Viso2Task.h
     Tasks/Viso2Task.cpp
+    Tasks/MeshImportTask.h
+    Tasks/MeshImportTask.cpp
 
     # Views
+    Views/Toolbar.h
+    Views/Toolbar.cpp
     Views/VideoPreview.h
     Views/VideoPreview.cpp
     Views/Outliner.h

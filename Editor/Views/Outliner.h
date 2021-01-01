@@ -1,10 +1,12 @@
 #pragma once
 
-#include "SceneRenderer.h"
+#include "Engine/SceneRenderer.h"
+
+#include "Editor/Views/IView.hpp"
 
 namespace Orb {
 
-class Outliner {
+class Outliner : public IView {
 
 public:
     Outliner(std::shared_ptr<SceneRenderer> renderer);

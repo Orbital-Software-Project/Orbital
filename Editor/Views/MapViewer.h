@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Mesh.h"
 #include "SceneRenderer.h"
+#include "IView.hpp"
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -14,7 +15,7 @@
 
 namespace Orb {
 
-class MapViewer {
+class MapViewer : public IView {
 
 public:
     MapViewer(std::shared_ptr<SceneRenderer> renderer, std::shared_ptr<Shader> shader);
@@ -22,8 +23,6 @@ public:
     ~MapViewer();
 
     void OnRender();
-
-    void ImportMesh(std::string file);
 
 private:
     void drawToolbar();

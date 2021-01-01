@@ -1,6 +1,9 @@
 #pragma once
 
-#include "Texture.h"
+#include "Engine/Texture.h"
+
+#include "Editor/Views/IView.hpp"
+
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -10,7 +13,7 @@
 
 namespace Orb {
 
-class VideoPreview {
+class VideoPreview : public IView {
 
 public:
     VideoPreview();

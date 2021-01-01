@@ -22,8 +22,6 @@ namespace Orb {
 
     void TaskPanel::OnRender() {
 
-        this->processfinishedTasks();
-
         ImGui::Begin("Task Panel");
 
         // Filepicker
@@ -51,50 +49,21 @@ namespace Orb {
 
                 TaskWorker::GetInstance().Exec(std::make_shared<OpenVslamTask>(videoFile, cfgFile, vocabFile));
 
-
-                //slamTask = std::make_unique<SlamTask>(videoFile, cfgFile, vocabFile);
-                //slamTask->Run();
-
-                //Global::GetInstance().FramePublisher = slamTask->GetFramePublisher();
-                //Global::GetInstance().MapPublisher = slamTask->GetMapPublisher();
-
             }
 
-            
-
-
-
-            //if (slamTask) {
-            //    TaskReport report = slamTask->GetReport();
-            //    // Show progressbar and cancel button only when slam is running
-            //    if (report.Status == TaskStatus::Running) {
-            //        ImGui::ProgressBar(static_cast<float>(report.FramesProcessed) / static_cast<float>(report.NumFrames));
-            //        if (ImGui::Button("Cancel")) {
-            //            slamTask->Cancel();
-            //        }
-            //    }
-            //}
 
         }
 
         if (videoFile != "") {
             if (ImGui::Button("Run libViso2 SLAM")) {
-                
                 TaskWorker::GetInstance().Exec(
                     std::make_shared<Viso2Task>(Viso2TaskParam(959.500000, 539.500000, 1034.650696, videoFile))
                 );
-
-                //slamTask = std::make_unique<SlamTask>(videoFile, cfgFile, vocabFile);
-                //slamTask->Run(true);
-
-                //Global::GetInstance().FramePublisher = slamTask->GetFramePublisher();
-                //Global::GetInstance().MapPublisher = slamTask->GetMapPublisher();
-
             }
         }
 
         {
-            ImGui::LabelText("Current Tasks", "");
+            ImGui::Text("Current Tasks", "");
 
             ImGui::Separator();
 
@@ -119,14 +88,5 @@ namespace Orb {
 
         ImGui::End();
 
-    }
-
-    void TaskPanel::processfinishedTasks() {
-        auto tasks = TaskWorker::GetInstance().GetFinishedTasks();
-        for (std::shared_ptr<ITask> task : tasks) {
-
-
-
-        }
     }
 }

@@ -10,15 +10,14 @@
 
 #include "Editor/Global.h"
 #include "Editor/Utils.hpp"
-
 #include "Engine/PrimitiveFactory.h"
 
 namespace Orb {
 
     OpenVslamTask::OpenVslamTask(std::string videoFile, std::string configFile, std::string vocabFile) {
-        this->videoFile = videoFile;
+        this->videoFile  = videoFile;
         this->configFile = configFile;
-        this->vocabFile = vocabFile;
+        this->vocabFile  = vocabFile;
 
 
         this->pointCloud = std::make_shared<Mesh>();
@@ -39,6 +38,8 @@ namespace Orb {
         this->slamCam->Name = "Camera";
         this->slamCam->VisibleInOutliner = true;
         Global::GetInstance().Renderer->AddEntity(this->slamCam);
+
+        
 
     }
 
@@ -130,8 +131,6 @@ namespace Orb {
 
         // shutdown the SLAM process
         SLAM->shutdown();
-
-
 
         if (false) {
 

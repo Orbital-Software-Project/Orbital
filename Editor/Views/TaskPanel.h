@@ -1,11 +1,13 @@
 #pragma once
 
+#include "Editor/Views/IView.hpp"
+
 #include <string>
 #include <memory>
 
 namespace Orb {
 
-    class TaskPanel {
+    class TaskPanel : public IView {
 
     public:
         TaskPanel();
@@ -13,9 +15,6 @@ namespace Orb {
         ~TaskPanel();
 
         void OnRender();
-
-    private:
-        void processfinishedTasks();
 
     private:
         std::string videoFile;

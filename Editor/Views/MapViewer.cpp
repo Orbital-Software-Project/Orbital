@@ -5,6 +5,9 @@
 
 #include "PrimitiveFactory.h"
 
+#include "Editor/Tasks/MeshImportTask.h"
+#include "Editor/Tasks/TaskWorker.h"
+
 #include <stdint.h>
 #include <iostream>
 
@@ -18,7 +21,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 
-#include "Editor/Tasks/TaskWorker.h"
 
 #include <map>
 
@@ -106,14 +108,6 @@ namespace Orb {
 
         ImGui::End();
 
-    }
-
-    void MapViewer::ImportMesh(std::string file) {
-        MeshImporter exporter;
-        for (std::shared_ptr<Mesh> meshdata : exporter.Import(file)) {
-            meshdata->DrawOnlyVertColors(false);
-            this->renderer->AddEntity(std::move(meshdata));
-        }
     }
 
     void MapViewer::drawToolbar() {

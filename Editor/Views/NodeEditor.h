@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Editor/Views/IView.hpp"
+
 #include <memory>
 
 #include <imgui.h>
@@ -25,7 +27,7 @@ namespace Orb {
     // https://www.blenderfreak.com/tutorials/node-editor-tutorial-series/
 
 
-    class NodeEditor {
+    class NodeEditor : public IView {
 
     public:
         NodeEditor(std::shared_ptr<SceneRenderer> renderer);
