@@ -37,15 +37,110 @@ namespace Orb {
 
         std::shared_ptr<IEntity> entityToRemove = nullptr;
         for (std::shared_ptr<IEntity> entity : entities) {
-            
+
             if (!entity->VisibleInOutliner) {
                 continue;
             }
 
-            
+            {
+
+
+                //if (ImGui::TreeNode("Basic trees"))
+                //{
+                //    
+                //    for (int i = 0; i < 5; i++)
+                //    {
+                //        // Use SetNextItemOpen() so set the default state of a node to be open. We could
+                //        // also use TreeNodeEx() with the ImGuiTreeNodeFlags_DefaultOpen flag to achieve the same thing!
+                //        if (i == 0)
+                //            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+
+                //        if (ImGui::TreeNode((void*)(intptr_t)i, "Child %d", i))
+                //        {
+                //            ImGui::Text("blah blah");
+                //            ImGui::SameLine();
+                //            if (ImGui::SmallButton("button")) {}
+                //            ImGui::TreePop();
+                //        }
+                //    }
+
+
+
+                //    ImGui::TreePop();
+                //}
+
+
+
+
+
+            }
+
+
+
+            // check if it is a group, then append it as children
+            if (entity->GetEntityType() == IEntity::EntityType::Group) {
+                
+                auto childEntites = std::dynamic_pointer_cast<EntityGroup, IEntity>(entity)->GetChildEntites();
+                if (ImGui::TreeNode((void*)(intptr_t)id, entity->Name.c_str()))
+                {
+                    
+                    {
+                        ImGui::SameLine(ImGui::GetWindowWidth() - 250);
+
+                        if (ImGui::Button("Remove")) {
+                            entityToRemove = entity;
+                        }
+
+                        ImGui::SameLine();
+
+                        if (ImGui::Button(entity->Visible ? "Hide" : "Show")) {
+                            if (entity->GetEntityType() == IEntity::EntityType::Group) {
+                                std::dynamic_pointer_cast<EntityGroup, IEntity>(entity)->SetVisibility(!entity->Visible);
+                            }
+                        }
+
+                        ImGui::SameLine();
+
+                        if (ImGui::Button("Properties")) {
+                            entity->Selected = true;
+                        }
+
+                    }
+
+                    this->drawEntityTree(id++, childEntites);
+                    ImGui::TreePop();
+                }
+
+            } else {
+
+                ImGui::PushID(std::to_string(id++).c_str());
+                {
+                    ImGui::Text(entity->Name.c_str());
+
+                    ImGui::SameLine(ImGui::GetWindowWidth() - 250);
+
+                    if (ImGui::Button("Remove")) {
+                        entityToRemove = entity;
+                    }
+
+                    ImGui::SameLine();
+
+                    if (ImGui::Button(entity->Visible ? "Hide" : "Show")) {
+                        entity->Visible = !entity->Visible;
+                    }
+
+                    ImGui::SameLine();
+
+                    if (ImGui::Button("Properties")) {
+                        entity->Selected = true;
+                    }
+
+                }
+                ImGui::PopID();
+            }
 
             {
-                ImGui::PushID(std::to_string(id++).c_str());
+                /*ImGui::PushID(std::to_string(id++).c_str());
 
                 if (entity->GetEntityType() == IEntity::EntityType::Group) {
                     auto childEntites = std::dynamic_pointer_cast<EntityGroup, IEntity>(entity)->GetChildEntites();
@@ -75,18 +170,19 @@ namespace Orb {
                 }
 
                 ImGui::PopID();
+            }*/
+
+
+
             }
 
+            // Remove mesh object
+            if (entityToRemove != nullptr) {
+                this->renderer->RemoveEntity(entityToRemove);
+                entityToRemove = nullptr;
+            }
 
-
-        }
-
-        // Remove mesh object
-        if (entityToRemove != nullptr) {
-            this->renderer->RemoveEntity(entityToRemove);
-            entityToRemove = nullptr;
         }
 
     }
-
 }
