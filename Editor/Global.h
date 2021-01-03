@@ -1,21 +1,10 @@
 #pragma once
 
-#include "Texture.h"
-
-#include <string>
-#include <opencv2/core.hpp>
-#include <GL/glew.h>
+#include "Engine/Texture.h"
+#include "Engine/IEntity.h"
+#include "Engine/SceneRenderer.h"
 
 #include <memory>
-
-#include <openvslam/publish/frame_publisher.h>
-#include <openvslam/publish/map_publisher.h>
-
-#include "IEntity.h"
-
-#include <viso_mono.h>
-
-#include "Engine/SceneRenderer.h"
 
 namespace Orb {
 

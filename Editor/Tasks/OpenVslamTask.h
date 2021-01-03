@@ -24,6 +24,7 @@
 
 #include "Engine/Mesh.h"
 #include "Engine/Camera.h"
+#include "Engine/EntityGroup.hpp"
 
 namespace Orb {
 
@@ -64,6 +65,7 @@ private:
     std::shared_ptr<openvslam::publish::map_publisher> mapPublisher;
     std::shared_ptr<openvslam::publish::frame_publisher> framePublisher;
 
+    std::shared_ptr<EntityGroup> entGroup = nullptr;
     std::shared_ptr<Mesh> pointCloud = nullptr;
     std::shared_ptr<Mesh> keyframes = nullptr;
 

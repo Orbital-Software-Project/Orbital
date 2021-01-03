@@ -1,14 +1,15 @@
 #pragma once
 
 namespace Orb {
+
     class Core {
 
-        public:
-            Core();
+    public:
+        Core();
 
-            ~Core();
+        ~Core();
 
-            void Run();
+        void Run();
 
     };
 

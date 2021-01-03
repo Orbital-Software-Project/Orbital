@@ -1,7 +1,6 @@
 #include "Core.h"
 
-
-#include "Global.h"
+#include "Editor/Global.h"
 
 #include "Editor/Views/VideoPreview.h"
 #include "Editor/Views/MapViewer.h"

@@ -76,23 +76,30 @@ target_link_libraries(ImGui PRIVATE glfw GLEW::GLEW)
 find_package(assimp CONFIG REQUIRED)
 
 Set(ENGINE_SRC
-        IEntity.h
-        Texture.h
-        Texture.cpp
-        Shader.h
-        Shader.cpp
-        Mesh.h
-        Mesh.cpp
-        MeshImporter.h
-        MeshImporter.cpp
-        SceneRenderer.h
-        SceneRenderer.cpp
-        Camera.h
-        Camera.cpp
-        CameraController.h
-        CameraController.cpp
+
+    Shader.h
+    Shader.cpp
+    Texture.h
+    Texture.cpp
+    Vertex.hpp
+
+    MeshImporter.h
+    MeshImporter.cpp
+    SceneRenderer.h
+    SceneRenderer.cpp
 	PrimitiveFactory.h
-        PrimitiveFactory.cpp
+    PrimitiveFactory.cpp
+    CameraController.h
+    CameraController.cpp
+    
+    # Entities
+    IEntity.h
+    Mesh.h
+    Mesh.cpp
+    Camera.h
+    Camera.cpp
+    EntityGroup.hpp
+
 )
 
 Set(SHADERS_SRC

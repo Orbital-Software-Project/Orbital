@@ -12,6 +12,7 @@
 #include "Editor/Utils.hpp"
 #include "Engine/PrimitiveFactory.h"
 
+
 namespace Orb {
 
     OpenVslamTask::OpenVslamTask(std::string videoFile, std::string configFile, std::string vocabFile) {
@@ -20,26 +21,31 @@ namespace Orb {
         this->vocabFile  = vocabFile;
 
 
+        this->entGroup = std::make_shared<EntityGroup>();
+        entGroup->Name = "OpenVSLAM reconstruction";
+        Global::GetInstance().Renderer->AddEntity(entGroup);
+
+
         this->pointCloud = std::make_shared<Mesh>();
         this->pointCloud->Name = "Pointcloud";
         this->pointCloud->VisibleInOutliner = true;
         this->pointCloud->SetPolygonMode(GL_POINTS);
         this->pointCloud->DrawOnlyVertColors(true);
-        Global::GetInstance().Renderer->AddEntity(this->pointCloud);
+        entGroup->AddEntity(this->pointCloud);
+        
 
         this->keyframes = std::make_shared<Mesh>();
         this->keyframes->Name = "Keyframes";
         this->keyframes->VisibleInOutliner = true;
         this->keyframes->DrawOnlyVertColors(true);
         this->keyframes->SetPolygonMode(GL_LINE_STRIP);
-        Global::GetInstance().Renderer->AddEntity(this->keyframes);
+        entGroup->AddEntity(this->keyframes);
+
 
         this->slamCam = std::make_shared<Camera>();
         this->slamCam->Name = "Camera";
         this->slamCam->VisibleInOutliner = true;
-        Global::GetInstance().Renderer->AddEntity(this->slamCam);
-
-        
+        entGroup->AddEntity(this->slamCam);
 
     }
 
@@ -337,42 +343,25 @@ namespace Orb {
 
     void OpenVslamTask::updateCameraPos() {
 
-        //return;
-        //if (Global::GetInstance().MapPublisher.get() != nullptr) {
-
         //http://ogldev.atspace.co.uk/index.html
-
 
         // Get camera pose and convert it to opengl conform matrix (glm)
         Eigen::Matrix4f camera_pos = Eigen::Matrix4f::Identity();
         camera_pos = this->mapPublisher->get_current_cam_pose().inverse().eval().cast<float>();
         glm::mat4 converted = Utils::ToGLM_Mat4f(camera_pos);
 
-
         // With inverse i get the correct pos, and
         // Translation is correct
         // slamcam is correct except wrong rotation
-
 
         // https://stackoverflow.com/questions/63429179/eigen-and-glm-products-produce-different-results
 
         this->slamCam->Matrix = converted;
 
-        //}
-
-
-        //if (this->viewVirtualCamera) {
-            //TODO: Inverse and scale
-            //this->viewportCam->Matrix = glm::inverse(this->slamCam->Matrix);
-            // Flip camera
-            //this->viewportCam->Matrix = glm::scale(glm::mat4(1.0f), glm::vec3(-1.0f, 1.0f, -1.0f)) * this->viewportCam->Matrix;
-        //}
-
     }
 
     void OpenVslamTask::updateVideoPlane(float width, float height, float depth) {
         // https://stackoverflow.com/questions/46578529/how-to-compute-the-size-of-the-rectangle-that-is-visible-to-the-camera-at-a-give
-
 
         // calc box
         float aspect = width / height;
@@ -392,16 +381,13 @@ namespace Orb {
         if (this->videoPlane.get() == nullptr) {
             this->videoPlane = PrimitiveFactory::SizedPlane(newWidth, newHeight);
             this->videoPlane->Name = "Video plane";
+            this->videoPlane->VisibleInOutliner = true;
+            
             this->videoTexture = std::make_shared<Texture>();
             this->videoPlane->Textures.push_back(this->videoTexture);
-            this->videoPlane->VisibleInOutliner = true;
 
-            Global::GetInstance().Renderer->AddEntity(this->videoPlane);
+            this->entGroup->AddEntity(this->videoPlane);
         }
-
-        //this->videoPlane->Visible = this->showVideoBackground;
-        this->videoPlane->Visible = true;
-
 
         if (!this->videoPlane->Visible) {
             return;
@@ -409,7 +395,6 @@ namespace Orb {
 
         glm::mat4 newMat = glm::translate(this->slamCam->Matrix, glm::vec3(0.0f, 0.0f, depth));
         this->videoPlane->Matrix = newMat;
-
 
         this->videoTexture->UpdateTexture(this->framePublisher->draw_frame());
     }

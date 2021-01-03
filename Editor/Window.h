@@ -1,12 +1,12 @@
 #pragma once
 
+#include "Editor/Views/IView.hpp"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <vector>
 #include <memory>
-
-#include "Editor/Views/IView.hpp"
 
 namespace Orb {
 

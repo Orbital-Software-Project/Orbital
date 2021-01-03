@@ -13,6 +13,7 @@ class IEntity {
 public:
     enum class EntityType {
         Camera,
+        Group,
         Mesh
     };
 

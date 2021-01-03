@@ -12,7 +12,6 @@
 namespace Orb {
 
     Window::Window() {
-
         WindowData mainWindow;
 
         if (!glfwInit()) {

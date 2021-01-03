@@ -3,6 +3,7 @@
 #include "Engine/SceneRenderer.h"
 
 #include "Editor/Views/IView.hpp"
+#include "Engine/EntityGroup.hpp"
 
 namespace Orb {
 
@@ -14,6 +15,9 @@ public:
     ~Outliner();
 
     void OnRender();
+
+private:
+    void drawEntityTree(int id, std::vector<std::shared_ptr<IEntity>> entities);
 
 private:
     std::shared_ptr<SceneRenderer> renderer = nullptr;
