@@ -24,10 +24,10 @@ find_package(glm CONFIG REQUIRED)
 include_directories(.)
 
 add_subdirectory(ThirdParty)
+add_subdirectory(ThirdParty/libmv)
 add_subdirectory(ThirdParty/libviso2)
 
 add_subdirectory(Engine)
-
 add_subdirectory(Editor)
 
 

@@ -96,6 +96,7 @@ target_link_libraries(Editor PRIVATE
     unofficial::nativefiledialog::nfd
     Cpp-Taskflow::Cpp-Taskflow
     libviso2
+    libmv
 )
 
 

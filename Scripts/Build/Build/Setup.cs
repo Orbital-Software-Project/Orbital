@@ -144,13 +144,13 @@ namespace Build
             if(this.isWindows)  {
                 this.execCommand(
                     "vcpkg.exe", 
-                    "install assimp opencv eigen3 yaml-cpp glog suitesparse glfw3 glew nativefiledialog glm --triplet x64-windows", 
+                    "install assimp opencv eigen3 yaml-cpp glog suitesparse glfw3 glew nativefiledialog glm ceres --triplet x64-windows", 
                     vcpkgDir
                 );
             } else {
                 this.execCommand(
-                    "bash", 
-                    "-c \"./vcpkg install assimp opencv eigen3 yaml-cpp glog suitesparse glfw3 glew nativefiledialog glm\"", 
+                    "bash",
+                    "-c \"./vcpkg install assimp opencv eigen3 yaml-cpp glog suitesparse glfw3 glew nativefiledialog glm ceres\"", 
                     vcpkgDir
                 );
             }
