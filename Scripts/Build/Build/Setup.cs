@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Text;
-
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Build
 {
@@ -28,7 +26,8 @@ namespace Build
         {
 
             this.workDir = Path.Combine(Directory.GetCurrentDirectory(), "tmp");
-            this.orbitalRootDir = "/home/celvin/Documents/Projects/Orbital";
+            
+            this.orbitalRootDir = Path.GetFullPath("../../../../../../"); // Orbital root dir
             this.orbitalThirdPartyDir = Path.Combine(this.orbitalRootDir, "ThirdParty");
 
             if (Directory.Exists(workDir))
@@ -417,16 +416,25 @@ namespace Build
                     "--build . --target install --config Debug", 
                     g2oBuildDir
                     );
-
             }
         }
 
         private void execCommand(string command, string arguments, string workdir)
         {
-            ProcessStartInfo process = new ProcessStartInfo(command.Trim(), arguments);
-            process.WorkingDirectory = workdir;
-            Process.Start(process).WaitForExit();
+            var psi = new ProcessStartInfo
+            {
+                FileName = command.Trim(),
+                Arguments = arguments,
+                WorkingDirectory = workdir,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+            };
+
+            Process proc = Process.Start(psi);
+            proc.WaitForExit();
+
         }
-    
+
     }
 }
