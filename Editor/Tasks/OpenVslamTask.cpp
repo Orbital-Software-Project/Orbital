@@ -1,5 +1,7 @@
 #include "OpenVslamTask.h"
 
+#include "Editor/Base/ScopeMutexLock.hpp"
+
 #include <opencv2/videoio.hpp>
 #include <opencv2/imgproc.hpp>
 
@@ -7,6 +9,7 @@
 #include <thread>
 
 #include <glm/ext/matrix_transform.hpp>
+
 
 #include "Editor/Global.h"
 #include "Editor/Utils.hpp"
@@ -21,13 +24,21 @@ namespace Orb {
         this->vocabFile  = vocabFile;
 
 
+        ScopeMutexLock lock(Global::GetInstance().GlobalMutex);
+
+
         this->entGroup = std::make_shared<EntityGroup>();
-        entGroup->Name = "OpenVSLAM reconstruction";
+        entGroup->SetName("OpenVSLAM reconstruction");
         Global::GetInstance().Renderer->AddEntity(entGroup);
 
 
+        this->videoEnt = std::make_shared<Video>(videoFile);
+        this->videoEnt->SetSyncCurrFrameIdxSequencer(true);
+        entGroup->AddEntity(this->videoEnt);
+
+
         this->pointCloud = std::make_shared<Mesh>();
-        this->pointCloud->Name = "Pointcloud";
+        this->pointCloud->SetName("Pointcloud");
         this->pointCloud->VisibleInOutliner = true;
         this->pointCloud->SetPolygonMode(GL_POINTS);
         this->pointCloud->DrawOnlyVertColors(true);
@@ -35,7 +46,7 @@ namespace Orb {
         
 
         this->keyframes = std::make_shared<Mesh>();
-        this->keyframes->Name = "Keyframes";
+        this->keyframes->SetName("Keyframes");
         this->keyframes->VisibleInOutliner = true;
         this->keyframes->DrawOnlyVertColors(true);
         this->keyframes->SetPolygonMode(GL_LINE_STRIP);
@@ -43,7 +54,7 @@ namespace Orb {
 
 
         this->slamCam = std::make_shared<Camera>();
-        this->slamCam->Name = "Camera";
+        this->slamCam->SetName("Camera");
         this->slamCam->VisibleInOutliner = true;
         entGroup->AddEntity(this->slamCam);
 
@@ -100,7 +111,11 @@ namespace Orb {
             if (!frame.empty() && (num_frame % frame_skip == 0)) {
                 // input the current frame and estimate the camera pose
                 SLAM->feed_monocular_frame(frame, timestamp, cv::Mat());
+                
             }
+
+            this->videoEnt->SetFrameIdx(num_frame);
+
 
             const auto tp_2 = std::chrono::steady_clock::now();
             const auto track_time = std::chrono::duration_cast<std::chrono::duration<double>>(tp_2 - tp_1).count();
@@ -132,11 +147,13 @@ namespace Orb {
             std::this_thread::sleep_for(std::chrono::microseconds(2000));
         }
 
+        
         // Update last report
         this->updateReport(frameCount, num_frame);
 
         // shutdown the SLAM process
         SLAM->shutdown();
+        
 
         if (false) {
 
@@ -380,7 +397,7 @@ namespace Orb {
 
         if (this->videoPlane.get() == nullptr) {
             this->videoPlane = PrimitiveFactory::SizedPlane(newWidth, newHeight);
-            this->videoPlane->Name = "Video plane";
+            this->videoPlane->SetName("Video plane");
             this->videoPlane->VisibleInOutliner = true;
             
             this->videoTexture = std::make_shared<Texture>();

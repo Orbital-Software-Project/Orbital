@@ -7,7 +7,7 @@ namespace Orb {
 
 Camera::Camera()  {
     this->mesh = PrimitiveFactory::Plane();
-    this->Name = "Camera";
+    this->SetName("Camera");
 }
 
 Camera::~Camera() {

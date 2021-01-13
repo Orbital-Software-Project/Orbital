@@ -8,6 +8,7 @@
 #include "Editor/Views/PropertyEditor.h"
 #include "Editor/Views/TaskPanel.h"
 #include "Editor/Views/Toolbar.h"
+#include "Editor/Views/Sequencer.h"
 
 #include "Editor/Window.h"
 
@@ -29,6 +30,7 @@ void Core::Run() {
     wnd.AddView(std::make_unique<MapViewer>(Global::GetInstance().Renderer, shader));
     wnd.AddView(std::make_unique<PropertyEditor>(Global::GetInstance().Renderer));
     wnd.AddView(std::make_unique<TaskPanel>());
+    wnd.AddView(std::make_unique<Sequencer>());
 
     wnd.EnterMsgLoop();
 

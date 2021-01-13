@@ -19,11 +19,12 @@
 #include <viso_mono.h>
 
 
-#include "TaskWorker.h"
-#include "Vertex.hpp"
+#include "Editor/Tasks/TaskWorker.h"
 
+#include "Engine/Vertex.hpp"
 #include "Engine/Mesh.h"
 #include "Engine/Camera.h"
+#include "Engine/Video.h"
 #include "Engine/EntityGroup.hpp"
 
 namespace Orb {
@@ -64,6 +65,9 @@ private:
     std::unique_ptr<openvslam::system> SLAM;
     std::shared_ptr<openvslam::publish::map_publisher> mapPublisher;
     std::shared_ptr<openvslam::publish::frame_publisher> framePublisher;
+
+    std::shared_ptr<Video> videoEnt = nullptr;
+
 
     std::shared_ptr<EntityGroup> entGroup = nullptr;
     std::shared_ptr<Mesh> pointCloud = nullptr;

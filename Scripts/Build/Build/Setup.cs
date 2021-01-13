@@ -263,26 +263,16 @@ namespace Build
 
 
             /*
-             commit fa004ae79a287ad744772fcb6fa9d9c7dad7aeb4 (HEAD -> docking, origin/docking)
-             Merge: 42575d4a 1ec464eb
-             Author: ocornut <omarcornut@gmail.com>
-             Date:   Tue Sep 22 17:00:57 2020 +0200
-             
-                 Merge branch 'master' into docking
-             
-                 # Conflicts:
-                 #       examples/imgui_examples.sln
-                 #       examples/imgui_impl_dx12.cpp
-                 #       examples/imgui_impl_dx12.h
-                 #       examples/imgui_impl_opengl3.cpp
-                 #       imgui.cpp
-                 #       imgui_demo.cpp
-                 #       imgui_internal.h
-                 #       imgui_widgets.cpp
+             commit 70703da7829ba74a92a08fe3c6fe0664c39c97c9 (HEAD -> docking, origin/docking)                                       
+             Merge: b11518d7 e18abe36                                                                                                
+             Author: ocornut <omarcornut@gmail.com>                                                                                  
+             Date:   Fri Jan 8 18:55:16 2021 +0100
+            
+             Merge branch 'master' into docking
              */
             this.execCommand(
                 "git",
-                "checkout fa004ae79a287ad744772fcb6fa9d9c7dad7aeb4",
+                "checkout 70703da7829ba74a92a08fe3c6fe0664c39c97c9",
                 Path.Combine(this.orbitalThirdPartyDir, "imgui")
                 );
         }
@@ -300,15 +290,15 @@ namespace Build
                     );
 
                 /*
-                 commit 687a72f940c76cf5064e13fe55fa0408c18fcbe4 (HEAD -> master, origin/master, origin/HEAD)
-                 Author: thedmd <michcic@gmail.com>
-                 Date:   Fri Sep 4 11:56:12 2020 +0200
-                 
-                 Convert GLuint to void* using intptr_t #62
+                commit ac4bd3506296a808675334eeb569146ec8f63dd6 (HEAD -> develop, origin/develop)
+                Author: thedmd <michcic@gmail.com>
+                Date:   Tue Dec 29 16:10:00 2020 +0100
+
+                Examples: Correct case of `data` directory (#97)
                  */
                 this.execCommand(
-                    "git", 
-                    "checkout 687a72f940c76cf5064e13fe55fa0408c18fcbe4", 
+                    "git",
+                    "checkout ac4bd3506296a808675334eeb569146ec8f63dd6", 
                     Path.Combine(this.orbitalThirdPartyDir, "imgui-node-editor")
                     );
 
@@ -325,17 +315,16 @@ namespace Build
 
 
             /*
-             commit 28c67f9f586aa83212ebbc057e6dc138b093fa35 (HEAD -> develop, origin/master, origin/HEAD, master)
-             Author: None <none@none.ch>
-             Date:   Wed Sep 23 10:59:46 2020 +0200
-             
-                 Add Docking WIP
-             
-                 + Checkout Git repo with specific commit id (latest)
+             commit 3765b5ab9c7f83db0065b554068ad8eff57cb3a0 (HEAD -> master, origin/master, origin/HEAD)                            
+             Author: Cedric Guillemet <ceguille@microsoft.com>                                                                      
+             Date:   Sat Jan 2 18:28:22 2021 +0100            
+            
+             over filter for operation
+
              */
             this.execCommand(
                 "git",
-                "checkout 28c67f9f586aa83212ebbc057e6dc138b093fa35",
+                "checkout 3765b5ab9c7f83db0065b554068ad8eff57cb3a0",
                 Path.Combine(this.orbitalThirdPartyDir, "ImGuizmo")
                 );
 

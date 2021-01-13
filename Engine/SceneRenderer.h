@@ -4,6 +4,7 @@
 
 #include "Mesh.h"
 #include "Camera.h"
+#include "EntityGroup.hpp"
 
 #include <GL/glew.h>
 #include <vector>
@@ -28,8 +29,28 @@ public:
 
     std::vector<std::shared_ptr<IEntity>> GetEntities();
 
+    std::vector<std::shared_ptr<IEntity>> EntitiesByType(IEntity::EntityType entityType) {
+        std::vector<std::shared_ptr<IEntity>> entsToReturn;
+        this->getEntitiesByType(this->GetEntities(), entsToReturn, entityType);
+        return entsToReturn;
+    }
+
 private:
     void setFBOSize(int widht, int height);
+
+    // template class parameter MUST be derived from IEntity
+    void getEntitiesByType(std::vector<std::shared_ptr<IEntity>> &entities, std::vector<std::shared_ptr<IEntity>> &entsToReturn, IEntity::EntityType entityType) {
+        for (std::shared_ptr<IEntity>& ent : entities) {
+            if (ent->GetEntityType() == IEntity::EntityType::Group) {
+                std::shared_ptr<EntityGroup> grp = std::dynamic_pointer_cast<EntityGroup, IEntity>(ent);
+                this->getEntitiesByType(grp->GetChildEntites(), entsToReturn, entityType);
+            }
+            if (ent->GetEntityType() == entityType || entityType == IEntity::EntityType::Any) {
+                entsToReturn.push_back(ent);
+            }
+        }
+    }
+
 
 private:
     GLuint fbo = 0;

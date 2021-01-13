@@ -17,6 +17,7 @@ Set(SRC
 
     # Base
     Base/Percentage.hpp
+    Base/ScopeMutexLock.hpp
 
     # Tasks
     Tasks/TaskWorker.h
@@ -43,6 +44,8 @@ Set(SRC
     Views/MapViewer.cpp
     Views/TaskPanel.h
     Views/TaskPanel.cpp
+    Views/Sequencer.h
+    Views/Sequencer.cpp
 
     # Nodes
     Nodes/FileNode.h

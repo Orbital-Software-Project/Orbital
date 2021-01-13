@@ -3,6 +3,8 @@
 #include "Editor/Global.h"
 #include "Engine/MeshImporter.h"
 
+#include "Editor/Base/ScopeMutexLock.hpp"
+
 namespace Orb {
 
     MeshImportTask::MeshImportTask(MeshImportTaskParam param) {

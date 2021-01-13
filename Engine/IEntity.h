@@ -12,6 +12,8 @@ class IEntity {
 
 public:
     enum class EntityType {
+        Any,
+        Video,
         Camera,
         Group,
         Mesh
@@ -27,6 +29,10 @@ public:
 
     virtual EntityType GetEntityType() = 0;
 
+    std::string GetName() { return this->name; }
+
+    void SetName(std::string name) { this->name = name; }
+
     bool Selected = false;
 
     bool Visible = true;
@@ -41,9 +47,12 @@ public:
 
     glm::vec3 Scale = glm::vec4(1.0f);
 
-    std::string Name = "IEntity";
+    
 
     std::shared_ptr<void> Data;
+
+private:
+    std::string name = "IEntity";
 
 };
 

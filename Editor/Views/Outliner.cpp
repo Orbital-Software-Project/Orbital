@@ -81,7 +81,7 @@ namespace Orb {
             if (entity->GetEntityType() == IEntity::EntityType::Group) {
                 
                 auto childEntites = std::dynamic_pointer_cast<EntityGroup, IEntity>(entity)->GetChildEntites();
-                if (ImGui::TreeNode((void*)(intptr_t)id, entity->Name.c_str()))
+                if (ImGui::TreeNode((void*)(intptr_t)id, entity->GetName().c_str()))
                 {
                     
                     {
@@ -115,7 +115,7 @@ namespace Orb {
 
                 ImGui::PushID(std::to_string(id++).c_str());
                 {
-                    ImGui::Text(entity->Name.c_str());
+                    ImGui::Text(entity->GetName().c_str());
 
                     ImGui::SameLine(ImGui::GetWindowWidth() - 250);
 

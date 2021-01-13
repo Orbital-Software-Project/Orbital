@@ -9,11 +9,13 @@ namespace Orb {
 
 Mesh::Mesh() {
     this->isInit = true;
+    this->SetName("Mesh");
 }
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<std::shared_ptr<Texture>> textures) {
     this->isInit = true;
-    
+    this->SetName("Mesh");
+
     this->UpdateColored(vertices, indices, textures);
 }
 
@@ -91,7 +93,7 @@ void Mesh::Draw(std::shared_ptr<Shader> shader) {
 }
 
 void Mesh::init() {
-    this->Name = "Mesh";
+    
 
     this->isInit = false;
 

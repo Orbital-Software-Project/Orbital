@@ -8,6 +8,8 @@
 #include "Editor/Tasks/MeshImportTask.h"
 #include "Editor/Tasks/TaskWorker.h"
 
+#include "Editor/Base/ScopeMutexLock.hpp"
+
 #include <stdint.h>
 #include <iostream>
 
@@ -40,7 +42,7 @@ namespace Orb {
         this->viewportCam = std::make_shared<Camera>();
         this->viewportCam->VisibleInOutliner = false;
         this->viewportCam->Visible = false;
-        this->viewportCam->Name = "Viewport camera";
+        this->viewportCam->SetName("Viewport camera");
         this->renderer->AddEntity(this->viewportCam);
 
 
@@ -172,26 +174,26 @@ namespace Orb {
 
         // Get indexes of all camera entities
         std::vector<int> cameraIdxVec;
+        std::vector<std::shared_ptr<IEntity>> cameraCollection = Global::GetInstance().Renderer->EntitiesByType(IEntity::EntityType::Camera);
+
+
         int idx = 0;
-        for (auto ent : Global::GetInstance().Renderer->GetEntities()) {
-            if (ent->GetEntityType() == IEntity::EntityType::Camera) {
-                cameraIdxVec.push_back(idx);
-            }
-            idx++;
+        for (auto ent : cameraCollection) {
+            cameraIdxVec.push_back(idx++);
         }
 
-        auto& ents = Global::GetInstance().Renderer->GetEntities();
-
         ImGui::SetNextItemWidth(100.0f);
-        if (ImGui::BeginCombo("##combo", ents[this->currCameraIdx]->Name.c_str()))
+        if (ImGui::BeginCombo("##combo", cameraCollection[this->currCameraIdx]->GetName().c_str()))
         {
-            for (int n = 0; n < cameraIdxVec.size(); n++)
+            for (int n = 0; n < cameraCollection.size(); n++)
             {
                 bool selected = (this->currCameraIdx == cameraIdxVec[n]);
-                if (ImGui::Selectable(ents[cameraIdxVec[n]]->Name.c_str(), selected)) {
+                if (ImGui::Selectable(cameraCollection[cameraIdxVec[n]]->GetName().c_str(), selected)) {
                     this->currCameraIdx = cameraIdxVec[n];
+                    this->selectedCam = std::dynamic_pointer_cast<Camera, IEntity>(cameraCollection[this->currCameraIdx]);
                     if (selected) {
                         ImGui::SetItemDefaultFocus();
+                        
                     }
                 }
             }
@@ -217,7 +219,7 @@ namespace Orb {
     void MapViewer::handleViewportNav(ImVec2 vMin, ImVec2 vMax) {
 
         if (this->currCameraIdx != 0) {
-            this->viewportCam->Matrix = glm::inverse(Global::GetInstance().Renderer->GetEntities()[this->currCameraIdx]->Matrix);
+            this->viewportCam->Matrix = glm::inverse(this->selectedCam->Matrix);
             this->viewportCam->Matrix = glm::scale(glm::mat4(1.0f), glm::vec3(-1.0f, 1.0f, -1.0f)) * this->viewportCam->Matrix;
 
         } else {

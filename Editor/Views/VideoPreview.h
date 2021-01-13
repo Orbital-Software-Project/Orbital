@@ -11,7 +11,9 @@
 #include <GL/glew.h>
 
 
+
 namespace Orb {
+
 
 class VideoPreview : public IView {
 
@@ -21,6 +23,7 @@ public:
     ~VideoPreview();
 
     void OnRender();
+
 
 };
 

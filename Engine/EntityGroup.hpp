@@ -11,7 +11,9 @@ namespace Orb {
 class EntityGroup : public IEntity {
 
 public:
-    EntityGroup() { this->Name = "Entity group"; }
+    EntityGroup() { 
+        this->SetName("Entity group"); 
+    }
 
     ~EntityGroup() {}
 

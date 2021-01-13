@@ -1,6 +1,10 @@
 #include "VideoPreview.h"
 #include "Editor/Global.h"
 
+#include "Engine/Video.h"
+
+#include "Editor/Tasks/TaskWorker.h"
+#include "Editor/Base/ScopeMutexLock.hpp"
 
 #include <cstdint>
 #include <iostream>
@@ -8,7 +12,13 @@
 #include <GL/glew.h>
 #include <imgui.h>
 
-#include "Editor/Tasks/TaskWorker.h"
+
+
+
+// TODO:
+// - Add video sequencer
+//  - List Video entites 
+//  - Logic for playing videos while reconstruction (openvslam task)
 
 namespace Orb {
 
@@ -74,8 +84,6 @@ namespace Orb {
                     )
                 );
             }
-            
-
             
 
             ImGui::EndChild();

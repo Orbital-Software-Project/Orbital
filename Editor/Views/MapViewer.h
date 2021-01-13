@@ -34,8 +34,14 @@ private:
 private:
     std::shared_ptr<Shader> meshShader = nullptr;
     std::shared_ptr<Mesh> gridMesh = nullptr;
-    std::shared_ptr<Camera> viewportCam = nullptr;
     std::shared_ptr<SceneRenderer> renderer = nullptr;
+
+
+    std::shared_ptr<Camera> viewportCam = nullptr;
+
+    std::shared_ptr<Camera> selectedCam = nullptr;
+
+
 
     bool showVideoBackground = false;
     float backVideoDistance = 2.5f;

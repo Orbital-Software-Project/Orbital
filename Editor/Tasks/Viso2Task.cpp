@@ -1,5 +1,7 @@
 #include "Viso2Task.h"
 
+#include "Editor/Base/ScopeMutexLock.hpp"
+
 #include <chrono>
 #include <thread>
 
@@ -19,7 +21,7 @@ Viso2Task::Viso2Task(Viso2TaskParam param) {
     this->param = param;
 
     this->slamCam = std::make_shared<Camera>();
-    this->slamCam->Name = "Slam camera";
+    this->slamCam->SetName("Slam camera");
     this->slamCam->VisibleInOutliner = true;
     Global::GetInstance().Renderer->AddEntity(this->slamCam);
 
@@ -95,6 +97,7 @@ void Viso2Task::Run() {
         if (viso->process(img_data, dims, false)) {
             currPose = currPose * Matrix::inv(viso->getMotion());
 
+
             this->cameraPoses.push_back(currPose);
 
             {
@@ -107,17 +110,15 @@ void Viso2Task::Run() {
                 Global::GetInstance().VideoFrame->UpdateTexture(currFrame);
 
                 std::cout << currPose << std::endl;
+
                 for (int m = 0; m < 4; m++) {
                     for (int n = 0; n < 4; n++) {
                         this->slamCam->Matrix[n][m] = currPose.val[m][n];
                     }
                 }
-
             }
 
-
             std::cout << glm::to_string(this->slamCam->Matrix) << std::endl;
-
             this->slamCam->Matrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f)) * this->slamCam->Matrix;
 
 

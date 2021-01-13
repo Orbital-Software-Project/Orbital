@@ -12,16 +12,17 @@ Set(IMGUI_SRC
     ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/imgui_demo.cpp
     ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/imgui_draw.cpp
     ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/imgui_widgets.cpp
+    ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/imgui_tables.cpp
 
     ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/imstb_rectpack.h
     ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/imstb_textedit.h
     ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/imstb_truetype.h
 
-    ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/examples/imgui_impl_glfw.h
-    ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/examples/imgui_impl_glfw.cpp
+    ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/backends/imgui_impl_glfw.h
+    ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/backends/imgui_impl_glfw.cpp
 
-    ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/examples/imgui_impl_opengl3.h
-    ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/examples/imgui_impl_opengl3.cpp
+    ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/backends/imgui_impl_opengl3.h
+    ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}/backends/imgui_impl_opengl3.cpp
 
 )
 
@@ -81,6 +82,8 @@ Set(ENGINE_SRC
     Shader.cpp
     Texture.h
     Texture.cpp
+    Video.h
+    Video.cpp
     Vertex.hpp
 
     MeshImporter.h
