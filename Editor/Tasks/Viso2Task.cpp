@@ -35,7 +35,7 @@ Viso2Task::~Viso2Task() {
 void Viso2Task::Run() {
     this->Status = TaskStatus::Running;
 
-    VisualOdometryMono::parameters param;
+    //VisualOdometryMono::parameters param;
 
     // calibration parameters for sequence 2010_03_09_drive_0019
     // param.calib.f = 1034.650696; // focal length in pixels
@@ -43,12 +43,12 @@ void Viso2Task::Run() {
     // param.calib.cv = 539.500000;  // principal point (v-coordinate) in pixels
     // param.motion_threshold = std::numeric_limits<double>::max();
 
-    param.calib.f  = this->param.F;
-    param.calib.cu = this->param.CX;
-    param.calib.cv = this->param.CY;
-    param.motion_threshold = std::numeric_limits<double>::max();
+    //param.calib.f  = this->param.F;
+   // param.calib.cu = this->param.CX;
+    //param.calib.cv = this->param.CY;
+    //param.motion_threshold = std::numeric_limits<double>::max();
 
-    VisualOdometryMono* viso = new VisualOdometryMono(param);
+   // VisualOdometryMono* viso = new VisualOdometryMono(param);
 
     cv::VideoCapture videoCapture(this->param.FilePath, cv::CAP_ANY);
 
@@ -59,7 +59,7 @@ void Viso2Task::Run() {
 
     cv::Mat currFrame;
     uint8_t* img_data = nullptr;
-    Matrix currPose = Matrix::eye(4);
+    //Matrix currPose = Matrix::eye(4);
 
     this->frameCount = videoCapture.get(cv::CAP_PROP_FRAME_COUNT);
     cv::Mat frameConverted;
@@ -94,11 +94,11 @@ void Viso2Task::Run() {
 
         int32_t dims[] = { frameConverted.cols, frameConverted.rows, frameConverted.cols };
 
-        if (viso->process(img_data, dims, false)) {
-            currPose = currPose * Matrix::inv(viso->getMotion());
+        //if (viso->process(img_data, dims, false)) {
+          //  currPose = currPose * Matrix::inv(viso->getMotion());
 
 
-            this->cameraPoses.push_back(currPose);
+            //this->cameraPoses.push_back(currPose);
 
             {
                 ScopeMutexLock lock(Global::GetInstance().GlobalMutex);
@@ -109,11 +109,11 @@ void Viso2Task::Run() {
 
                 Global::GetInstance().VideoFrame->UpdateTexture(currFrame);
 
-                std::cout << currPose << std::endl;
+                //std::cout << currPose << std::endl;
 
                 for (int m = 0; m < 4; m++) {
                     for (int n = 0; n < 4; n++) {
-                        this->slamCam->Matrix[n][m] = currPose.val[m][n];
+                        //this->slamCam->Matrix[n][m] = currPose.val[m][n];
                     }
                 }
             }
@@ -122,9 +122,9 @@ void Viso2Task::Run() {
             this->slamCam->Matrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f)) * this->slamCam->Matrix;
 
 
-        } else {
+       // } else {
 
-        }
+       // }
 
 
         // Update report every 50 frames
@@ -132,7 +132,7 @@ void Viso2Task::Run() {
             if (this->currFrameIdx % 10 == 0) {
                 ScopeMutexLock lock(this->TaskReportMutex);
                 this->taskReport.Percentage = Percentage(this->frameCount, this->currFrameIdx);
-                this->taskReport.CameraPoses = this->cameraPoses;
+                //this->taskReport.CameraPoses = this->cameraPoses;
             }
         }
         
@@ -146,7 +146,7 @@ void Viso2Task::Run() {
     {
         ScopeMutexLock lock(this->TaskReportMutex);
         this->taskReport.Percentage = Percentage(this->frameCount, this->currFrameIdx);
-        this->taskReport.CameraPoses = this->cameraPoses;
+        //this->taskReport.CameraPoses = this->cameraPoses;
     }
 
 

@@ -16,7 +16,7 @@
 #include <memory>
 
 #include <Eigen/Core>
-#include <viso_mono.h>
+//#include <viso_mono.h>
 
 
 #include "Editor/Tasks/TaskWorker.h"

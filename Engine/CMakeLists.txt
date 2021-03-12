@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.6)
 
 project(Engine)
 
@@ -56,25 +56,33 @@ Set(IMGUI_SEQUENCER_GUIZMO_SRC
 )
 
 if(MSVC)
-    add_compile_options($<$<CONFIG:Debug>:/MDd> $<$<CONFIG:Release>:/MD>)
+    add_compile_options($<$<CONFIG:Debug>:/MTd> $<$<CONFIG:Release>:/MT>)
 endif()
 
+find_package(OpenCV REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
 
-add_library(ImGui STATIC ${IMGUI_SRC} ${IMGUI_NODE_ED_SRC} ${IMGUI_SEQUENCER_GUIZMO_SRC})
+
+add_library(ImGui STATIC 
+    ${IMGUI_SRC} 
+    #${IMGUI_NODE_ED_SRC} 
+    ${IMGUI_SEQUENCER_GUIZMO_SRC}
+)
+
 target_include_directories(ImGui PUBLIC
     ${CMAKE_SOURCE_DIR}/ThirdParty/${IMGUI_VERSION}
-    ${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor
+    #${CMAKE_SOURCE_DIR}/ThirdParty/imgui-node-editor
     ${CMAKE_SOURCE_DIR}/ThirdParty/ImGuizmo
 )
 
 target_link_libraries(ImGui PRIVATE glfw GLEW::GLEW)
 
-
-
-
-
-
-find_package(assimp CONFIG REQUIRED)
+if(MSVC)
+    target_compile_options(ImGui PRIVATE "$<$<CONFIG:Debug>:/MTd>;$<$<CONFIG:Release>:/MT>")
+endif()
 
 Set(ENGINE_SRC
 
@@ -106,15 +114,12 @@ Set(ENGINE_SRC
 )
 
 Set(SHADERS_SRC
-        ${CMAKE_SOURCE_DIR}/Shaders/MapViewer.vs
-        ${CMAKE_SOURCE_DIR}/Shaders/MapViewer.fs
-        ${CMAKE_SOURCE_DIR}/Shaders/Mesh.vs
-        ${CMAKE_SOURCE_DIR}/Shaders/Mesh.fs
+    ${CMAKE_SOURCE_DIR}/Shaders/MapViewer.vs
+    ${CMAKE_SOURCE_DIR}/Shaders/MapViewer.fs
+    ${CMAKE_SOURCE_DIR}/Shaders/Mesh.vs
+    ${CMAKE_SOURCE_DIR}/Shaders/Mesh.fs
 )
 
-if(MSVC)
-    add_compile_options($<$<CONFIG:Debug>:/MDd> $<$<CONFIG:Release>:/MD>)
-endif()
 
 
 #add_subdirectory(Examples)
@@ -126,3 +131,6 @@ add_library(Engine STATIC ${ENGINE_SRC} ${SHADERS_SRC})
 target_include_directories(Engine PUBLIC .)
 target_link_libraries(Engine PRIVATE ${OpenCV_LIBS} glfw GLEW::GLEW glm assimp::assimp)
 
+if(MSVC)
+    target_compile_options(Engine PRIVATE "$<$<CONFIG:Debug>:/MTd>;$<$<CONFIG:Release>:/MT>")
+endif()

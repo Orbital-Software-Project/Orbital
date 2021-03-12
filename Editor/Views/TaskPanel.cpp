@@ -7,7 +7,7 @@
 #include <imgui.h>
 
 #include "Editor/Tasks/TaskWorker.h"
-#include "Editor/Tasks/Viso2Task.h"
+//#include "Editor/Tasks/Viso2Task.h"
 #include "Editor/Tasks/OpenVslamTask.h"
 
 namespace Orb {
@@ -56,9 +56,9 @@ namespace Orb {
 
         if (videoFile != "") {
             if (ImGui::Button("Run libViso2 SLAM")) {
-                TaskWorker::GetInstance().Exec(
+                /*TaskWorker::GetInstance().Exec(
                     std::make_shared<Viso2Task>(Viso2TaskParam(959.500000, 539.500000, 1034.650696, videoFile))
-                );
+                );*/
             }
         }
 

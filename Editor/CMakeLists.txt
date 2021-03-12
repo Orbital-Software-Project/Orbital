@@ -1,11 +1,8 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.6)
 
 project(Editor)
 
-find_package(Cpp-Taskflow CONFIG REQUIRED)
-
 Set(SRC
-
     # Core
     Main.cpp
     Core.h
@@ -24,8 +21,8 @@ Set(SRC
     Tasks/TaskWorker.cpp
     Tasks/OpenVslamTask.h
     Tasks/OpenVslamTask.cpp
-    Tasks/Viso2Task.h
-    Tasks/Viso2Task.cpp
+    #Tasks/Viso2Task.h
+    #Tasks/Viso2Task.cpp
     Tasks/MeshImportTask.h
     Tasks/MeshImportTask.cpp
 
@@ -38,8 +35,8 @@ Set(SRC
     Views/Outliner.cpp
     Views/PropertyEditor.h
     Views/PropertyEditor.cpp
-    Views/NodeEditor.h
-    Views/NodeEditor.cpp
+    #Views/NodeEditor.h
+    #Views/NodeEditor.cpp
     Views/MapViewer.h
     Views/MapViewer.cpp
     Views/TaskPanel.h
@@ -48,60 +45,65 @@ Set(SRC
     Views/Sequencer.cpp
 
     # Nodes
-    Nodes/FileNode.h
-    Nodes/FileNode.cpp
-    Nodes/SlamNode.h
-    Nodes/SlamNode.cpp
-    Nodes/VideoPrevNode.h
-    Nodes/VideoPrevNode.cpp
-    Nodes/MapViewNode.h
-    Nodes/MapViewNode.cpp
+    #Nodes/FileNode.h
+    #Nodes/FileNode.cpp
+    #Nodes/SlamNode.h
+    #Nodes/SlamNode.cpp
+    #Nodes/VideoPrevNode.h
+    #Nodes/VideoPrevNode.cpp
+    #Nodes/MapViewNode.h
+    #Nodes/MapViewNode.cpp
 
 )
 
-if(MSVC)
-    add_compile_options(/bigobj /MDd /source-charset:utf-8 /execution-charset:utf-8 /wd4996 /wd4275 /wd4251 /wd4244 /wd4305 /wd4267 /wd4127)
-    add_compile_options($<$<CONFIG:Debug>:/MDd> $<$<CONFIG:Release>:/MD>)
 
-    # Set Editor as Visual Studio startup project
-    set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT Editor)
 
-    source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRC})
-    
-    set(DLL_FILES 
-    	"/ThirdParty/g2o/bin/g2o_core_d.dll"
-    	"/ThirdParty/g2o/bin/g2o_types_slam3d_d.dll"
-    	"/ThirdParty/g2o/bin/g2o_csparse_extension_d.dll"
-    	"/ThirdParty/g2o/bin/g2o_solver_csparse_d.dll"
-    	"/ThirdParty/g2o/bin/g2o_solver_dense_d.dll"
-    	"/ThirdParty/g2o/bin/g2o_solver_eigen_d.dll"
-    	"/ThirdParty/g2o/bin/g2o_stuff_d.dll"
-    	"/ThirdParty/g2o/bin/g2o_types_sba_d.dll"
-    	"/ThirdParty/g2o/bin/g2o_types_sim3_d.dll"
-    	"/ThirdParty/DBoW2/lib/dbow2.dll"
-    	"/ThirdParty/vcpkg-2020.06/installed/x64-windows/bin/libcxsparse.dll"
-    )
+find_package(unofficial-nativefiledialog CONFIG REQUIRED)
+find_package(SuiteSparse CONFIG REQUIRED)
+#find_package(libpng CONFIG REQUIRED)
 
-foreach(DLL_FILE ${DLL_FILES})
-file(COPY ${CMAKE_SOURCE_DIR}${DLL_FILE}
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
-endforeach()
+find_package(openvslam CONFIG REQUIRED)
+find_package(fbow CONFIG REQUIRED)
 
+# For CMake < 3.9, we need to make the target ourselves
+if(NOT TARGET OpenMP::OpenMP_CXX)
+    find_package(Threads REQUIRED)
+    add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
+    set_property(TARGET OpenMP::OpenMP_CXX
+                 PROPERTY INTERFACE_COMPILE_OPTIONS ${OpenMP_CXX_FLAGS})
+    # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang)
+    set_property(TARGET OpenMP::OpenMP_CXX
+                 PROPERTY INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
 endif()
 
+
+
 add_executable(Editor ${SRC})
+
 
 target_link_libraries(Editor PRIVATE 
     Engine
     ImGui
     ${OpenCV_LIBS}
-    openvslam
+    Threads::Threads
+    OpenMP::OpenMP_CXX
+    fbow::fbow
+    openvslam::openvslam 
     unofficial::nativefiledialog::nfd
-    Cpp-Taskflow::Cpp-Taskflow
-    libviso2
-    libmv
+    ${SUITESPARSE_LIBRARIES} 
+    #libviso2
+    #libmv
+    #${PNG_LIBRARIES}
 )
 
 
 
+if(MSVC)
+    target_compile_options(Editor PRIVATE /bigobj /source-charset:utf-8 /execution-charset:utf-8 /wd4996 /wd4275 /wd4251 /wd4244 /wd4305 /wd4267 /wd4127)
+    target_compile_options(Editor PRIVATE "$<$<CONFIG:Debug>:/MTd>;$<$<CONFIG:Release>:/MT>")
+   
+    # Set Editor as Visual Studio startup project
+    set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT Editor)
 
+    source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRC})
+endif()

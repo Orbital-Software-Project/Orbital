@@ -3,7 +3,7 @@
 #include <string>
 #include <mutex>
 #include <memory>
-#include <viso_mono.h>
+//#include <viso_mono.h>
 
 #include "TaskWorker.h"
 
@@ -33,7 +33,7 @@ namespace Orb {
     public:
         struct Viso2TaskReport : public ITask::ITaskReport {
 
-            std::vector<Matrix> CameraPoses;
+            //std::vector<Matrix> CameraPoses;
 
         };
 
@@ -49,7 +49,7 @@ namespace Orb {
         bool requestCancel = false;
         bool pauseTask = false;
         
-        std::vector<Matrix> cameraPoses;
+        //std::vector<Matrix> cameraPoses;
 
         std::shared_ptr<Texture> videoTexture = nullptr;
         std::shared_ptr<Mesh> videoPlane      = nullptr;

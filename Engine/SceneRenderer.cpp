@@ -14,7 +14,7 @@ SceneRenderer::SceneRenderer()  {
     glGenVertexArrays(1, &this->vao);
     glGenBuffers(1, &this->vbo);
 
-    this->setFBOSize(800, 600);
+    //this->setFBOSize(800, 600);
 }
 
 SceneRenderer::~SceneRenderer() {}
