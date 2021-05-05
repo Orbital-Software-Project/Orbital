@@ -32,6 +32,8 @@ public:
 
     std::mutex GlobalMutex;
 
+    std::string RootDir = "";
+
 };
 
 }

@@ -74,7 +74,7 @@ int CalibFile::SaveCalibration(const char *filename, int format, float Wc, float
                                const double *Rc, const double *Tc, const double *Ke, const double *Re, const double *Te)
 {
 
-    FILE *arq;
+    FILE *arq = nullptr;
 
     // TMP
    // if( (arq=fopen_s(filename,"w")) == NULL ) return 0;

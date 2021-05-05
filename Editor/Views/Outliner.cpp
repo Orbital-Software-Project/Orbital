@@ -11,14 +11,12 @@ namespace Orb {
     }
 
     Outliner::~Outliner() {
-
+        std::cout << "Outliner closed" << std::endl;
     }
 
     void Outliner::OnRender() {
-
-        ImGui::Begin("Outliner");
+        if(ImGui::Begin("Outliner", &this->Open))
         {
-
             auto entities = renderer->GetEntities();
             int i = 0;
 
@@ -27,10 +25,8 @@ namespace Orb {
                 this->drawEntityTree(i, entities);
             }
 
+            ImGui::End();
         }
-        ImGui::End();
-
-
     }
 
     void Outliner::drawEntityTree(int id, std::vector<std::shared_ptr<IEntity>> entities) {

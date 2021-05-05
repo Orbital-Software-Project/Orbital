@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "Editor/Global.h"
 
 namespace Orb {
 

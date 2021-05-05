@@ -33,6 +33,29 @@ namespace Orb {
                     }
                     ImGui::EndMenu();
                 }
+
+                if (ImGui::BeginMenu("Views")) {
+                    if (ImGui::MenuItem("Map viewer")) {
+                        this->Request = ViewWindowRequest::Open_MapViewer;
+                    }
+                    if (ImGui::MenuItem("Video preview")) {
+                        this->Request = ViewWindowRequest::Open_VideoPrev;
+                    }
+                    if (ImGui::MenuItem("Sequencer")) {
+                        this->Request = ViewWindowRequest::Open_Sequencer;
+                    }
+                    if (ImGui::MenuItem("Property editor")) {
+                        this->Request = ViewWindowRequest::Open_PropertyEd;
+                    }
+                    if (ImGui::MenuItem("Task panel")) {
+                        this->Request = ViewWindowRequest::Open_Taskpanel;
+                    }
+                    if (ImGui::MenuItem("Outliner")) {
+                        this->Request = ViewWindowRequest::Open_Outliner;
+                    }
+
+                    ImGui::EndMenu();
+                }
             }
             ImGui::EndMainMenuBar();
         }

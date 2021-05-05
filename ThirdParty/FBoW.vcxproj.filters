@@ -33,4 +33,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="openvslam\3rd\FBoW\vocabulary\orb_vocab.fbow">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

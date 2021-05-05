@@ -7,12 +7,7 @@ namespace Orb {
 
 SceneRenderer::SceneRenderer()  {
     // Generate buffers and shaders for the viewport texture
-    glGenFramebuffers(1, &this->fbo);
-    glGenTextures(1, &this->mapTexture);
-    glGenRenderbuffers(1, &this->rbo);
-    glGenBuffers(1, &this->ebo);
-    glGenVertexArrays(1, &this->vao);
-    glGenBuffers(1, &this->vbo);
+    
 
     //this->setFBOSize(800, 600);
 }
@@ -21,6 +16,10 @@ SceneRenderer::~SceneRenderer() {}
 
 GLuint SceneRenderer::RenderToTexture(std::shared_ptr<Shader> shader, int width, int height) {
 
+    if (!this->isInit) {
+        this->init();
+        this->isInit = true;
+    }
     // Update framebuffer size when size has changed
     if(this->width != width || this->height != height) {
         this->setFBOSize(width, height);
@@ -40,6 +39,12 @@ GLuint SceneRenderer::RenderToTexture(std::shared_ptr<Shader> shader, int width,
 }
 
 void SceneRenderer::Render(std::shared_ptr<Shader> shader, int width, int height) {
+
+    if (!this->isInit) {
+        this->init();
+        this->isInit = true;
+    }
+
     glViewport(0, 0, width, height);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -64,6 +69,12 @@ void SceneRenderer::RemoveEntity(std::shared_ptr<IEntity> entity) {
 }
 
 void SceneRenderer::setFBOSize(int width, int height) {
+
+    if (!this->isInit) {
+        this->init();
+        this->isInit = true;
+    }
+
 
     this->width = width;
     this->height = height;

@@ -21,7 +21,7 @@ PropertyEditor::~PropertyEditor() {}
 
 void PropertyEditor::OnRender() {
 
-    ImGui::Begin("Property Editor");
+    if(ImGui::Begin("Property Editor", &this->Open)) 
     {
         auto meshList = this->renderer->GetEntities();
 
@@ -71,8 +71,8 @@ void PropertyEditor::OnRender() {
         }
 
 
+        ImGui::End();
     }
-    ImGui::End();
 }
 
 void PropertyEditor::matrix4x4(glm::mat4 mat) {

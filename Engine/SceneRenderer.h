@@ -53,6 +53,15 @@ private:
         }
     }
 
+    void init() {
+        glGenFramebuffers(1, &this->fbo);
+        glGenTextures(1, &this->mapTexture);
+        glGenRenderbuffers(1, &this->rbo);
+        glGenBuffers(1, &this->ebo);
+        glGenVertexArrays(1, &this->vao);
+        glGenBuffers(1, &this->vbo);
+    }
+
 
 private:
     GLuint fbo = 0;
@@ -62,6 +71,8 @@ private:
     int width = 800, height = 600;
 
     std::vector<std::shared_ptr<IEntity>> entities;
+
+    bool isInit = false;
 
 };
 

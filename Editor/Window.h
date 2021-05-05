@@ -2,11 +2,14 @@
 
 #include "Editor/Views/IView.hpp"
 
+#include "Engine/Shader.h"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <vector>
 #include <memory>
+#include <string>
 
 namespace Orb {
 
@@ -32,6 +35,7 @@ namespace Orb {
     private:
         std::vector<WindowData> childWindows;
 
+        std::shared_ptr<Shader> shader;
     };
 
 }

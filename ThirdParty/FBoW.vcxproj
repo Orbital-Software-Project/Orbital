@@ -27,6 +27,11 @@
     <ClInclude Include=".\openvslam\3rd\FBoW\include\fbow\fbow_exports.h" />
     <ClInclude Include=".\openvslam\3rd\FBoW\include\fbow\vocabulary_creator.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="openvslam\3rd\FBoW\vocabulary\orb_vocab.fbow">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -88,13 +93,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>..\ThirdParty\openvslam\3rd\FBoW\include;$(IncludePath)</IncludePath>
-    <IntDir>Intermediate\FBoW\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <PublicIncludeDirectories>.\openvslam\3rd\FBoW\include;$(PublicIncludeDirectories)</PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>..\ThirdParty\openvslam\3rd\FBoW\include;$(IncludePath)</IncludePath>
-    <IntDir>Intermediate\FBoW\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <PublicIncludeDirectories>.\openvslam\3rd\FBoW\include;$(PublicIncludeDirectories)</PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

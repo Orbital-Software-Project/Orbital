@@ -7,101 +7,134 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 
-//#include "imgui_node_editor.h"
+
+#include "Editor/Global.h"
+#include "Editor/Views/VideoPreview.h"
+#include "Editor/Views/MapViewer.h"
+#include "Editor/Views/Outliner.h"
+#include "Editor/Views/PropertyEditor.h"
+#include "Editor/Views/TaskPanel.h"
+#include "Editor/Views/Toolbar.h"
+#include "Editor/Views/Sequencer.h"
 
 namespace Orb {
 
     Window::Window() {
         WindowData mainWindow;
 
-        if (!glfwInit()) {
-            return;
-        }
+        
+        /*
+        this->AddView(std::make_unique<VideoPreview>());
+        this->AddView(std::make_unique<Outliner>(Global::GetInstance().Renderer));
+        this->AddView(std::make_unique<MapViewer>(Global::GetInstance().Renderer, shader));
+        this->AddView(std::make_unique<PropertyEditor>(Global::GetInstance().Renderer));
+        this->AddView(std::make_unique<TaskPanel>());
+        this->AddView(std::make_unique<Sequencer>());
+        */
 
-        glfwWindowHint(GLFW_DOUBLEBUFFER, 1);
-        glfwWindowHint(GLFW_DEPTH_BITS, 24);
-        glfwWindowHint(GLFW_STENCIL_BITS, 8);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        // GLFW/ImGui init
+        {
 
-        //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
-        std::string glsl_version = "";
+            if (!glfwInit()) {
+                return;
+            }
+
+            glfwWindowHint(GLFW_DOUBLEBUFFER, 1);
+            glfwWindowHint(GLFW_DEPTH_BITS, 24);
+            glfwWindowHint(GLFW_STENCIL_BITS, 8);
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+            //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+
+            std::string glsl_version = "";
 #ifdef __APPLE__
-        // GL 3.2 + GLSL 150
-        glsl_version = "#version 150";
-        glfwWindowHint( // required on Mac OS
-            GLFW_OPENGL_FORWARD_COMPAT,
-            GL_TRUE
-        );
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+            // GL 3.2 + GLSL 150
+            glsl_version = "#version 150";
+            glfwWindowHint( // required on Mac OS
+                GLFW_OPENGL_FORWARD_COMPAT,
+                GL_TRUE
+            );
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 #elif __linux__
-        // GL 3.2 + GLSL 150
-        glsl_version = "#version 150";
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+            // GL 3.2 + GLSL 150
+            glsl_version = "#version 150";
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 #elif _WIN32
-        // GL 3.0 + GLSL 130
-        glsl_version = "#version 130";
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+            // GL 3.0 + GLSL 130
+            glsl_version = "#version 130";
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 #endif
 
-        //float highDPIscaleFactor = 1.0;
+            //float highDPIscaleFactor = 1.0;
 #ifdef _WIN32
     // if it's a HighDPI monitor, try to scale everything
-        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-        float xscale, yscale;
-        glfwGetMonitorContentScale(monitor, &xscale, &yscale);
-        if (xscale > 1 || yscale > 1)
-        {
-            //highDPIscaleFactor = xscale;
-            glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
-        }
+            GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+            float xscale, yscale;
+            glfwGetMonitorContentScale(monitor, &xscale, &yscale);
+            if (xscale > 1 || yscale > 1)
+            {
+                //highDPIscaleFactor = xscale;
+                glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
+            }
 #elif __APPLE__
     // to prevent 1200x800 from becoming 2400x1600
-        glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
+            glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
 #endif
 
-        mainWindow.Window = glfwCreateWindow(1920, 1080, "Orbital", nullptr, nullptr);
+            mainWindow.Window = glfwCreateWindow(1920, 1080, "Orbital", nullptr, nullptr);
 
-        if (!mainWindow.Window)
-        {
-            glfwTerminate();
-            return;
+            if (!mainWindow.Window)
+            {
+                glfwTerminate();
+                return;
+            }
+
+            glfwSetFramebufferSizeCallback(mainWindow.Window, Window::OnResize);
+            glfwMakeContextCurrent(mainWindow.Window);
+
+            GLenum err = glewInit();
+            if (GLEW_OK != err)
+            {
+                std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
+                glfwTerminate();
+                return;
+            }
+
+            int actualWindowWidth, actualWindowHeight;
+            glfwGetWindowSize(mainWindow.Window, &actualWindowWidth, &actualWindowHeight);
+            glViewport(0, 0, actualWindowWidth, actualWindowHeight);
+
+
+            // Init ImGui
+            {
+                IMGUI_CHECKVERSION();
+
+                ImGui::CreateContext();
+
+                ImGui_ImplGlfw_InitForOpenGL(mainWindow.Window, true);
+                ImGui_ImplOpenGL3_Init(glsl_version.c_str());
+
+                //ImGuiIO& io = ImGui::GetIO();
+                //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+            }
+
         }
-
-        glfwSetFramebufferSizeCallback(mainWindow.Window, Window::OnResize);
-        glfwMakeContextCurrent(mainWindow.Window);
-
-        GLenum err = glewInit();
-        if (GLEW_OK != err)
-        {
-            std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
-            glfwTerminate();
-            return;
-        }
-
-        int actualWindowWidth, actualWindowHeight;
-        glfwGetWindowSize(mainWindow.Window, &actualWindowWidth, &actualWindowHeight);
-        glViewport(0, 0, actualWindowWidth, actualWindowHeight);
-        
-        
-        // Init ImGui
-        {
-            IMGUI_CHECKVERSION();
-
-            ImGui::CreateContext();
-
-            ImGui_ImplGlfw_InitForOpenGL(mainWindow.Window, true);
-            ImGui_ImplOpenGL3_Init(glsl_version.c_str());
-
-            //ImGuiIO& io = ImGui::GetIO();
-            //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        }
-
 
         this->childWindows.push_back(std::move(mainWindow));
+
+        std::string rootDir = Global::GetInstance().RootDir;
+        this->shader =
+            std::make_shared<Shader>(
+                rootDir + "\\Shaders\\Mesh.vs",
+                rootDir + "\\Shaders\\Mesh.fs");
+
+        // Default views
+        this->AddView(std::make_unique<Toolbar>());
+
     }
 
     Window::~Window() {
@@ -136,18 +169,67 @@ namespace Orb {
             //this->ShowDockSpace(&showDockSpace);
 
 #ifndef NDEBUG
-            ImGui::ShowDemoWindow();
+            //ImGui::ShowDemoWindow();
 #endif
             
-
             {
                 for (int h = 0; h < this->childWindows.size(); h++) {
+                    int viewToRemoveIdx = -1;
+
                     auto& cWnd = this->childWindows[h];
                     for (int i = 0; i < cWnd.Editors.size(); i++) {
+                        
+                        // TODO: Multiple instances in separate windows
                         auto& editor = cWnd.Editors[i];
                         editor->OnRender();
+                        
+                        // Handle view requests
+                        // TODO: Add this to a message handler
+                        {
+
+                            IView::ViewWindowRequest request =
+                                IView::ViewWindowRequest::Close;
+                            if (editor->HasRequest(request)) {
+                                switch (request) {
+                                case IView::ViewWindowRequest::Close:
+                                    // Mark for remove
+                                    viewToRemoveIdx = i;
+                                    break;
+                                case IView::ViewWindowRequest::Open_MapViewer:
+                                    this->AddView(std::make_unique<Orb::MapViewer>(Global::GetInstance().Renderer, this->shader));
+                                    break;
+                                case IView::ViewWindowRequest::Open_Outliner:
+                                    this->AddView(std::make_unique<Orb::Outliner>(Global::GetInstance().Renderer));
+                                    break;
+                                case IView::ViewWindowRequest::Open_PropertyEd:
+                                    this->AddView(std::make_unique<Orb::PropertyEditor>(Global::GetInstance().Renderer));
+                                    break;
+                                case IView::ViewWindowRequest::Open_Sequencer:
+                                    this->AddView(std::make_unique<Orb::Sequencer>());
+                                    break;
+                                case IView::ViewWindowRequest::Open_Taskpanel:
+                                    this->AddView(std::make_unique<Orb::TaskPanel>());
+                                    break;
+                                case IView::ViewWindowRequest::Open_VideoPrev:
+                                    this->AddView(std::make_unique<Orb::VideoPreview>());
+                                    break;
+                                }
+
+                            }
+
+                        }
+                        
                     }
+
+                    if (viewToRemoveIdx != -1) {
+                        auto edBegin = this->childWindows[h].Editors.begin();
+                        this->childWindows[h].Editors.erase(edBegin + viewToRemoveIdx);
+                        viewToRemoveIdx = -1;
+                    }
+                    
                 }
+
+                
             }
 
             ImGui::EndFrame();
