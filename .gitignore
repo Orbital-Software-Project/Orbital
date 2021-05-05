@@ -17,3 +17,4 @@ CMakeLists.txt.user
 /Engine/x64/
 /ThirdParty/Intermediate/
 /ThirdParty/x64/
+/Shaders/x64/

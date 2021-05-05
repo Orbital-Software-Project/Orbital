@@ -12,9 +12,16 @@
 
 #include "Editor/Window.h"
 
+
+
+
 namespace Orb {
 
-Core::Core() {}
+Core::Core(std::string rootDir) {
+    this->rootDir = rootDir;
+
+
+}
 
 Core::~Core() {}
 
@@ -22,7 +29,11 @@ void Core::Run() {
 
     Window wnd;
 
-    std::shared_ptr<Shader> shader = std::make_shared<Shader>("Shaders/Mesh.vs", "Shaders/Mesh.fs");
+
+    std::shared_ptr<Shader> shader = 
+        std::make_shared<Shader>(
+            this->rootDir + "\\Shaders\\Mesh.vs", 
+            this->rootDir + "\\Shaders\\Mesh.fs");
 
     wnd.AddView(std::make_unique<Toolbar>());
     wnd.AddView(std::make_unique<VideoPreview>());
