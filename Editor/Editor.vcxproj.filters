@@ -63,15 +63,6 @@
     <ClCompile Include="Tasks\TaskWorker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="_Triangulation\AKAZE.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="_Triangulation\Image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="_Triangulation\Triangulation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Nodes\MapViewNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -141,15 +132,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Nodes\SlamNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="_Triangulation\Image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="_Triangulation\AKAZE.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="_Triangulation\Triangulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Nodes\MapViewNode.h">

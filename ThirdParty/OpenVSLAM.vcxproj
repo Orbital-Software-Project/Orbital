@@ -87,7 +87,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <PublicIncludeDirectories>.\openvslam\src;.\openvslam\3rd\json\include;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <IncludePath>.\openvslam\3rd\spdlog\include;.\openvslam\3rd\popl\include;$(VcpkgRoot)installed\x64-windows-static\include\suitesparse;.\openvslam\src;.\openvslam\3rd\json\include;$(IncludePath)</IncludePath>
+    <IncludePath>.\openvslam\3rd\spdlog\include;.\openvslam\3rd\popl\include;$(VcpkgRoot)\installed\x64-windows-static\include\suitesparse;.\openvslam\src;.\openvslam\3rd\json\include;$(IncludePath)</IncludePath>
     <IntDir>Intermediate\OpenVSLAM\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
@@ -154,6 +154,7 @@
       <LanguageStandard>Default</LanguageStandard>
       <ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

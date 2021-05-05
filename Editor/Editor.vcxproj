@@ -142,6 +142,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -171,9 +172,6 @@
     <ClCompile Include="Views\Toolbar.cpp" />
     <ClCompile Include="Views\VideoPreview.cpp" />
     <ClCompile Include="Window.cpp" />
-    <ClCompile Include="_Triangulation\AKAZE.cpp" />
-    <ClCompile Include="_Triangulation\Image.cpp" />
-    <ClCompile Include="_Triangulation\Triangulation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base\Percentage.hpp" />
@@ -200,9 +198,6 @@
     <ClInclude Include="Views\Toolbar.h" />
     <ClInclude Include="Views\VideoPreview.h" />
     <ClInclude Include="Window.h" />
-    <ClInclude Include="_Triangulation\AKAZE.h" />
-    <ClInclude Include="_Triangulation\Image.h" />
-    <ClInclude Include="_Triangulation\Triangulation.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
