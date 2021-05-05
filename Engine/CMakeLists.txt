@@ -110,6 +110,7 @@ Set(ENGINE_SRC
     Camera.h
     Camera.cpp
     EntityGroup.hpp
+    FrameTransformation.hpp
 
 )
 

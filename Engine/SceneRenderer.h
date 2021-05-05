@@ -31,7 +31,8 @@ public:
 
     std::vector<std::shared_ptr<IEntity>> EntitiesByType(IEntity::EntityType entityType) {
         std::vector<std::shared_ptr<IEntity>> entsToReturn;
-        this->getEntitiesByType(this->GetEntities(), entsToReturn, entityType);
+        auto ents = this->GetEntities();
+        this->getEntitiesByType(ents, entsToReturn, entityType);
         return entsToReturn;
     }
 
@@ -43,7 +44,8 @@ private:
         for (std::shared_ptr<IEntity>& ent : entities) {
             if (ent->GetEntityType() == IEntity::EntityType::Group) {
                 std::shared_ptr<EntityGroup> grp = std::dynamic_pointer_cast<EntityGroup, IEntity>(ent);
-                this->getEntitiesByType(grp->GetChildEntites(), entsToReturn, entityType);
+                auto children = grp->GetChildEntites();
+                this->getEntitiesByType(children, entsToReturn, entityType);
             }
             if (ent->GetEntityType() == entityType || entityType == IEntity::EntityType::Any) {
                 entsToReturn.push_back(ent);

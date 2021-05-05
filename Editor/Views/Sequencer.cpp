@@ -38,7 +38,7 @@ namespace Orb {
             //if (this->sequence.myItems.size() == 1) {
 
             this->sequence.myItems.clear();
-            auto& videosEnts = Global::GetInstance().Renderer->EntitiesByType(IEntity::EntityType::Video);
+            auto videosEnts = Global::GetInstance().Renderer->EntitiesByType(IEntity::EntityType::Video);
 
             // Get all video entities and fill sequencer
             for (int i = 0; i < videosEnts.size(); i++) {

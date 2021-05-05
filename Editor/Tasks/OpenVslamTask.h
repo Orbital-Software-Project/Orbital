@@ -26,6 +26,7 @@
 #include "Engine/Camera.h"
 #include "Engine/Video.h"
 #include "Engine/EntityGroup.hpp"
+#include "Engine/FrameTransformation.hpp"
 
 namespace Orb {
 
@@ -78,5 +79,6 @@ private:
 
     std::shared_ptr<Camera> slamCam = nullptr;
 
+    std::shared_ptr<FrameTransformation> cameraTransformation = nullptr;
 };
 }

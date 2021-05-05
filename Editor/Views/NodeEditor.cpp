@@ -1,5 +1,5 @@
 #include "NodeEditor.h"
-#include "SceneRenderer.h"
+#include "Engine/SceneRenderer.h"
 
 #include "Editor/Nodes/INode.h"
 #include "Editor/Nodes/FileNode.h"

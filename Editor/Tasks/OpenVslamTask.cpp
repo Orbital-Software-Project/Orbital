@@ -58,6 +58,10 @@ namespace Orb {
         this->slamCam->VisibleInOutliner = true;
         entGroup->AddEntity(this->slamCam);
 
+        this->cameraTransformation = std::make_shared<FrameTransformation>();
+        this->cameraTransformation->SetName("Camera transformation");
+        this->cameraTransformation->SetEntity(this->slamCam);
+        entGroup->AddEntity(this->cameraTransformation);
     }
 
     OpenVslamTask::~OpenVslamTask() {
@@ -73,7 +77,7 @@ namespace Orb {
         this->SLAM->startup();
 
         this->framePublisher = this->SLAM->get_frame_publisher();
-        this->mapPublisher = this->SLAM->get_map_publisher();
+        this->mapPublisher   = this->SLAM->get_map_publisher();
 
 
         cv::VideoCapture video(this->videoFile);
@@ -111,11 +115,9 @@ namespace Orb {
             if (!frame.empty() && (num_frame % frame_skip == 0)) {
                 // input the current frame and estimate the camera pose
                 SLAM->feed_monocular_frame(frame, timestamp, cv::Mat());
-                
             }
 
             this->videoEnt->SetFrameIdx(num_frame);
-
 
             const auto tp_2 = std::chrono::steady_clock::now();
             const auto track_time = std::chrono::duration_cast<std::chrono::duration<double>>(tp_2 - tp_1).count();
@@ -132,7 +134,11 @@ namespace Orb {
 
                 this->updatePointCloud();
                 this->updateKeyframes();
+
+                // Update camera matrix and store transformation per frame
                 this->updateCameraPos();
+                this->cameraTransformation->SetFrameTransformation(num_frame, this->slamCam->Matrix);
+               
                 this->updateVideoPlane(frame.cols, frame.rows, 2.5f);
 
                 // Update video preview

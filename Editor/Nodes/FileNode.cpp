@@ -35,7 +35,7 @@ namespace Orb {
                 ImGui::SameLine();
 
                 if (ImGui::Button("...")) {
-                    strcpy(charBuf, Utils::PickFile().c_str());                
+                    strcpy_s(charBuf, Utils::PickFile().c_str());                
                 }
             }
         }

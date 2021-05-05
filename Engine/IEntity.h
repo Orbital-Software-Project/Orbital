@@ -16,7 +16,8 @@ public:
         Video,
         Camera,
         Group,
-        Mesh
+        Mesh,
+        FrameTransformation
     };
 
 public:

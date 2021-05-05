@@ -12,3 +12,8 @@ Scripts/Build/Build/obj/
 Scripts/Build/Build/bin/
 Content/
 CMakeLists.txt.user
+/x64/
+/Editor/x64/
+/Engine/x64/
+/ThirdParty/Intermediate/
+/ThirdParty/x64/

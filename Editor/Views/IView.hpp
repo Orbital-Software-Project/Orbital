@@ -9,8 +9,6 @@ namespace Orb {
             Close,
         };
 
-
-
     public:
         virtual ~IView() {}
 

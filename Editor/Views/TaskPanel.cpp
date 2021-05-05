@@ -67,7 +67,7 @@ namespace Orb {
 
             ImGui::Separator();
 
-            auto& running_tasks = TaskWorker::GetInstance().GetRunningTasks();
+            auto running_tasks = TaskWorker::GetInstance().GetRunningTasks();
             int id = 0;
 
             for (auto task : running_tasks) {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Shader.h"
-#include "Mesh.h"
-#include "SceneRenderer.h"
+#include "Engine/Shader.h"
+#include "Engine/Mesh.h"
+#include "Engine/SceneRenderer.h"
 #include "IView.hpp"
 
 #include <opencv2/core.hpp>

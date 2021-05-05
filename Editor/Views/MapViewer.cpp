@@ -1,9 +1,9 @@
 #include "MapViewer.h"
 #include "Editor/Global.h"
 #include "Editor/Utils.hpp"
-#include "MeshImporter.h"
+#include "Engine/MeshImporter.h"
 
-#include "PrimitiveFactory.h"
+#include "Engine/PrimitiveFactory.h"
 
 #include "Editor/Tasks/MeshImportTask.h"
 #include "Editor/Tasks/TaskWorker.h"

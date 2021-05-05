@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Engine/IEntity.h"
-#include "Engine/Mesh.h"
+#include "IEntity.h"
+#include "Mesh.h"
 
 #include <glm/glm.hpp>
 #include <memory>
