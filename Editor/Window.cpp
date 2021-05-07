@@ -206,7 +206,7 @@ namespace Orb {
                 ImGui::SetNextWindowSize(use_work_area ? viewport->WorkSize : viewport->Size);
 
                 bool open = true;
-                if (ImGui::Begin("Example: Fullscreen window", &open, flags))
+                if (ImGui::Begin("Background", &open, flags))
                 {
 
 

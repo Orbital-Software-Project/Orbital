@@ -213,7 +213,7 @@
     <ProjectReference Include="..\ThirdParty\ImGuizmo.vcxproj">
       <Project>{a2c1fbbe-7fe7-4274-987a-b90d7f13e4cc}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\ThirdParty\NodeEd.vcxproj">
+    <ProjectReference Include="..\ThirdParty\ImNodes.vcxproj">
       <Project>{3c4ffedc-2839-4246-b376-32f616da37d2}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ThirdParty\OpenVSLAM.vcxproj">

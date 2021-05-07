@@ -4,6 +4,8 @@ namespace Orb {
     class IView {
 
     public:
+        // Use for communicating with other views or specialised classes (window, core, taskworker etc.)
+        // [View]_[Request]
         enum class ViewWindowRequest {
             None,
             Close,
@@ -14,7 +16,8 @@ namespace Orb {
             Open_Sequencer,
             Open_Taskpanel,
             Open_VideoPrev,
-            Open_PropertyEd,
+            Open_PropertyEd
+
 
         };
 
