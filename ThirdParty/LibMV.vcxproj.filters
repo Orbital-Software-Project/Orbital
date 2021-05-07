@@ -1,0 +1,345 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="libmv\libmv\image\array_nd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\tracking\track_region.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\tracking\trklt_region_tracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\tracking\region_tracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\tracking\retrack_region_tracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\tracking\pyramid_region_tracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\tracking\kalman_filter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\tracking\klt_region_tracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\tracking\hybrid_region_tracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\tracking\brute_region_tracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\threading\threading.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\tracks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\resect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\reconstruction_scale.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\reconstruction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\pipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\packed_intrinsics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\modal_solver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\intersect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\keyframe_selection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\initialize_reconstruction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\distortion_models.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\detect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\camera_intrinsics_impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\camera_intrinsics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\bundle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\simple_pipeline\callbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\numeric\poly.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\numeric\numeric.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\numeric\levenberg_marquardt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\numeric\dogleg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\numeric\function_derivative.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\multiview\triangulation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\multiview\two_view_kernel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\multiview\projection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\multiview\resection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\multiview\panography.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\multiview\panography_kernel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\multiview\nviewtriangulation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\multiview\homography.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\multiview\homography_error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\multiview\homography_parameterization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\multiview\fundamental.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\multiview\conditioning.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\multiview\euclidean_resection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\logging\logging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\image\sample.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\image\tuple.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\image\image_converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\image\image_drawing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\image\correlation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\image\image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\image\convolve.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\build\build_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\base\vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\base\vector_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\base\scoped_ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\base\id_generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\base\map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\base\aligned_malloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\base\array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\autotrack\tracks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\autotrack\region.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\autotrack\predict_tracks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\autotrack\quad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\autotrack\reconstruction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\autotrack\frame_accessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\autotrack\marker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\autotrack\model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\autotrack\autotrack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libmv\libmv\autotrack\callbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="libmv\libmv\multiview\fundamental.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\tracking\track_region.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\autotrack\autotrack.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\tracking\trklt_region_tracker.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\tracking\retrack_region_tracker.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\tracking\pyramid_region_tracker.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\tracking\klt_region_tracker.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\tracking\brute_region_tracker.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\tracking\hybrid_region_tracker.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\tracks.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\resect.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\reconstruction_scale.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\reconstruction.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\pipeline.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\packed_intrinsics.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\modal_solver.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\keyframe_selection.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\initialize_reconstruction.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\intersect.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\distortion_models.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\detect.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\camera_intrinsics.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\simple_pipeline\bundle.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\numeric\poly.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\numeric\numeric.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\multiview\triangulation.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\multiview\projection.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\multiview\panography_kernel.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\multiview\panography.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\multiview\homography.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\multiview\conditioning.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\multiview\euclidean_resection.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\image\convolve.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\image\array_nd.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\base\aligned_malloc.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\autotrack\tracks.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libmv\libmv\autotrack\predict_tracks.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
