@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ThirdParty", "ThirdParty", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FBoW", "ThirdParty\FBoW.vcxproj", "{E2E39350-4F7B-4EB8-82CA-CAFFC4D2D4BE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NodeEd", "ThirdParty\NodeEd.vcxproj", "{3C4FFEDC-2839-4246-B376-32F616DA37D2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NodeEd", "ThirdParty\ImNodes.vcxproj", "{3C4FFEDC-2839-4246-B376-32F616DA37D2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImGuizmo", "ThirdParty\ImGuizmo.vcxproj", "{A2C1FBBE-7FE7-4274-987A-B90D7F13E4CC}"
 EndProject

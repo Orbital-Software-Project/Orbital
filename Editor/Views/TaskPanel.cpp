@@ -7,7 +7,6 @@
 #include <imgui.h>
 
 #include "Editor/Tasks/TaskWorker.h"
-//#include "Editor/Tasks/Viso2Task.h"
 #include "Editor/Tasks/OpenVslamTask.h"
 
 #include "Editor/Global.h"
@@ -77,10 +76,13 @@ namespace Orb {
                     {
                         ImGui::Text("Task %i", id);
                         ImGui::SameLine();
-                        ImGui::ProgressBar(
-                            static_cast<float>(
-                                task->GetReport()->Percentage.GetCurrStep()) / static_cast<float>(task->GetReport()->Percentage.GetMaxSteps())
-                        );
+
+
+                        float fraction = 
+                            static_cast<float>(task->GetReport()->Percentage.GetCurrStep()) / 
+                            (static_cast<float>(task->GetReport()->Percentage.GetMaxSteps()) + 0.1);
+
+                        ImGui::ProgressBar(fraction);
                     }
                     ImGui::PopID();
                 }

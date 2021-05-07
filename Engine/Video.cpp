@@ -39,7 +39,7 @@ void Video::UpdateVideo(std::string data) {
 
 void Video::init() {
     this->isCurrTextureUpdated = false;
-    this->currFrame = std::make_shared<Texture>();
+    this->CurrFrame = std::make_shared<Texture>();
 }
 
 
@@ -83,7 +83,7 @@ cv::Mat Video::ReadFrameByIndex(int idx) {
     this->Data.read(result);
     this->Data.set(cv::CAP_PROP_POS_FRAMES, this->currFrameIdx);
 
-    return result;
+    return std::move(result);
 }
 
 void Video::Draw(std::shared_ptr<Shader> shader) {

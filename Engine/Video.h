@@ -50,7 +50,7 @@ public:
 public:
     std::string FilePath = "";
     cv::VideoCapture Data;
-    std::shared_ptr<Texture> currFrame = nullptr;
+    std::shared_ptr<Texture> CurrFrame = nullptr;
 
 private:
     void init();

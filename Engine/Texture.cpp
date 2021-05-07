@@ -51,7 +51,7 @@ GLuint Texture::GetTextureID() {
 }
 
 void Texture::UpdateTexture(cv::Mat data) {
-    this->Data = data.clone();
+    data.copyTo(this->Data);
     this->openglBufferUpdateRequired = true;
 }
 

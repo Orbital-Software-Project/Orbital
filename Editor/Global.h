@@ -20,6 +20,10 @@ public: // Singleton
 private:
     Global() {
         this->Renderer = std::make_shared<SceneRenderer>();
+
+        this->VideoFrame = std::make_shared<Texture>();
+
+        this->SequencerFrame = std::make_shared<Texture>();
     }
 
 public:
@@ -29,6 +33,8 @@ public:
     std::shared_ptr<SceneRenderer> Renderer;
 
     std::shared_ptr<Texture> VideoFrame;
+
+    std::shared_ptr<Texture> SequencerFrame;
 
     std::mutex GlobalMutex;
 

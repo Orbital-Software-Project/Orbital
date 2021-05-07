@@ -32,10 +32,13 @@ namespace Orb {
 
         void ShowDockSpace(bool* p_open);
 
+        void loadImGuiTheme();
+
     private:
         std::vector<WindowData> childWindows;
 
         std::shared_ptr<Shader> shader;
+
     };
 
 }

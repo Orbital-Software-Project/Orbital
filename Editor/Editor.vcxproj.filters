@@ -27,9 +27,6 @@
     <ClCompile Include="Views\MapViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Views\NodeEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Views\Outliner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -90,9 +87,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Views\MapViewer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Views\NodeEditor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Views\Outliner.h">

@@ -24,6 +24,7 @@
     <ProjectGuid>{3c4ffedc-2839-4246-b376-32f616da37d2}</ProjectGuid>
     <RootNamespace>NodeEd</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>ImNodes</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

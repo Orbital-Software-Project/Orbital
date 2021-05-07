@@ -8,6 +8,10 @@
 #include <string>
 #include <imgui.h>
 
+// Import video
+#include "Editor/Global.h"
+#include "Engine/Video.h"
+
 namespace Orb {
 
     Toolbar::Toolbar() {
@@ -25,12 +29,20 @@ namespace Orb {
             ImGui::BeginMainMenuBar();
             {
                 if (ImGui::BeginMenu("File")) {
-                    if (ImGui::MenuItem("Import")) {
+                    if (ImGui::MenuItem("Import mesh")) {
                         std::string file = Utils::PickFile();
                         if (file != "") {
                             TaskWorker::GetInstance().Exec(std::make_shared<MeshImportTask>(file));
                         }
                     }
+
+                    if (ImGui::MenuItem("Import video")) {
+                        std::string file = Utils::PickFile();
+                        if (file != "") {
+                            Global::GetInstance().Renderer->AddEntity(std::make_shared<Video>(file));
+                        }
+                    }
+
                     ImGui::EndMenu();
                 }
 

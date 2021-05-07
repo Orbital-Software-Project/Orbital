@@ -325,38 +325,51 @@ namespace Orb {
             const openvslam::Vec3_t cam_center_1 = keyFrame->get_cam_center();
 
             // covisibility graph
-            const auto covisibilities = keyFrame->graph_node_->get_covisibilities_over_weight(100);
-            if (!covisibilities.empty()) {
-                for (const auto covisibility : covisibilities) {
-                    if (!covisibility || covisibility->will_be_erased()) {
-                        continue;
+            bool drawCovisibilityGraph = true;
+            if (drawCovisibilityGraph) {
+
+                const auto covisibilities = keyFrame->graph_node_->get_covisibilities_over_weight(100);
+                if (!covisibilities.empty()) {
+                    for (const auto covisibility : covisibilities) {
+                        if (!covisibility || covisibility->will_be_erased()) {
+                            continue;
+                        }
+                        if (covisibility->id_ < keyFrame->id_) {
+                            continue;
+                        }
+                        const openvslam::Vec3_t cam_center_2 = covisibility->get_cam_center();
+                        draw_edge(cam_center_1, cam_center_2);
                     }
-                    if (covisibility->id_ < keyFrame->id_) {
-                        continue;
-                    }
-                    const openvslam::Vec3_t cam_center_2 = covisibility->get_cam_center();
-                    draw_edge(cam_center_1, cam_center_2);
                 }
             }
 
             // spanning tree
-            auto spanning_parent = keyFrame->graph_node_->get_spanning_parent();
-            if (spanning_parent) {
-                const openvslam::Vec3_t cam_center_2 = spanning_parent->get_cam_center();
-                draw_edge(cam_center_1, cam_center_2);
+            bool drawSpanningTree = false;
+            if (drawSpanningTree) {
+
+                auto spanning_parent = keyFrame->graph_node_->get_spanning_parent();
+                if (spanning_parent) {
+                    const openvslam::Vec3_t cam_center_2 = spanning_parent->get_cam_center();
+                    draw_edge(cam_center_1, cam_center_2);
+                }
             }
 
             // loop edges
-            const auto loop_edges = keyFrame->graph_node_->get_loop_edges();
-            for (const auto loop_edge : loop_edges) {
-                if (!loop_edge) {
-                    continue;
+
+            bool drawLoopEdge = false;
+            if (drawLoopEdge) {
+
+                const auto loop_edges = keyFrame->graph_node_->get_loop_edges();
+                for (const auto loop_edge : loop_edges) {
+                    if (!loop_edge) {
+                        continue;
+                    }
+                    if (loop_edge->id_ < keyFrame->id_) {
+                        continue;
+                    }
+                    const openvslam::Vec3_t cam_center_2 = loop_edge->get_cam_center();
+                    draw_edge(cam_center_1, cam_center_2);
                 }
-                if (loop_edge->id_ < keyFrame->id_) {
-                    continue;
-                }
-                const openvslam::Vec3_t cam_center_2 = loop_edge->get_cam_center();
-                draw_edge(cam_center_1, cam_center_2);
             }
         }
 

@@ -296,6 +296,10 @@ namespace Orb {
 
 		void OnRender();
 
+	private:
+		void updateSequencerEntries();
+
+		void composeFrame();
 
 	private:
 		int VideoSliderValue = 0;

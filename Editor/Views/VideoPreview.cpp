@@ -33,7 +33,7 @@ namespace Orb {
     void VideoPreview::OnRender() {
 
         if (ImGui::Begin("Video preview", &this->Open)) {
-            if (Global::GetInstance().VideoFrame != nullptr) {
+            if (Global::GetInstance().SequencerFrame != nullptr) {
 
                 static ImVec2 imgViewPos;
                 float viewWidth = ImGui::GetWindowWidth();
@@ -60,8 +60,8 @@ namespace Orb {
 
 
                 {
-                    float imgWidth = Global::GetInstance().VideoFrame->GetColorMap().cols;
-                    float imgHeight = Global::GetInstance().VideoFrame->GetColorMap().rows;
+                    float imgWidth = Global::GetInstance().SequencerFrame->GetColorMap().cols;
+                    float imgHeight = Global::GetInstance().SequencerFrame->GetColorMap().rows;
                     float aspect = imgWidth / imgHeight;
 
                     ImVec2 p_min = ImVec2(
@@ -75,7 +75,7 @@ namespace Orb {
 
                     ImGui::GetWindowDrawList()->AddText(ImVec2(p_min.x, p_min.y - 15), IM_COL32(255, 255, 255, 255), sizeStr.c_str());
                     ImGui::GetWindowDrawList()->AddImage(
-                        (void*)(intptr_t)Global::GetInstance().VideoFrame->GetTextureID(),
+                        (void*)(intptr_t)Global::GetInstance().SequencerFrame->GetTextureID(),
                         p_min,
                         ImVec2(
                             panPanelPos.x + imgViewPos.x + imgWidth + (zoom * aspect),

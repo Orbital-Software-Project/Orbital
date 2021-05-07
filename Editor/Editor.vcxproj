@@ -164,7 +164,6 @@
     <ClCompile Include="Tasks\TaskWorker.cpp" />
     <ClCompile Include="Tasks\Viso2Task.cpp" />
     <ClCompile Include="Views\MapViewer.cpp" />
-    <ClCompile Include="Views\NodeEditor.cpp" />
     <ClCompile Include="Views\Outliner.cpp" />
     <ClCompile Include="Views\PropertyEditor.cpp" />
     <ClCompile Include="Views\Sequencer.cpp" />
@@ -190,7 +189,6 @@
     <ClInclude Include="Utils.hpp" />
     <ClInclude Include="Views\IView.hpp" />
     <ClInclude Include="Views\MapViewer.h" />
-    <ClInclude Include="Views\NodeEditor.h" />
     <ClInclude Include="Views\Outliner.h" />
     <ClInclude Include="Views\PropertyEditor.h" />
     <ClInclude Include="Views\Sequencer.h" />
