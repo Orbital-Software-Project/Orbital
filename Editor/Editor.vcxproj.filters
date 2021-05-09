@@ -34,6 +34,12 @@
     <Filter Include="Source Files\Nodes">
       <UniqueIdentifier>{3576e3ed-2b17-46cb-98fb-146c5f5bab46}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Views\NodeEditor">
+      <UniqueIdentifier>{3c504950-d598-4235-ab1c-31d648bb9976}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Views\NodeEditor">
+      <UniqueIdentifier>{70f647f6-176e-427b-8a88-9ba403a9ef63}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core.cpp">
@@ -78,9 +84,6 @@
     <ClCompile Include="Tasks\TaskWorker.cpp">
       <Filter>Source Files\Tasks</Filter>
     </ClCompile>
-    <ClCompile Include="Nodes\VideoPrevNode.cpp">
-      <Filter>Source Files\Tasks</Filter>
-    </ClCompile>
     <ClCompile Include="Tasks\MeshImportTask.cpp">
       <Filter>Source Files\Tasks</Filter>
     </ClCompile>
@@ -90,11 +93,14 @@
     <ClCompile Include="Tasks\Viso2Task.cpp">
       <Filter>Source Files\Tasks</Filter>
     </ClCompile>
-    <ClCompile Include="Views\NodeEditor\NodeEditor.cpp">
-      <Filter>Source Files\Views</Filter>
-    </ClCompile>
     <ClCompile Include="Views\LayoutManager.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Views\NodeEditor\NodeEditor.cpp">
+      <Filter>Source Files\Views\NodeEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="Nodes\VideoPrevNode.cpp">
+      <Filter>Source Files\Nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -167,11 +173,11 @@
     <ClInclude Include="Nodes\SlamNode.h">
       <Filter>Header Files\Nodes</Filter>
     </ClInclude>
-    <ClInclude Include="Views\NodeEditor\NodeEditor.h">
-      <Filter>Header Files\Nodes</Filter>
-    </ClInclude>
     <ClInclude Include="Views\LayoutManager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Views\NodeEditor\NodeEditor.h">
+      <Filter>Header Files\Views\NodeEditor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

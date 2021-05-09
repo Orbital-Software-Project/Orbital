@@ -8,7 +8,16 @@
 
 namespace Orb {
 
+	// Hardcoded default layout of the Views
 	class LayoutManager {
+
+	public:
+		enum class DockType {
+			Dock_Left,
+			Dock_Right,
+			Dock_Central_Top,
+			Dock_Central_Bottom,
+		};
 
 	public:
 		LayoutManager(std::shared_ptr<Shader> shader);

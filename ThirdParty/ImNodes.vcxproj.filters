@@ -15,48 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="imgui-node-editor\crude_json.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui-node-editor\imgui_bezier_math.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui-node-editor\imgui_canvas.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui-node-editor\imgui_extra_math.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui-node-editor\imgui_node_editor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui-node-editor\imgui_node_editor_internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="imgui-node-editor\crude_json.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui-node-editor\imgui_canvas.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui-node-editor\imgui_node_editor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui-node-editor\imgui_node_editor_api.cpp">
+    <ClCompile Include="imnodes\imnodes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="imgui-node-editor\imgui_bezier_math.inl">
+    <ClInclude Include="imnodes\imnodes.h">
       <Filter>Header Files</Filter>
-    </None>
-    <None Include="imgui-node-editor\imgui_extra_math.inl">
+    </ClInclude>
+    <ClInclude Include="imnodes\imnodes_internal.h">
       <Filter>Header Files</Filter>
-    </None>
-    <None Include="imgui-node-editor\imgui_node_editor_internal.inl">
-      <Filter>Header Files</Filter>
-    </None>
+    </ClInclude>
   </ItemGroup>
 </Project>

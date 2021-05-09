@@ -7,132 +7,92 @@
 #include "Editor/Nodes/VideoPrevNode.h"
 #include "Editor/Nodes/MapViewNode.h"
 
+
 namespace Orb {
+
 
 NodeEditor::NodeEditor(std::shared_ptr<SceneRenderer> renderer) {
     this->renderer = renderer;
-    this->context = ax::NodeEditor::CreateEditor();
+
 
     // Default node setup
     this->nodes.push_back(std::make_shared<FileNode>());
     this->nodes.push_back(std::make_shared<FileNode>());
     this->nodes.push_back(std::make_shared<FileNode>());
-
-    this->nodes.push_back(std::make_shared<VideoPrevNode>());
     this->nodes.push_back(std::make_shared<SlamNode>());
-    this->nodes.push_back(std::make_shared<MapViewNode>());
 
+
+    this->context = ImNodes::CreateContext();
+
+    ImNodes::PushAttributeFlag(ImNodesAttributeFlags_EnableLinkDetachWithDragClick);
+
+    auto& io = ImNodes::GetIO();
+    io.LinkDetachWithModifierClick.Modifier = &ImGui::GetIO().KeyCtrl;
 
 }
 
 
 NodeEditor::~NodeEditor() {
 
-    ax::NodeEditor::DestroyEditor(this->context);
 }
 
 void NodeEditor::OnRender() {
-
     this->drawToolbar();
+    
+    // Node editor
     {
-        ax::NodeEditor::SetCurrentEditor(context);
-        {
-            ax::NodeEditor::Begin("NodeEd");
-            {
 
-                int id = 1;
-                for (std::shared_ptr<INode> node : this->nodes) {
-                    node->OnRender(id);
-                    id += 1;
-                }
+        ImNodes::BeginNodeEditor();
 
-                // Build links
-                for (auto& linkInfo : this->links) {
-                    ax::NodeEditor::Link(linkInfo.Id, linkInfo.InputId, linkInfo.OutputId);
-                }
-
-
-                /*ax::NodeEditor::Suspend();
-                {
-                    static ax::NodeEditor::NodeId contextNodeId = 0;
-
-                    if (ax::NodeEditor::ShowBackgroundContextMenu()) {
-                        ImGui::OpenPopup("Node Context Menu");
-                    }
-                    ax::NodeEditor::Resume();
-
-                    ax::NodeEditor::Suspend();
-
-                    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
-                    if (ImGui::BeginPopup("Create New Node"))
-                    {
-                        ImGui::MenuItem("Input Action");
-
-                        ImGui::MenuItem("Output Action");
-
-
-                        ImGui::EndPopup();
-                    }
-                }
-                ax::NodeEditor::Resume();*/
-
-
-                // Create link logic
-                static int linkId = 0;
-                if (ax::NodeEditor::BeginCreate())
-                {
-                    ax::NodeEditor::PinId inputPinId, outputPinId;
-                    if (ax::NodeEditor::QueryNewLink(&inputPinId, &outputPinId))
-                    {
-
-                        if (ax::NodeEditor::AcceptNewItem())
-                        {
-                            // Since we accepted new link, lets add one to our list of links.
-                            this->links.push_back({ ax::NodeEditor::LinkId(linkId++), inputPinId, outputPinId });
-
-                            // Draw new link.
-                            ax::NodeEditor::Link(this->links.back().Id, this->links.back().InputId, this->links.back().OutputId);
-                        }
-
-                    }
-                }
-                ax::NodeEditor::EndCreate();
-
-
-                // Delete logic
-                if (ax::NodeEditor::BeginDelete())
-                {
-                    ax::NodeEditor::LinkId deletedLinkId;
-                    while (ax::NodeEditor::QueryDeletedLink(&deletedLinkId))
-                    {
-                        if (ax::NodeEditor::AcceptDeletedItem())
-                        {
-                            for (auto& link : this->links)
-                            {
-                                if (link.Id == deletedLinkId)
-                                {
-                                    this->links.erase(&link);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                ax::NodeEditor::EndDelete();
-            }
-            ax::NodeEditor::End();
+        int id = 0;
+        for (auto node : this->nodes) {
+            node->OnRender(id);
         }
-        ax::NodeEditor::SetCurrentEditor(nullptr);
+
+        // Link nodes
+        for (int i = 0; i < this->links.size(); ++i)
+        {
+            const std::pair<int, int> p = this->links[i];
+            // in this case, we just use the array index of the link
+            // as the unique identifier
+            ImNodes::Link(i, p.first, p.second);
+        }
+
+        ImNodes::EndNodeEditor();
+
+        int start_attr, end_attr;
+        if (ImNodes::IsLinkCreated(&start_attr, &end_attr))
+        {
+
+            // TODO: Check if input socket is already used
+            // TODO: Check if circular connection exists
+
+            // check if socket is already used
+            for (auto& lnk : this->links) {
+                if (lnk.second == end_attr) {
+                    return;
+                }
+            }
+
+            links.push_back(std::make_pair(start_attr, end_attr));
+
+            // Update node pyramid
+           
+        }
+        int lnk_id = 0;
+        if (ImNodes::IsLinkDestroyed(&lnk_id)) {
+            this->links.erase(this->links.begin() + lnk_id);
+        }
+
+
     }
 
 
-    return;
 }
 
 
 void NodeEditor::drawToolbar() {
     
-
     const char* items[] = { 
         "File Node", 
         "Track and Map Tasknode",

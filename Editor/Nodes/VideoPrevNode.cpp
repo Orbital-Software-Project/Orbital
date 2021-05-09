@@ -3,9 +3,9 @@
 #include "../Utils.hpp"
 
 
-#include <imgui_node_editor.h>
 #include <nfd.h>
 
+#include <imgui.h>
 
 namespace Orb {
 
@@ -19,30 +19,30 @@ namespace Orb {
 
 	void VideoPrevNode::OnRender(int &id) {
 
-        ax::NodeEditor::BeginNode(id++);
+        //ax::NodeEditor::BeginNode(id++);
         {
             ImGui::Text("Video Preview");
             {
 
                 {
-                    ax::NodeEditor::BeginPin(id++, ax::NodeEditor::PinKind::Input);
+                    //ax::NodeEditor::BeginPin(id++, //ax::NodeEditor::PinKind::Input);
                     ImGui::Text("<- File");
-                    ax::NodeEditor::EndPin();
+                    //ax::NodeEditor::EndPin();
                 }
 
                 ImGui::SameLine();
 
                 {
-                    ax::NodeEditor::BeginPin(id++, ax::NodeEditor::PinKind::Output);
+                    //ax::NodeEditor::BeginPin(id++, //ax::NodeEditor::PinKind::Output);
                     ImGui::Text("Video ->");
-                    ax::NodeEditor::EndPin();
+                    //ax::NodeEditor::EndPin();
                 }
                 
 
 
             }
         }
-        ax::NodeEditor::EndNode();
+        //ax::NodeEditor::EndNode();
 
 	}
 

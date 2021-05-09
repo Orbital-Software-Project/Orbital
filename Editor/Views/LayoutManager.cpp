@@ -15,6 +15,7 @@
 namespace Orb {
 
 	LayoutManager::LayoutManager(std::shared_ptr<Shader> shader) {
+
 		this->AddView(std::make_shared<Outliner>(Global::GetInstance().Renderer));
 
 		this->AddView(std::make_shared<PropertyEditor>(Global::GetInstance().Renderer));
@@ -25,7 +26,6 @@ namespace Orb {
 		this->AddView(std::make_shared<MapViewer>(Global::GetInstance().Renderer, shader));
 		this->AddView(std::make_shared<Sequencer>());
 		this->AddView(std::make_shared<NodeEditor>(Global::GetInstance().Renderer));
-
 
 	}
 
@@ -126,11 +126,7 @@ namespace Orb {
 			topCentralSizeY = ImGui::GetWindowSize().y;
 
 			ImGui::End();
-
-
 		}
-
-
 
 		
 		int bottomCentralPosX = outlinerSizeX;

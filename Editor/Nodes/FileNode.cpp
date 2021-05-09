@@ -3,10 +3,10 @@
 #include "../Utils.hpp"
 
 
-#include <imgui_node_editor.h>
-
 #include <nfd.h>
+#include <imgui.h>
 
+#include <imnodes.h>
 
 namespace Orb {
 
@@ -18,29 +18,37 @@ namespace Orb {
 
 	}
 
-	void FileNode::OnRender(int &id) {
+    void FileNode::OnRender(int& id) {
 
-        ax::NodeEditor::BeginNode(id++);
+        ImNodes::PushColorStyle(ImNodesCol_TitleBar, IM_COL32(111, 175, 223, 255));
+
+        ImNodes::BeginNode(id++);
         {
-            ImGui::Text("File");
-            {
-                ax::NodeEditor::BeginPin(id++, ax::NodeEditor::PinKind::Output);
-                ImGui::Text("Out ->");
-                ax::NodeEditor::EndPin();
 
-                static char charBuf[1000];
+            ImNodes::BeginNodeTitleBar();
+            {
+                ImGui::Text("File");
+            }
+            ImNodes::EndNodeTitleBar();
+
+            {
+                ImNodes::BeginOutputAttribute(id++);
+                ImGui::Text("Out");
+                ImNodes::EndOutputAttribute();
+
+
                 ImGui::SetNextItemWidth(150);
-                ImGui::InputText("", charBuf, 1000);
+                ImGui::InputText("", this->charBuf, 1000);
 
                 ImGui::SameLine();
 
                 if (ImGui::Button("...")) {
-                    strcpy_s(charBuf, Utils::PickFile().c_str());                
+                    strcpy_s(this->charBuf, Utils::PickFile().c_str());
                 }
             }
         }
-        ax::NodeEditor::EndNode();
+        ImNodes::EndNode();
 
-	}
+    }
 
 }

@@ -1,13 +1,22 @@
 #pragma once
 
-#include "Editor/Views/IView.hpp"
-
-#include <memory>
 
 #include <imgui.h>
-#include <imgui_node_editor.h>
 
+
+#include "Editor/Views/IView.hpp"
+#include "Engine/Texture.h"
+
+
+#include <string>
 #include <vector>
+#include <map>
+#include <algorithm>
+#include <utility>
+#include <memory>
+
+
+#include <imnodes.h>
 
 namespace Orb {
     class SceneRenderer;
@@ -15,13 +24,6 @@ namespace Orb {
 }
 
 namespace Orb {
-
-    struct LinkInfo
-    {
-        ax::NodeEditor::LinkId Id;
-        ax::NodeEditor::PinId InputId;
-        ax::NodeEditor::PinId OutputId;
-    };
 
     // https://www.youtube.com/watch?v=xbTLhMJARrk&list=PLZSNHzwDCOggHLThIbCxUhWTgrKVemZkz
     // https://www.blenderfreak.com/tutorials/node-editor-tutorial-series/
@@ -41,10 +43,11 @@ namespace Orb {
 
     private:
         std::shared_ptr<SceneRenderer> renderer;
-        ax::NodeEditor::EditorContext* context = nullptr;
 
-        ImVector<LinkInfo> links;
+        std::vector<std::pair<int, int>> links;
         std::vector<std::shared_ptr<INode>> nodes;
+
+        ImNodesContext* context;
 
     };
 

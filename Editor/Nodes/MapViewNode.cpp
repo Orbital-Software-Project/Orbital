@@ -16,18 +16,18 @@ namespace Orb {
 	}
 
 	void MapViewNode::OnRender(int &id) {
-        ax::NodeEditor::BeginNode(id++);
+        //ax::NodeEditor::BeginNode(id++);
         {
             ImGui::Text("Map Viewer");
             {
                 {
-                    ax::NodeEditor::BeginPin(id++, ax::NodeEditor::PinKind::Input);
+                    //ax::NodeEditor::BeginPin(id++, //ax::NodeEditor::PinKind::Input);
                     ImGui::Text("<- Map");
-                    ax::NodeEditor::EndPin();
+                    //ax::NodeEditor::EndPin();
                 }
             }
         }
-        ax::NodeEditor::EndNode();
+        //ax::NodeEditor::EndNode();
 
 	}
 

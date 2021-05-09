@@ -4,6 +4,7 @@
 
 #include <imgui_node_editor.h>
 
+#include <imnodes.h>
 
 namespace Orb {
 
@@ -17,53 +18,44 @@ namespace Orb {
 
 	void SlamNode::OnRender(int &id) {
 
-        ax::NodeEditor::BeginNode(id++);
+        ImNodes::PushColorStyle(ImNodesCol_TitleBar, IM_COL32(224, 112, 106, 255));
+
+        ImNodes::BeginNode(id++);
         {
-            ImGui::Text("Track and Map");
+            
+            ImNodes::BeginNodeTitleBar();
             {
-                ax::NodeEditor::BeginPin(id++, ax::NodeEditor::PinKind::Input);
-                ImGui::Text("<- Video ");
-                ax::NodeEditor::EndPin();
+                ImGui::Text("Track and Map");
+            }
+            ImNodes::EndNodeTitleBar();
 
-                ImGui::SameLine();
+            ImGui::Dummy(ImVec2(150.0f, 0.0f));
 
-                ax::NodeEditor::BeginPin(id++, ax::NodeEditor::PinKind::Output);
-                ImGui::Text("3d Map ->");
-                ax::NodeEditor::EndPin();
+            {
+                ImNodes::BeginInputAttribute(id++);
+                ImGui::Text("Video");
+                ImNodes::EndInputAttribute();
 
+                ImGui::Spacing();
 
-                ax::NodeEditor::BeginPin(id++, ax::NodeEditor::PinKind::Input);
-                ImGui::Text("<- Config ");
-                ax::NodeEditor::EndPin();
+                ImNodes::BeginInputAttribute(id++);
+                ImGui::Text("Config");
+                ImNodes::EndInputAttribute();
 
-                ImGui::SameLine();
+                ImGui::Spacing();
 
-                ax::NodeEditor::BeginPin(id++, ax::NodeEditor::PinKind::Output);
-                ImGui::Text("Curr. Frame ->");
-                ax::NodeEditor::EndPin();
+                ImNodes::BeginInputAttribute(id++);
+                ImGui::Text("Orb Vocab");
+                ImNodes::EndInputAttribute();
 
-                ax::NodeEditor::BeginPin(id++, ax::NodeEditor::PinKind::Input);
-                ImGui::Text("<- Orb Vocab ");
-                ax::NodeEditor::EndPin();
-
-                
-                
 
                 if (ImGui::Button("Start")) {
 
                 }
-                ImGui::SameLine();
-                if (ImGui::Button("Pause")) {
-
-                }
-                ImGui::SameLine();
-                if (ImGui::Button("Stop")) {
-
-                }
-
             }
+
         }
-        ax::NodeEditor::EndNode();
+        ImNodes::EndNode();
 
 	}
 

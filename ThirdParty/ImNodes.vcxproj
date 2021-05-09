@@ -80,10 +80,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>.\imnodes;$(IncludePath)</IncludePath>
+    <PublicIncludeDirectories>.\imnodes;$(PublicIncludeDirectories)</PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>.\imnodes;$(IncludePath)</IncludePath>
+    <PublicIncludeDirectories>.\imnodes;$(PublicIncludeDirectories)</PublicIncludeDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -123,7 +127,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
@@ -142,7 +146,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
@@ -158,28 +162,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="imgui-node-editor\crude_json.h" />
-    <ClInclude Include="imgui-node-editor\imgui_bezier_math.h" />
-    <ClInclude Include="imgui-node-editor\imgui_canvas.h" />
-    <ClInclude Include="imgui-node-editor\imgui_extra_math.h" />
-    <ClInclude Include="imgui-node-editor\imgui_node_editor.h" />
-    <ClInclude Include="imgui-node-editor\imgui_node_editor_internal.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="imgui-node-editor\crude_json.cpp" />
-    <ClCompile Include="imgui-node-editor\imgui_canvas.cpp" />
-    <ClCompile Include="imgui-node-editor\imgui_node_editor.cpp" />
-    <ClCompile Include="imgui-node-editor\imgui_node_editor_api.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="imgui-node-editor\imgui_bezier_math.inl" />
-    <None Include="imgui-node-editor\imgui_extra_math.inl" />
-    <None Include="imgui-node-editor\imgui_node_editor_internal.inl" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="ImGui.vcxproj">
       <Project>{9bedac37-b062-40fb-aa21-257bd86d0076}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="imnodes\imnodes.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="imnodes\imnodes.h" />
+    <ClInclude Include="imnodes\imnodes_internal.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

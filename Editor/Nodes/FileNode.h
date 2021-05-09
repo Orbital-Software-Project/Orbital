@@ -16,6 +16,9 @@ public:
 
     void OnRender(int &id);
 
+private:
+    char charBuf[1000] = { '\0' };
+
 
 };
 
