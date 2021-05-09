@@ -25,110 +25,106 @@ NodeEditor::NodeEditor(std::shared_ptr<SceneRenderer> renderer) {
 
 }
 
+
 NodeEditor::~NodeEditor() {
 
     ax::NodeEditor::DestroyEditor(this->context);
 }
 
 void NodeEditor::OnRender() {
-    
 
-    if (ImGui::Begin("Node Editor", &this->Open)) {
-
-        this->drawToolbar();
+    this->drawToolbar();
+    {
+        ax::NodeEditor::SetCurrentEditor(context);
         {
-            ax::NodeEditor::SetCurrentEditor(context);
+            ax::NodeEditor::Begin("NodeEd");
             {
-                ax::NodeEditor::Begin("NodeEd");
+
+                int id = 1;
+                for (std::shared_ptr<INode> node : this->nodes) {
+                    node->OnRender(id);
+                    id += 1;
+                }
+
+                // Build links
+                for (auto& linkInfo : this->links) {
+                    ax::NodeEditor::Link(linkInfo.Id, linkInfo.InputId, linkInfo.OutputId);
+                }
+
+
+                /*ax::NodeEditor::Suspend();
                 {
+                    static ax::NodeEditor::NodeId contextNodeId = 0;
 
-                    int id = 1;
-                    for (std::shared_ptr<INode> node : this->nodes) {
-                        node->OnRender(id);
-                        id += 1;
+                    if (ax::NodeEditor::ShowBackgroundContextMenu()) {
+                        ImGui::OpenPopup("Node Context Menu");
                     }
+                    ax::NodeEditor::Resume();
 
-                    // Build links
-                    for (auto& linkInfo : this->links) {
-                        ax::NodeEditor::Link(linkInfo.Id, linkInfo.InputId, linkInfo.OutputId);
-                    }
+                    ax::NodeEditor::Suspend();
 
-
-                    /*ax::NodeEditor::Suspend();
+                    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
+                    if (ImGui::BeginPopup("Create New Node"))
                     {
-                        static ax::NodeEditor::NodeId contextNodeId = 0;
+                        ImGui::MenuItem("Input Action");
 
-                        if (ax::NodeEditor::ShowBackgroundContextMenu()) {
-                            ImGui::OpenPopup("Node Context Menu");
-                        }
-                        ax::NodeEditor::Resume();
-
-                        ax::NodeEditor::Suspend();
-
-                        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
-                        if (ImGui::BeginPopup("Create New Node"))
-                        {
-                            ImGui::MenuItem("Input Action");
-
-                            ImGui::MenuItem("Output Action");
+                        ImGui::MenuItem("Output Action");
 
 
-                            ImGui::EndPopup();
-                        }
+                        ImGui::EndPopup();
                     }
-                    ax::NodeEditor::Resume();*/
+                }
+                ax::NodeEditor::Resume();*/
 
 
-                    // Create link logic
-                    static int linkId = 0;
-                    if (ax::NodeEditor::BeginCreate())
+                // Create link logic
+                static int linkId = 0;
+                if (ax::NodeEditor::BeginCreate())
+                {
+                    ax::NodeEditor::PinId inputPinId, outputPinId;
+                    if (ax::NodeEditor::QueryNewLink(&inputPinId, &outputPinId))
                     {
-                        ax::NodeEditor::PinId inputPinId, outputPinId;
-                        if (ax::NodeEditor::QueryNewLink(&inputPinId, &outputPinId))
-                        {
 
-                            if (ax::NodeEditor::AcceptNewItem())
+                        if (ax::NodeEditor::AcceptNewItem())
+                        {
+                            // Since we accepted new link, lets add one to our list of links.
+                            this->links.push_back({ ax::NodeEditor::LinkId(linkId++), inputPinId, outputPinId });
+
+                            // Draw new link.
+                            ax::NodeEditor::Link(this->links.back().Id, this->links.back().InputId, this->links.back().OutputId);
+                        }
+
+                    }
+                }
+                ax::NodeEditor::EndCreate();
+
+
+                // Delete logic
+                if (ax::NodeEditor::BeginDelete())
+                {
+                    ax::NodeEditor::LinkId deletedLinkId;
+                    while (ax::NodeEditor::QueryDeletedLink(&deletedLinkId))
+                    {
+                        if (ax::NodeEditor::AcceptDeletedItem())
+                        {
+                            for (auto& link : this->links)
                             {
-                                // Since we accepted new link, lets add one to our list of links.
-                                this->links.push_back({ ax::NodeEditor::LinkId(linkId++), inputPinId, outputPinId });
-
-                                // Draw new link.
-                                ax::NodeEditor::Link(this->links.back().Id, this->links.back().InputId, this->links.back().OutputId);
-                            }
-
-                        }
-                    }
-                    ax::NodeEditor::EndCreate();
-
-
-                    // Delete logic
-                    if (ax::NodeEditor::BeginDelete())
-                    {
-                        ax::NodeEditor::LinkId deletedLinkId;
-                        while (ax::NodeEditor::QueryDeletedLink(&deletedLinkId))
-                        {
-                            if (ax::NodeEditor::AcceptDeletedItem())
-                            {
-                                for (auto& link : this->links)
+                                if (link.Id == deletedLinkId)
                                 {
-                                    if (link.Id == deletedLinkId)
-                                    {
-                                        this->links.erase(&link);
-                                        break;
-                                    }
+                                    this->links.erase(&link);
+                                    break;
                                 }
                             }
                         }
                     }
-                    ax::NodeEditor::EndDelete();
                 }
-                ax::NodeEditor::End();
+                ax::NodeEditor::EndDelete();
             }
-            ax::NodeEditor::SetCurrentEditor(nullptr);
+            ax::NodeEditor::End();
         }
-
-        ImGui::End();
+        ax::NodeEditor::SetCurrentEditor(nullptr);
     }
+
 
     return;
 }

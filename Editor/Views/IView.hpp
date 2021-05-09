@@ -16,8 +16,8 @@ namespace Orb {
             Open_Sequencer,
             Open_Taskpanel,
             Open_VideoPrev,
-            Open_PropertyEd
-
+            Open_PropertyEd,
+            Open_NodeEd
 
         };
 
@@ -45,10 +45,10 @@ namespace Orb {
             return outRequest != ViewWindowRequest::None;
         }
 
+        bool Open = true;
+
     protected:
         ViewWindowRequest Request = ViewWindowRequest::None;
 	
-        bool Open = true;
-
     };
 }

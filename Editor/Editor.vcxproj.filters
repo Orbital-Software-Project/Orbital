@@ -90,6 +90,12 @@
     <ClCompile Include="Tasks\Viso2Task.cpp">
       <Filter>Source Files\Tasks</Filter>
     </ClCompile>
+    <ClCompile Include="Views\NodeEditor\NodeEditor.cpp">
+      <Filter>Source Files\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="Views\LayoutManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core.h">
@@ -160,6 +166,12 @@
     </ClInclude>
     <ClInclude Include="Nodes\SlamNode.h">
       <Filter>Header Files\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="Views\NodeEditor\NodeEditor.h">
+      <Filter>Header Files\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="Views\LayoutManager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

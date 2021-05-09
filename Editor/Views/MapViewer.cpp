@@ -56,48 +56,44 @@ namespace Orb {
     void MapViewer::OnRender() {
         ScopeMutexLock lock(Global::GetInstance().GlobalMutex);
 
-        if (ImGui::Begin("Map viewer", &this->Open)) {
+        this->drawToolbar();
 
-            this->drawToolbar();
+        // Get content size of the imgui window
+        ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+        ImVec2 vMax = ImGui::GetWindowContentRegionMax();
 
-            // Get content size of the imgui window
-            ImVec2 vMin = ImGui::GetWindowContentRegionMin();
-            ImVec2 vMax = ImGui::GetWindowContentRegionMax();
-
-            // get current size of the imgui window
-            ImVec2 vSize = ImVec2(vMax.x - vMin.x, vMax.y - (vMin.y + 30));
+        // get current size of the imgui window
+        ImVec2 vSize = ImVec2(vMax.x - vMin.x, vMax.y - (vMin.y + 30));
 
 
 
-            this->gridMesh->Visible = (this->currCameraIdx == 0);
+        this->gridMesh->Visible = (this->currCameraIdx == 0);
 
-            // Set view matrix
-            this->meshShader->SetMat4("view", this->viewportCam->Matrix);
+        // Set view matrix
+        this->meshShader->SetMat4("view", this->viewportCam->Matrix);
 
-            // use negative apsect ration to flip viewport because of openvslam
-            // https://www.learnopengles.com/tag/aspect-ratio/
-            this->meshShader->SetMat4("projection", glm::perspective(glm::radians(45.0f), -vSize.x / vSize.y, 0.1f, 100.0f));
+        // use negative apsect ration to flip viewport because of openvslam
+        // https://www.learnopengles.com/tag/aspect-ratio/
+        this->meshShader->SetMat4("projection", glm::perspective(glm::radians(45.0f), -vSize.x / vSize.y, 0.1f, 100.0f));
 
-            // Childframe to prevent movement of the window and enable viewport rotation
-            ImGui::BeginChild("DragPanel", vSize, false, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
+        // Childframe to prevent movement of the window and enable viewport rotation
+        ImGui::BeginChild("DragPanel", vSize, false, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar);
 
 
 
-            // when the window is to small the framebuffer throws errors
-            if (vSize.x < 50 || vSize.y < 50) {
-                vSize = ImVec2(800, 600);
-                ImGui::SetWindowSize(vSize);
-            }
-            else {
-                this->handleViewportNav(vMin, vMax);
-                // Draw opengl texture (viewport) as imgui image
-                ImGui::Image((void*)(intptr_t)this->renderer->RenderToTexture(this->meshShader, vSize.x, vSize.y), vSize);
-            }
-
-            ImGui::EndChild();
-
-            ImGui::End();
+        // when the window is to small the framebuffer throws errors
+        if (vSize.x < 50 || vSize.y < 50) {
+            vSize = ImVec2(800, 600);
+            ImGui::SetWindowSize(vSize);
         }
+        else {
+            this->handleViewportNav(vMin, vMax);
+            // Draw opengl texture (viewport) as imgui image
+            ImGui::Image((void*)(intptr_t)this->renderer->RenderToTexture(this->meshShader, vSize.x, vSize.y), vSize);
+        }
+
+        ImGui::EndChild();
+
 
     }
 

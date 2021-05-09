@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Editor/Views/IView.hpp"
-
+#include "Editor/Views/LayoutManager.h"
 #include "Engine/Shader.h"
 
 #include <GL/glew.h>
@@ -38,6 +38,8 @@ namespace Orb {
         std::vector<WindowData> childWindows;
 
         std::shared_ptr<Shader> shader;
+
+        std::unique_ptr<LayoutManager> lmgr;
 
     };
 

@@ -15,18 +15,16 @@ namespace Orb {
     }
 
     void Outliner::OnRender() {
-        if(ImGui::Begin("Outliner", &this->Open))
+
+        auto entities = renderer->GetEntities();
+        int i = 0;
+
+        // Display all meshes
         {
-            auto entities = renderer->GetEntities();
-            int i = 0;
-
-            // Display all meshes
-            {
-                this->drawEntityTree(i, entities);
-            }
-
-            ImGui::End();
+            this->drawEntityTree(i, entities);
         }
+
+
     }
 
     void Outliner::drawEntityTree(int id, std::vector<std::shared_ptr<IEntity>> entities) {

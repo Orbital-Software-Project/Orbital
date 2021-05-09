@@ -28,41 +28,33 @@ namespace Orb {
 
     void Sequencer::OnRender() {
 
-        
+        ImGui::Separator();
 
-        if (ImGui::Begin("Sequencer", &this->Open)) {
+        ImGui::PushItemWidth(100);
+        ImGui::InputInt("Current Frame", &this->VideoSliderValue);
+        ImGui::PopItemWidth();
+        ImGui::Separator();
 
-            ImGui::Separator();
+        // ------------------------------
+        // Draw the sequencer
+        // ------------------------------
 
-            ImGui::PushItemWidth(100);
-            ImGui::InputInt("Current Frame", &this->VideoSliderValue);
-            ImGui::PopItemWidth();
-            ImGui::Separator();
+        this->updateSequencerEntries();
 
-            // ------------------------------
-            // Draw the sequencer
-            // ------------------------------
+        ImSequencer::Sequencer(
+            &this->sequence,
+            &this->VideoSliderValue,
+            &this->SequencerExpandet,
+            &this->SequencerSelectedEntry,
+            &this->FirstFrame,
+            ImSequencer::SEQUENCER_EDIT_STARTEND |
+            ImSequencer::SEQUENCER_ADD |
+            ImSequencer::SEQUENCER_DEL |
+            ImSequencer::SEQUENCER_COPYPASTE |
+            ImSequencer::SEQUENCER_CHANGE_FRAME
+        );
 
-            this->updateSequencerEntries();
-
-            ImSequencer::Sequencer(
-                &this->sequence,
-                &this->VideoSliderValue,
-                &this->SequencerExpandet,
-                &this->SequencerSelectedEntry,
-                &this->FirstFrame,
-                ImSequencer::SEQUENCER_EDIT_STARTEND | 
-                ImSequencer::SEQUENCER_ADD | 
-                ImSequencer::SEQUENCER_DEL | 
-                ImSequencer::SEQUENCER_COPYPASTE | 
-                ImSequencer::SEQUENCER_CHANGE_FRAME
-            );
-
-
-            ImGui::End();
-
-            this->composeFrame();
-        }
+        this->composeFrame();
     }
 
     void Sequencer::composeFrame() {

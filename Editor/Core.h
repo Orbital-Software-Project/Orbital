@@ -1,7 +1,11 @@
 #pragma once
 
-#include <string>
 #include "Editor/Global.h"
+
+#include "Editor/Views/LayoutManager.h"
+
+#include <string>
+
 
 namespace Orb {
 
@@ -16,6 +20,7 @@ namespace Orb {
 
     private:
         std::string rootDir = "";
+        
 
     };
 

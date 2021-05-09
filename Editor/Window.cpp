@@ -16,32 +16,23 @@
 #include "Editor/Views/TaskPanel.h"
 #include "Editor/Views/Toolbar.h"
 #include "Editor/Views/Sequencer.h"
+#include "Editor/Views/NodeEditor/NodeEditor.h"
 
 namespace Orb {
 
     Window::Window() {
         WindowData mainWindow;
 
-        
-        /*
-        this->AddView(std::make_unique<VideoPreview>());
-        this->AddView(std::make_unique<Outliner>(Global::GetInstance().Renderer));
-        this->AddView(std::make_unique<MapViewer>(Global::GetInstance().Renderer, shader));
-        this->AddView(std::make_unique<PropertyEditor>(Global::GetInstance().Renderer));
-        this->AddView(std::make_unique<TaskPanel>());
-        this->AddView(std::make_unique<Sequencer>());
-        */
 
         // GLFW/ImGui init
         {
-
 
             if (!glfwInit()) {
                 return;
             }
 
             glfwWindowHint(GLFW_DOUBLEBUFFER, 1);
-            glfwWindowHint(GLFW_DEPTH_BITS, 24);
+            glfwWindowHint(GLFW_DEPTH_BITS,  24);
             glfwWindowHint(GLFW_STENCIL_BITS, 8);
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
@@ -159,22 +150,29 @@ namespace Orb {
         // Mainwindow is the first entry of the vector
         auto& mainWnd = this->childWindows[0];
 
+        this->lmgr = std::make_unique<LayoutManager>(this->shader);
+
         while (!glfwWindowShouldClose(mainWnd.Window))
         {
+
             glfwPollEvents();
 
             glClearColor(
                 0.0f,
                 0.0f,
                 0.0f,
-                1.00f);
+                1.00f
+            );
 
 
-            /*glClearColor(
+            /*
+            glClearColor(
                 49.0f / 255.0f / 255.0f,
                 49.0f / 255.0f / 255.0f, 
                 49.0f / 255.0f / 255.0f, 
-                1.00f);*/
+                1.00f
+                );
+            */
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -182,15 +180,13 @@ namespace Orb {
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            //static bool showDockSpace = true;
-            //this->ShowDockSpace(&showDockSpace);
 
 #ifndef NDEBUG
             ImGui::ShowDemoWindow();
 #endif
+
             // Fullscreen view background
             {
-
                 static bool use_work_area = true;
                 static ImGuiWindowFlags flags = 
                     ImGuiWindowFlags_NoDecoration | 
@@ -223,6 +219,8 @@ namespace Orb {
                         // TODO: Multiple instances in separate windows
                         auto& editor = cWnd.Editors[i];
                         editor->OnRender();
+
+                        this->lmgr->OnRender();
                         
                         // Handle view requests
                         // TODO: Add this to a message handler
@@ -253,6 +251,9 @@ namespace Orb {
                                     break;
                                 case IView::ViewWindowRequest::Open_VideoPrev:
                                     this->AddView(std::make_unique<Orb::VideoPreview>());
+                                    break;
+                                case IView::ViewWindowRequest::Open_NodeEd:
+                                    this->AddView(std::make_unique<Orb::NodeEditor>(Global::GetInstance().Renderer));
                                     break;
                                 }
 

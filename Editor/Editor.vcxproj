@@ -163,7 +163,9 @@
     <ClCompile Include="Tasks\OpenVslamTask.cpp" />
     <ClCompile Include="Tasks\TaskWorker.cpp" />
     <ClCompile Include="Tasks\Viso2Task.cpp" />
+    <ClCompile Include="Views\LayoutManager.cpp" />
     <ClCompile Include="Views\MapViewer.cpp" />
+    <ClCompile Include="Views\NodeEditor\NodeEditor.cpp" />
     <ClCompile Include="Views\Outliner.cpp" />
     <ClCompile Include="Views\PropertyEditor.cpp" />
     <ClCompile Include="Views\Sequencer.cpp" />
@@ -188,7 +190,9 @@
     <ClInclude Include="Tasks\Viso2Task.h" />
     <ClInclude Include="Utils.hpp" />
     <ClInclude Include="Views\IView.hpp" />
+    <ClInclude Include="Views\LayoutManager.h" />
     <ClInclude Include="Views\MapViewer.h" />
+    <ClInclude Include="Views\NodeEditor\NodeEditor.h" />
     <ClInclude Include="Views\Outliner.h" />
     <ClInclude Include="Views\PropertyEditor.h" />
     <ClInclude Include="Views\Sequencer.h" />

@@ -2,6 +2,7 @@
 #include "Editor/Window.h"
 
 
+
 namespace Orb {
 
     Core::Core(std::string rootDir) {
@@ -11,6 +12,7 @@ namespace Orb {
     Core::~Core() {}
 
     void Core::Run() {
+
         Window wnd;
         wnd.EnterMsgLoop();        
 

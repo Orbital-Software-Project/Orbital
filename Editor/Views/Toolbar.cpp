@@ -65,6 +65,9 @@ namespace Orb {
                     if (ImGui::MenuItem("Outliner")) {
                         this->Request = ViewWindowRequest::Open_Outliner;
                     }
+                    if (ImGui::MenuItem("Node editor")) {
+                        this->Request = ViewWindowRequest::Open_NodeEd;
+                    }
 
                     ImGui::EndMenu();
                 }
