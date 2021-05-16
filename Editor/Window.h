@@ -15,7 +15,7 @@ namespace Orb {
 
     struct WindowData {
         GLFWwindow* Window;
-        std::vector<std::unique_ptr<IView>> Editors;
+        std::vector<std::shared_ptr<IView>> Editors;
     };
 
     class Window {
@@ -24,22 +24,37 @@ namespace Orb {
 
         ~Window();
 
-        void EnterMsgLoop();
+        bool DoEvents();
 
-        void AddView(std::unique_ptr<IView> editorView);
+        void AddView(std::shared_ptr<IView> editorView);
+
+        void Render();
 
         static void OnResize(GLFWwindow* window, int width, int height);
 
         void ShowDockSpace(bool* p_open);
 
-        void loadImGuiTheme();
+        std::vector<std::shared_ptr<IView>> GetViews();
+        
+        void RemoveView(std::shared_ptr<IView> view) {
+            auto begin = this->childWindows[0].Editors.begin();
+            auto end = this->childWindows[0].Editors.end();
+            
+            auto res = std::find(begin, end, view);
+            if (res != end) {
+                this->childWindows[0].Editors.erase(res);
+            }
+
+        }
 
     private:
+        void loadImGuiTheme();
+
         std::vector<WindowData> childWindows;
 
-        std::shared_ptr<Shader> shader;
+        //std::shared_ptr<Shader> shader;
 
-        std::unique_ptr<LayoutManager> lmgr;
+        //std::unique_ptr<LayoutManager> lmgr;
 
     };
 

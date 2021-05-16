@@ -15,6 +15,8 @@ namespace Orb {
 
 PropertyEditor::PropertyEditor(std::shared_ptr<SceneRenderer> renderer) {
     this->renderer = renderer;
+
+    this->Name = "Property editor";
 }
 
 PropertyEditor::~PropertyEditor() {}

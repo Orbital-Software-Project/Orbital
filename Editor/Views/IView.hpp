@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <typeinfo>
+
 namespace Orb {
     class IView {
 
@@ -23,9 +26,10 @@ namespace Orb {
 
     public:
         virtual ~IView() {}
-
+        
         virtual void OnRender() = 0;
 
+        std::string Name = "IView";
 
         bool HasRequest(ViewWindowRequest& outRequest) {
             if (!this->Open) {
@@ -33,9 +37,9 @@ namespace Orb {
 
                 // Request handled
                 this->Request = ViewWindowRequest::None;
+
                 return true;
             }
-
             outRequest = this->Request;
 
             // Request handled

@@ -16,6 +16,7 @@ namespace Orb {
 
     Toolbar::Toolbar() {
 
+        this->Name = "Toolbar";
     }
 
     Toolbar::~Toolbar() {

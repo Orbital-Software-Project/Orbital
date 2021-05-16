@@ -36,6 +36,8 @@ namespace Orb {
 
         this->renderer = renderer;
 
+        this->Name = "Map viewer";
+
         // Shader model
         this->meshShader = shader;
 
@@ -44,7 +46,6 @@ namespace Orb {
         this->viewportCam->Visible = false;
         this->viewportCam->SetName("Viewport camera");
         this->renderer->AddEntity(this->viewportCam);
-
 
         this->initGridMesh();
     }

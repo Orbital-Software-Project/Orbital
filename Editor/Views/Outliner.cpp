@@ -8,6 +8,8 @@ namespace Orb {
 
     Outliner::Outliner(std::shared_ptr<SceneRenderer> renderer) {
         this->renderer = renderer;
+
+        this->Name = "Outliner";
     }
 
     Outliner::~Outliner() {

@@ -1,31 +1,11 @@
 #include "LayoutManager.h"
 
-#include "Outliner.h"
-#include "PropertyEditor.h"
-#include "VideoPreview.h"
-#include "MapViewer.h"
-#include "Sequencer.h"
-#include "NodeEditor/NodeEditor.h"
-#include "TaskPanel.h"
-
-#include "Editor/Global.h"
-
 #include <imgui.h>
+#include <string>
 
 namespace Orb {
 
-	LayoutManager::LayoutManager(std::shared_ptr<Shader> shader) {
-
-		this->AddView(std::make_shared<Outliner>(Global::GetInstance().Renderer));
-
-		this->AddView(std::make_shared<PropertyEditor>(Global::GetInstance().Renderer));
-		this->AddView(std::make_shared<TaskPanel>());
-
-		this->AddView(std::make_shared<VideoPreview>());
-
-		this->AddView(std::make_shared<MapViewer>(Global::GetInstance().Renderer, shader));
-		this->AddView(std::make_shared<Sequencer>());
-		this->AddView(std::make_shared<NodeEditor>(Global::GetInstance().Renderer));
+	LayoutManager::LayoutManager() {
 
 	}
 
@@ -33,128 +13,151 @@ namespace Orb {
 
 	}
 
-	void LayoutManager::AddView(std::shared_ptr<IView> view) {
-		this->viewCollection.push_back(view);
+	void LayoutManager::AddView(std::shared_ptr<IView> view, DockType dockType) {
+		this->viewCollection.push_back(
+			ViewDockTypePair {dockType, view}
+		);
 	}
 
 	void LayoutManager::OnRender() {
 
-		// Outliner
+
+		for (auto viewDock : this->viewCollection) {
+			if (viewDock.Type == DockType::Dock_Float) {
+				viewDock.View->OnRender();
+			}
+		}
+
+		// ---------------------------
+
+		int tabID = 1;
+
+		// ---------------------------
+
+		int leftViewPosY = ImGui::GetMainViewport()->WorkPos.y;
+		int leftViewSizeY = ImGui::GetMainViewport()->WorkSize.y;
+		static int leftViewSizeX = 300;
+
 		static ImGuiWindowFlags flags =
 			ImGuiWindowFlags_NoCollapse |
 			ImGuiWindowFlags_NoTitleBar;
 
-		int outlinerPosY  = ImGui::GetMainViewport()->WorkPos.y;
-		int outlinerSizeY = ImGui::GetMainViewport()->WorkSize.y;
-		static int outlinerSizeX = 300;
-		ImGui::SetNextWindowPos(ImVec2(0, outlinerPosY));
-		ImGui::SetNextWindowSize(ImVec2(outlinerSizeX, outlinerSizeY));
-		if (ImGui::Begin("LeftPanel", &this->viewCollection[0]->Open, flags)) {
-			if (ImGui::BeginTabBar("Tabs##1", ImGuiTabBarFlags_None)) {
-				if (ImGui::BeginTabItem("Outliner"))
-				{
-					this->viewCollection[0]->OnRender();
-
-					ImGui::EndTabItem();
+		ImGui::SetNextWindowPos(ImVec2(0, leftViewPosY));
+		ImGui::SetNextWindowSize(ImVec2(leftViewSizeX, leftViewSizeY));
+		bool leftPanelOpen = true;
+		if (ImGui::Begin("LeftPanel", &leftPanelOpen, flags)) {
+			if (ImGui::BeginTabBar("LeftTabBar", ImGuiTabBarFlags_None)) {
+				for (auto viewDock : this->viewCollection) {
+					if (viewDock.Type == DockType::Dock_Left) {
+						if (ImGui::BeginTabItem((viewDock.View->Name + "##" + std::to_string(tabID)).c_str())) {
+							viewDock.View->OnRender();
+							ImGui::EndTabItem();
+						}
+						leftViewSizeX = ImGui::GetWindowSize().x;
+						tabID++;
+					}
 				}
 				ImGui::EndTabBar();
 			}
-			outlinerSizeX = ImGui::GetWindowSize().x;
-
 			ImGui::End();
 		}
 
+		// ---------------------------
 
-		static int propertyEdSizeX = 300;
-		int propertyEdPosX = ImGui::GetMainViewport()->Size.x - propertyEdSizeX;
-		int propertyEdPosY = ImGui::GetMainViewport()->WorkPos.y;
-		int propertyEdSizeY = ImGui::GetMainViewport()->WorkSize.y;
-		
-		ImGui::SetNextWindowPos(ImVec2(propertyEdPosX, propertyEdPosY));
-		ImGui::SetNextWindowSize(ImVec2(propertyEdSizeX, propertyEdSizeY));
-		if (ImGui::Begin("RightPanel", &this->viewCollection[1]->Open, flags)) {
-			if (ImGui::BeginTabBar("Tabs##2", ImGuiTabBarFlags_None)) {
-				if (ImGui::BeginTabItem("Property Editor"))
-				{
-					this->viewCollection[1]->OnRender();
+		static int rightViewSizeX = 300;
+		int rightViewPosX  = ImGui::GetMainViewport()->Size.x - rightViewSizeX;
+		int rightViewPosY  = ImGui::GetMainViewport()->WorkPos.y;
+		int rightViewSizeY = ImGui::GetMainViewport()->WorkSize.y;
 
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("Task panel"))
-				{
-					this->viewCollection[2]->OnRender();
-
-					ImGui::EndTabItem();
+		ImGui::SetNextWindowPos(ImVec2(rightViewPosX, rightViewPosY));
+		ImGui::SetNextWindowSize(ImVec2(rightViewSizeX, rightViewSizeY));
+		bool rightPanelOpen = true;
+		if (ImGui::Begin("RightPanel", &rightPanelOpen, flags)) {
+			if (ImGui::BeginTabBar("RightTabBar", ImGuiTabBarFlags_None)) {
+				for (auto viewDock : this->viewCollection) {
+					if (viewDock.Type == DockType::Dock_Right) {
+						if (ImGui::BeginTabItem((viewDock.View->Name + "##" + std::to_string(tabID)).c_str())) {
+							viewDock.View->OnRender();
+							ImGui::EndTabItem();
+						}
+						rightViewSizeX = ImGui::GetWindowSize().x;
+						tabID++;
+					}
 				}
 				ImGui::EndTabBar();
 			}
-
-			propertyEdSizeX = ImGui::GetWindowSize().x;
-
 			ImGui::End();
 		}
 
+		// ---------------------------
 
 		static ImGuiWindowFlags flagsTopCentralView =
 			ImGuiWindowFlags_NoCollapse |
-			ImGuiWindowFlags_NoTitleBar | 
-			ImGuiWindowFlags_NoScrollWithMouse;
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoScrollWithMouse | 
+			ImGuiWindowFlags_NoScrollbar;
 
-		int topCentralPosX  = outlinerSizeX;
+		int topCentralPosX  = leftViewSizeX;
 		int topCentralPosY  = ImGui::GetMainViewport()->WorkPos.y;
-		int topCentralSizeX = ImGui::GetMainViewport()->WorkSize.x - propertyEdSizeX - outlinerSizeX;
+		int topCentralSizeX = ImGui::GetMainViewport()->WorkSize.x - rightViewSizeX - leftViewSizeX;
 		static int topCentralSizeY = ImGui::GetMainViewport()->WorkSize.y - 500;
 
+		ImGui::SetNextWindowSizeConstraints(ImVec2(-1, 0), ImVec2(-1, FLT_MAX));      // Vertical only
 		ImGui::SetNextWindowPos(ImVec2(topCentralPosX, topCentralPosY));
 		ImGui::SetNextWindowSize(ImVec2(topCentralSizeX, topCentralSizeY));
-		if (ImGui::Begin("CentralTop", &this->viewCollection[3]->Open, flagsTopCentralView)) {
-
-			if (ImGui::BeginTabBar("Tabs##3", ImGuiTabBarFlags_None)) {
-				if (ImGui::BeginTabItem("Video Preview"))
-				{
-					this->viewCollection[3]->OnRender();
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("Map viewer"))
-				{
-					this->viewCollection[4]->OnRender();
-					ImGui::EndTabItem();
+		bool centralTopPanelOpen = true;
+		if (ImGui::Begin("CentralTopPanel", &centralTopPanelOpen, flagsTopCentralView)) {
+			if (ImGui::BeginTabBar("CentralTopTabBar", ImGuiTabBarFlags_None)) {
+				for (auto viewDock : this->viewCollection) {
+					if (viewDock.Type == DockType::Dock_Central_Top) {
+						if (ImGui::BeginTabItem((viewDock.View->Name + "##" + std::to_string(tabID)).c_str())) {
+							viewDock.View->OnRender();
+							ImGui::EndTabItem();
+						}
+						topCentralSizeY = ImGui::GetWindowSize().y;
+						tabID++;
+					}
 				}
 				ImGui::EndTabBar();
 			}
-
-			topCentralSizeY = ImGui::GetWindowSize().y;
-
 			ImGui::End();
 		}
 
-		
-		int bottomCentralPosX = outlinerSizeX;
-		int bottomCentralPosY = topCentralSizeY + 18;
-		int bottomCentralSizeX = ImGui::GetMainViewport()->WorkSize.x - propertyEdSizeX - outlinerSizeX;
+		// ---------------------------
+
+		static ImGuiWindowFlags flagsBottomCentralView =
+			ImGuiWindowFlags_NoCollapse |
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoScrollWithMouse |
+			ImGuiWindowFlags_NoDecoration;
+
+		int bottomCentralPosX  = leftViewSizeX;
+		int bottomCentralPosY  = topCentralSizeY + 18;
+		int bottomCentralSizeX = ImGui::GetMainViewport()->WorkSize.x - rightViewSizeX - leftViewSizeX;
 		int bottomCentralSizeY = ImGui::GetMainViewport()->WorkSize.y - topCentralSizeY;
+
 
 		ImGui::SetNextWindowPos(ImVec2(bottomCentralPosX, bottomCentralPosY));
 		ImGui::SetNextWindowSize(ImVec2(bottomCentralSizeX, bottomCentralSizeY));
-		if (ImGui::Begin("CentralBottom", &this->viewCollection[5]->Open, flags)) {
-			if (ImGui::BeginTabBar("Tabs##4", ImGuiTabBarFlags_None)) {
-				if (ImGui::BeginTabItem("Sequencer"))
-				{
-					this->viewCollection[5]->OnRender();
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("Node Editor"))
-				{
-					this->viewCollection[6]->OnRender();
-					ImGui::EndTabItem();
+		bool centralBottomPanelOpen = true;
+		if (ImGui::Begin("CentralBottomPanel", &centralBottomPanelOpen, flagsBottomCentralView)) {
+			if (ImGui::BeginTabBar("CentralBottomTabBar", ImGuiTabBarFlags_None)) {
+				for (auto viewDock : this->viewCollection) {
+					if (viewDock.Type == DockType::Dock_Central_Bottom) {
+						if (ImGui::BeginTabItem((viewDock.View->Name + "##" + std::to_string(tabID)).c_str())) {
+							viewDock.View->OnRender();
+							ImGui::EndTabItem();
+						}
+						topCentralSizeX = ImGui::GetWindowSize().x;
+						tabID++;
+					}
 				}
 				ImGui::EndTabBar();
 			}
-
 			ImGui::End();
 		}
 
-
+		return;
 	}
 
 }

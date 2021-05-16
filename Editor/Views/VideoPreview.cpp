@@ -24,6 +24,7 @@ namespace Orb {
 
     VideoPreview::VideoPreview() {
 
+        this->Name = "Video preview";
     }
 
     VideoPreview::~VideoPreview() {

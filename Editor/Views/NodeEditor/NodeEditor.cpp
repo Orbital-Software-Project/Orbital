@@ -14,6 +14,7 @@ namespace Orb {
 NodeEditor::NodeEditor(std::shared_ptr<SceneRenderer> renderer) {
     this->renderer = renderer;
 
+    this->Name = "Node editor";
 
     // Default node setup
     this->nodes.push_back(std::make_shared<FileNode>());

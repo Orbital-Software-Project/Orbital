@@ -9,14 +9,6 @@
 
 
 #include "Editor/Global.h"
-#include "Editor/Views/VideoPreview.h"
-#include "Editor/Views/MapViewer.h"
-#include "Editor/Views/Outliner.h"
-#include "Editor/Views/PropertyEditor.h"
-#include "Editor/Views/TaskPanel.h"
-#include "Editor/Views/Toolbar.h"
-#include "Editor/Views/Sequencer.h"
-#include "Editor/Views/NodeEditor/NodeEditor.h"
 
 namespace Orb {
 
@@ -119,14 +111,7 @@ namespace Orb {
 
         this->childWindows.push_back(std::move(mainWindow));
 
-        std::string rootDir = Global::GetInstance().RootDir;
-        this->shader =
-            std::make_shared<Shader>(
-                rootDir + "\\Shaders\\Mesh.vs",
-                rootDir + "\\Shaders\\Mesh.fs");
-
-        // Default views
-        this->AddView(std::make_unique<Toolbar>());
+        
 
 
 
@@ -141,19 +126,21 @@ namespace Orb {
         glfwTerminate();
     }
 
-    void Window::AddView(std::unique_ptr<IView> editorView) {
-        this->childWindows[0].Editors.push_back(std::move(editorView));
+    void Window::AddView(std::shared_ptr<IView> editorView) {
+        this->childWindows[0].Editors.push_back(editorView);
     }
 
-    void Window::EnterMsgLoop() {
+    bool Window::DoEvents() {
 
         // Mainwindow is the first entry of the vector
         auto& mainWnd = this->childWindows[0];
 
-        this->lmgr = std::make_unique<LayoutManager>(this->shader);
+        //this->lmgr = std::make_unique<LayoutManager>(this->shader);
 
-        while (!glfwWindowShouldClose(mainWnd.Window))
-        {
+        bool shouldClose = glfwWindowShouldClose(mainWnd.Window);
+
+        //while (!glfwWindowShouldClose(mainWnd.Window))
+        //{
 
             glfwPollEvents();
 
@@ -164,12 +151,8 @@ namespace Orb {
                 1.00f
             );
 
-
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
+            
 
             // Fullscreen view background
             {
@@ -197,86 +180,35 @@ namespace Orb {
             }
 
             {
-                for (int h = 0; h < this->childWindows.size(); h++) {
-                    int viewToRemoveIdx = -1;
+                //for (int h = 0; h < this->childWindows.size(); h++) {
+                //    int viewToRemoveIdx = -1;
 
-                    auto& cWnd = this->childWindows[h];
-                    for (int i = 0; i < cWnd.Editors.size(); i++) {
-                        
-                        // TODO: Multiple instances in separate windows
-                        auto& editor = cWnd.Editors[i];
-                        editor->OnRender();
+                //    auto& cWnd = this->childWindows[h];
+                //    for (int i = 0; i < cWnd.Editors.size(); i++) {
+                //        
+                //        // TODO: Multiple instances in separate windows
+                //        auto& editor = cWnd.Editors[i];
+                //        editor->OnRender();
 
-                        this->lmgr->OnRender();
-
-
+                //        //this->lmgr->OnRender();
 
 
-                        // Handle view requests
-                        // TODO: Add this to a message handler
-                        {
 
-                            IView::ViewWindowRequest request =
-                                IView::ViewWindowRequest::Close;
-                            if (editor->HasRequest(request)) {
-                                switch (request) {
-                                case IView::ViewWindowRequest::Close:
-                                    // Mark for remove
-                                    viewToRemoveIdx = i;
-                                    break;
-                                case IView::ViewWindowRequest::Open_MapViewer:
-                                    this->AddView(std::make_unique<Orb::MapViewer>(Global::GetInstance().Renderer, this->shader));
-                                    break;
-                                case IView::ViewWindowRequest::Open_Outliner:
-                                    this->AddView(std::make_unique<Orb::Outliner>(Global::GetInstance().Renderer));
-                                    break;
-                                case IView::ViewWindowRequest::Open_PropertyEd:
-                                    this->AddView(std::make_unique<Orb::PropertyEditor>(Global::GetInstance().Renderer));
-                                    break;
-                                case IView::ViewWindowRequest::Open_Sequencer:
-                                    this->AddView(std::make_unique<Orb::Sequencer>());
-                                    break;
-                                case IView::ViewWindowRequest::Open_Taskpanel:
-                                    this->AddView(std::make_unique<Orb::TaskPanel>());
-                                    break;
-                                case IView::ViewWindowRequest::Open_VideoPrev:
-                                    this->AddView(std::make_unique<Orb::VideoPreview>());
-                                    break;
-                                case IView::ViewWindowRequest::Open_NodeEd:
-                                    this->AddView(std::make_unique<Orb::NodeEditor>(Global::GetInstance().Renderer));
-                                    break;
-                                }
 
-                            }
+                //        
+                //    }
 
-                        }
-                        
-                    }
-
-                    if (viewToRemoveIdx != -1) {
-                        auto edBegin = this->childWindows[h].Editors.begin();
-                        this->childWindows[h].Editors.erase(edBegin + viewToRemoveIdx);
-                        viewToRemoveIdx = -1;
-                    }
-                    
-                }
+                //    
+                //    
+                //}
 
                 
             }
 
-#ifndef NDEBUG
-            ImGui::ShowDemoWindow();
-#endif
+            
+        //}
 
-            ImGui::EndFrame();
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-
-            for (WindowData& cWnd : this->childWindows) {
-                glfwSwapBuffers(cWnd.Window);
-            }
-        }
+            return shouldClose;
     }
 
     void Window::OnResize(GLFWwindow* window, int width, int height) {
@@ -346,6 +278,16 @@ namespace Orb {
 
 
         //ImGui::End();
+    }
+
+    std::vector<std::shared_ptr<IView>> Window::GetViews() {
+        return this->childWindows[0].Editors;
+    }
+
+    void Window::Render() {
+        for (WindowData& cWnd : this->childWindows) {
+            glfwSwapBuffers(cWnd.Window);
+        }
     }
 
     void Window::loadImGuiTheme() {

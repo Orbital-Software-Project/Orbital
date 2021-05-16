@@ -20,6 +20,8 @@ namespace Orb {
         sequence.mFrameMin = 0;
         sequence.mFrameMax = 1000;
 
+        this->Name = "Sequencer";
+
     }
 
     Sequencer::~Sequencer() {

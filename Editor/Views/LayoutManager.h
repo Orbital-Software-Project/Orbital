@@ -1,7 +1,6 @@
 #pragma once
 
 #include "IView.hpp"
-#include "Engine/Shader.h"
 
 #include <vector>
 #include <memory>
@@ -13,24 +12,31 @@ namespace Orb {
 
 	public:
 		enum class DockType {
+			Dock_Float,
 			Dock_Left,
 			Dock_Right,
 			Dock_Central_Top,
 			Dock_Central_Bottom,
 		};
 
+		struct ViewDockTypePair {
+			DockType Type;
+
+			std::shared_ptr<IView> View;
+		};
+
 	public:
-		LayoutManager(std::shared_ptr<Shader> shader);
+		LayoutManager();
 
 		~LayoutManager();
 
 	public:
-		void AddView(std::shared_ptr<IView> view);
+		void AddView(std::shared_ptr<IView> view, DockType dockType);
 
 		void OnRender();
 
 	private:
-		std::vector<std::shared_ptr<IView>> viewCollection;
+		std::vector<ViewDockTypePair> viewCollection;
 
 	};
 }
