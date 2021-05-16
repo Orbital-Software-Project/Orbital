@@ -22,7 +22,6 @@ PropertyEditor::PropertyEditor(std::shared_ptr<SceneRenderer> renderer) {
 PropertyEditor::~PropertyEditor() {}
 
 void PropertyEditor::OnRender() {
-
     auto meshList = this->renderer->GetEntities();
 
     for (int i = 0; i < meshList.size(); i++) {

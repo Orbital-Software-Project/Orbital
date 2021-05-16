@@ -30,7 +30,6 @@ namespace Orb {
 
     void Sequencer::OnRender() {
 
-        ImGui::Separator();
 
         ImGui::PushItemWidth(100);
         ImGui::InputInt("Current Frame", &this->VideoSliderValue);

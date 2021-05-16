@@ -28,7 +28,6 @@ namespace Orb {
     // https://www.youtube.com/watch?v=xbTLhMJARrk&list=PLZSNHzwDCOggHLThIbCxUhWTgrKVemZkz
     // https://www.blenderfreak.com/tutorials/node-editor-tutorial-series/
 
-
     class NodeEditor : public IView {
 
     public:
@@ -40,6 +39,7 @@ namespace Orb {
 
     private:
         void drawToolbar();
+
 
     private:
         std::shared_ptr<SceneRenderer> renderer;

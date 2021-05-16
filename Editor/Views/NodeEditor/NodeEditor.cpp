@@ -7,6 +7,7 @@
 #include "Editor/Nodes/VideoPrevNode.h"
 #include "Editor/Nodes/MapViewNode.h"
 
+#include <imnodes_internal.h>
 
 namespace Orb {
 
@@ -39,7 +40,7 @@ NodeEditor::~NodeEditor() {
 
 void NodeEditor::OnRender() {
     this->drawToolbar();
-    
+
     // Node editor
     {
 
@@ -59,7 +60,10 @@ void NodeEditor::OnRender() {
             ImNodes::Link(i, p.first, p.second);
         }
 
+        ImNodes::MiniMap(0.09f, ImNodesMiniMapLocation_TopRight);
+
         ImNodes::EndNodeEditor();
+
 
         int start_attr, end_attr;
         if (ImNodes::IsLinkCreated(&start_attr, &end_attr))
@@ -78,7 +82,7 @@ void NodeEditor::OnRender() {
             links.push_back(std::make_pair(start_attr, end_attr));
 
             // Update node pyramid
-           
+
         }
         int lnk_id = 0;
         if (ImNodes::IsLinkDestroyed(&lnk_id)) {

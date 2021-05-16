@@ -34,13 +34,14 @@ namespace Orb {
 
 		// ---------------------------
 
-		int leftViewPosY = ImGui::GetMainViewport()->WorkPos.y;
+		int leftViewPosY = ImGui::GetMainViewport()->WorkPos.y + 1;
 		int leftViewSizeY = ImGui::GetMainViewport()->WorkSize.y;
 		static int leftViewSizeX = 300;
 
 		static ImGuiWindowFlags flags =
 			ImGuiWindowFlags_NoCollapse |
-			ImGuiWindowFlags_NoTitleBar;
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoSavedSettings;
 
 		ImGui::SetNextWindowPos(ImVec2(0, leftViewPosY));
 		ImGui::SetNextWindowSize(ImVec2(leftViewSizeX, leftViewSizeY));
@@ -64,9 +65,9 @@ namespace Orb {
 
 		// ---------------------------
 
-		static int rightViewSizeX = 300;
-		int rightViewPosX  = ImGui::GetMainViewport()->Size.x - rightViewSizeX;
-		int rightViewPosY  = ImGui::GetMainViewport()->WorkPos.y;
+		static int rightViewSizeX = 300 - 1;
+		int rightViewPosX  = ImGui::GetMainViewport()->Size.x - rightViewSizeX + 1;
+		int rightViewPosY  = ImGui::GetMainViewport()->WorkPos.y + 1;
 		int rightViewSizeY = ImGui::GetMainViewport()->WorkSize.y;
 
 		ImGui::SetNextWindowPos(ImVec2(rightViewPosX, rightViewPosY));
@@ -95,11 +96,13 @@ namespace Orb {
 			ImGuiWindowFlags_NoCollapse |
 			ImGuiWindowFlags_NoTitleBar |
 			ImGuiWindowFlags_NoScrollWithMouse | 
-			ImGuiWindowFlags_NoScrollbar;
+			ImGuiWindowFlags_NoScrollbar |
+			ImGuiWindowFlags_NoSavedSettings |
+			ImGuiWindowFlags_NoBringToFrontOnFocus;
 
-		int topCentralPosX  = leftViewSizeX;
-		int topCentralPosY  = ImGui::GetMainViewport()->WorkPos.y;
-		int topCentralSizeX = ImGui::GetMainViewport()->WorkSize.x - rightViewSizeX - leftViewSizeX;
+		int topCentralPosX  = leftViewSizeX + 1;
+		int topCentralPosY  = ImGui::GetMainViewport()->WorkPos.y + 1;
+		int topCentralSizeX = ImGui::GetMainViewport()->WorkSize.x - rightViewSizeX - leftViewSizeX - 1;
 		static int topCentralSizeY = ImGui::GetMainViewport()->WorkSize.y - 500;
 
 		ImGui::SetNextWindowSizeConstraints(ImVec2(-1, 0), ImVec2(-1, FLT_MAX));      // Vertical only
@@ -129,14 +132,15 @@ namespace Orb {
 			ImGuiWindowFlags_NoCollapse |
 			ImGuiWindowFlags_NoTitleBar |
 			ImGuiWindowFlags_NoScrollWithMouse |
-			ImGuiWindowFlags_NoDecoration;
+			ImGuiWindowFlags_NoDecoration | 
+			ImGuiWindowFlags_NoSavedSettings;
 
-		int bottomCentralPosX  = leftViewSizeX;
-		int bottomCentralPosY  = topCentralSizeY + 18;
-		int bottomCentralSizeX = ImGui::GetMainViewport()->WorkSize.x - rightViewSizeX - leftViewSizeX;
-		int bottomCentralSizeY = ImGui::GetMainViewport()->WorkSize.y - topCentralSizeY;
+		int bottomCentralPosX  = leftViewSizeX + 1;
+		int bottomCentralPosY  = topCentralSizeY + 21;
+		int bottomCentralSizeX = ImGui::GetMainViewport()->WorkSize.x - rightViewSizeX - leftViewSizeX - 1;
+		int bottomCentralSizeY = ImGui::GetMainViewport()->WorkSize.y - topCentralSizeY - 2;
 
-
+		
 		ImGui::SetNextWindowPos(ImVec2(bottomCentralPosX, bottomCentralPosY));
 		ImGui::SetNextWindowSize(ImVec2(bottomCentralSizeX, bottomCentralSizeY));
 		bool centralBottomPanelOpen = true;
