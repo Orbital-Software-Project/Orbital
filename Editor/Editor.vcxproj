@@ -130,7 +130,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Ws2_32.Lib;Crypt32.Lib;Wldap32.Lib;Secur32.lib;Bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.Lib;Crypt32.Lib;Wldap32.Lib;Secur32.lib;Bcrypt.lib;version.lib;imagehlp.lib;dinput8.lib;dxguid.lib;winmm.lib;imm32.lib;uuid.lib;Setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -149,7 +149,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Ws2_32.Lib;Crypt32.Lib;Wldap32.Lib;Secur32.lib;Bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.Lib;Crypt32.Lib;Wldap32.Lib;Secur32.lib;Bcrypt.lib;version.lib;imagehlp.lib;dinput8.lib;dxguid.lib;winmm.lib;imm32.lib;uuid.lib;Setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -210,9 +210,6 @@
     </ProjectReference>
     <ProjectReference Include="..\ThirdParty\FBoW.vcxproj">
       <Project>{e2e39350-4f7b-4eb8-82ca-caffc4d2d4be}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ThirdParty\ImGui.vcxproj">
-      <Project>{9bedac37-b062-40fb-aa21-257bd86d0076}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ThirdParty\ImGuizmo.vcxproj">
       <Project>{a2c1fbbe-7fe7-4274-987a-b90d7f13e4cc}</Project>

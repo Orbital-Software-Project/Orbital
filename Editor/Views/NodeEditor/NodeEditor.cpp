@@ -43,7 +43,6 @@ void NodeEditor::OnRender() {
 
     // Node editor
     {
-
         ImNodes::BeginNodeEditor();
 
         int id = 0;
@@ -80,8 +79,6 @@ void NodeEditor::OnRender() {
             }
 
             links.push_back(std::make_pair(start_attr, end_attr));
-
-            // Update node pyramid
 
         }
         int lnk_id = 0;
