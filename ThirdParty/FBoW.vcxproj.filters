@@ -34,7 +34,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="openvslam\3rd\FBoW\vocabulary\orb_vocab.fbow">
+    <CopyFileToFolders Include="FBoW_orb_vocab\orb_vocab.fbow">
       <Filter>Resource Files</Filter>
     </CopyFileToFolders>
   </ItemGroup>

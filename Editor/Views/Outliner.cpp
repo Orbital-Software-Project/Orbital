@@ -12,9 +12,7 @@ namespace Orb {
         this->Name = "Outliner";
     }
 
-    Outliner::~Outliner() {
-        std::cout << "Outliner closed" << std::endl;
-    }
+    Outliner::~Outliner() {}
 
     void Outliner::OnRender() {
 

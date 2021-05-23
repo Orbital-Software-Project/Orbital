@@ -28,11 +28,9 @@
     <ClInclude Include=".\openvslam\3rd\FBoW\include\fbow\vocabulary_creator.h" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="openvslam\3rd\FBoW\vocabulary\orb_vocab.fbow">
+    <CopyFileToFolders Include="FBoW_orb_vocab\orb_vocab.fbow">
       <DeploymentContent>true</DeploymentContent>
       <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </CopyFileToFolders>
   </ItemGroup>
   <PropertyGroup Label="Globals">

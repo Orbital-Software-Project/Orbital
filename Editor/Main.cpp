@@ -43,6 +43,10 @@
 
 */
 
+// Assertion failed: 
+// image.type() == CV_8UC1, 
+// file C:\Users\rphil\Desktop\Orbital\ThirdParty\openvslam\src\openvslam\feature\orb_extractor.cc, line 79
+
 int main(int argc, char *argv[]) {
 	
 	// Get dir of the executable

@@ -12,12 +12,14 @@
 
 namespace Orb {
 
-    struct WindowData {
-        GLFWwindow* Window;
-        std::vector<std::shared_ptr<IView>> Editors;
-    };
-
     class Window {
+    public:
+        struct WindowData {
+            GLFWwindow* Window;
+            std::vector<std::shared_ptr<IView>> Editors;
+        };
+
+
     public:
         Window();
 
