@@ -14,16 +14,22 @@
 #include <memory>
 #include <GL/glew.h>
 
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 
 namespace Orb {
 
     Core::Core(std::string rootDir) {
         Global::GetInstance().RootDir = rootDir;
+
+        
     }
 
-    Core::~Core() {}
+    Core::~Core() {
+    
+        
+    }
 
     void Core::Run() {
 
@@ -77,46 +83,72 @@ namespace Orb {
 
             lmgr.OnRender();
 
-            std::shared_ptr<IView> viewToRemoveIdx = nullptr;
-            for (auto view : wnd.GetViews()) {
-                // Handle requests
-                IView::ViewWindowRequest request = IView::ViewWindowRequest::None;
-                if (view->HasRequest(request)) {
-                    switch (request) {
-                    case IView::ViewWindowRequest::Close:
-                        // Mark for remove
-                        viewToRemoveIdx = view;
-                        break;
-                    case IView::ViewWindowRequest::Open_MapViewer:
-                        wnd.AddView(std::make_shared<Orb::MapViewer>(Global::GetInstance().Renderer, shader));
-                        break;
-                    case IView::ViewWindowRequest::Open_Outliner:
-                        wnd.AddView(std::make_shared<Orb::Outliner>(Global::GetInstance().Renderer));
-                        break;
-                    case IView::ViewWindowRequest::Open_PropertyEd:
-                        wnd.AddView(std::make_shared<Orb::PropertyEditor>(Global::GetInstance().Renderer));
-                        break;
-                    case IView::ViewWindowRequest::Open_Sequencer:
-                        wnd.AddView(std::make_shared<Orb::Sequencer>());
-                        break;
-                    case IView::ViewWindowRequest::Open_Taskpanel:
-                        wnd.AddView(std::make_shared<Orb::TaskPanel>());
-                        break;
-                    case IView::ViewWindowRequest::Open_VideoPrev:
-                        wnd.AddView(std::make_shared<Orb::VideoPreview>());
-                        break;
-                    case IView::ViewWindowRequest::Open_NodeEd:
-                        wnd.AddView(std::make_shared<Orb::NodeEditor>(Global::GetInstance().Renderer));
-                        break;
+            // Handle IView Requests
+            {
+
+                std::shared_ptr<IView> viewToRemoveIdx = nullptr;
+                for (auto view : wnd.GetViews()) {
+                    // Handle requests
+                    IView::ViewWindowRequest request = IView::ViewWindowRequest::None;
+                    if (view->HasRequest(request)) {
+                        switch (request) {
+                        case IView::ViewWindowRequest::Close:
+                            // Mark for remove
+                            viewToRemoveIdx = view;
+                            break;
+                        case IView::ViewWindowRequest::Open_MapViewer:
+                            wnd.AddView(std::make_shared<Orb::MapViewer>(Global::GetInstance().Renderer, shader));
+                            break;
+                        case IView::ViewWindowRequest::Open_Outliner:
+                            wnd.AddView(std::make_shared<Orb::Outliner>(Global::GetInstance().Renderer));
+                            break;
+                        case IView::ViewWindowRequest::Open_PropertyEd:
+                            wnd.AddView(std::make_shared<Orb::PropertyEditor>(Global::GetInstance().Renderer));
+                            break;
+                        case IView::ViewWindowRequest::Open_Sequencer:
+                            wnd.AddView(std::make_shared<Orb::Sequencer>());
+                            break;
+                        case IView::ViewWindowRequest::Open_Taskpanel:
+                            wnd.AddView(std::make_shared<Orb::TaskPanel>());
+                            break;
+                        case IView::ViewWindowRequest::Open_VideoPrev:
+                            wnd.AddView(std::make_shared<Orb::VideoPreview>());
+                            break;
+                        case IView::ViewWindowRequest::Open_NodeEd:
+                            wnd.AddView(std::make_shared<Orb::NodeEditor>(Global::GetInstance().Renderer));
+                            break;
+                        }
+                    }
+                    if (viewToRemoveIdx != nullptr) {
+                        wnd.RemoveView(view);
+                        viewToRemoveIdx = nullptr;
                     }
                 }
-                if (viewToRemoveIdx != nullptr) {
-                    wnd.RemoveView(view);
-                    viewToRemoveIdx = nullptr;
+
+            }
+
+            //Handle LayoutManager Requests
+            {
+                LayoutManager::Request request = LayoutManager::Request::None;
+                if (lmgr.HasRequest(request)) {
+                    switch (request) {
+                    case LayoutManager::Request::Move_Window:
+                        wnd.MoveByDelta(lmgr.Dx, lmgr.Dy);
+                        break;
+                    case LayoutManager::Request::Close_Window:
+                        wnd.Close();
+                        break;
+                    case LayoutManager::Request::Minimize_Window:
+                        wnd.Minimize();
+                        break;
+                    case LayoutManager::Request::Maximize_Window:
+                        wnd.Maximize();
+                        break;
+                    }
+                    
                 }
             }
 
-            
 
 #ifndef NDEBUG
             ImGui::ShowDemoWindow();

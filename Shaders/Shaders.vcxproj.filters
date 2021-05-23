@@ -20,17 +20,17 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="MapViewer.fs">
+    <CopyFileToFolders Include="MapViewer.fs">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="MapViewer.vs">
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="MapViewer.vs">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Mesh.fs">
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Mesh.fs">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Mesh.vs">
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Mesh.vs">
       <Filter>Resource Files</Filter>
-    </None>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
