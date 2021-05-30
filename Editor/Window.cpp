@@ -149,7 +149,6 @@ namespace Orb {
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
-
             return shouldClose;
     }
 
@@ -199,11 +198,18 @@ namespace Orb {
         }
     }
 
-    void Window::MoveByDelta(int dx, int dy) {
+    void Window::MoveWindow(int dx, int dy) {
         int xpos = 0;
         int ypos = 0;
         glfwGetWindowPos(this->childWindows[0].Window, &xpos, &ypos);
-        glfwSetWindowPos(this->childWindows[0].Window, xpos + dx, ypos + dy);
+
+        double cursorPosX = 0;
+        double cursorPosY = 0;
+        glfwGetCursorPos(this->childWindows[0].Window, &cursorPosX, &cursorPosY);
+
+        int mouseWndDeltaX = dx - xpos;
+        int mouseWndDeltaY = dy - ypos;
+        glfwSetWindowPos(this->childWindows[0].Window, cursorPosX - mouseWndDeltaX, cursorPosY - mouseWndDeltaY);
     }
 
 }

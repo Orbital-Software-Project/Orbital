@@ -1,51 +1,66 @@
-#include "LayoutManager.h"
+#include "ViewManager.h"
 
 #include <imgui.h>
+#include <imgui_internal.h>
+
 #include <string>
 #include <iostream>
 
 
 namespace Orb {
 
-	LayoutManager::LayoutManager() {
+	ViewManager::ViewManager() {
 		this->loadImGuiTheme();
 	}
 
-	LayoutManager::~LayoutManager() {
+	ViewManager::~ViewManager() {
 
 	}
 
-	void LayoutManager::AddView(std::shared_ptr<IView> view, DockType dockType) {
+	void ViewManager::AddView(std::shared_ptr<IView> view, DockType dockType) {
 		this->viewCollection.push_back(
 			ViewDockTypePair {dockType, view}
 		);
 	}
 
-	bool LayoutManager::HasRequest(Request& r) {
+	bool ViewManager::HasRequest(Request& r) {
 		r = this->req;
 		bool hasReq = this->req != Request::None;
 		this->req = Request::None; // Reset request
 		return hasReq;
 	}
 
-	void LayoutManager::OnRender() {
+	void ViewManager::OnRender() {
 
-		// Window dragging and double click
+		// Window dragging and double click behavior
 		auto mp = ImGui::GetMousePos();
 		{
-			// Mouse cursor inside main menu bar
-			if (mp.x < ImGui::GetMainViewport()->WorkSize.x - 60 && mp.y <= 20) {
+			static bool dragging = false;
+			if (dragging || (mp.x < ImGui::GetMainViewport()->WorkSize.x - 60 && mp.y <= 20)) {
 
-				if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
-					auto delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
-					this->Dx = delta.x;
-					this->Dy = delta.y;
+				// Mouse cursor inside main menu bar
+				if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+					this->req = Request::Maximize_Window;
+					return;
+				}
+
+				if (!dragging &&
+					ImGui::IsMouseDown(ImGuiMouseButton_Left) && 
+					ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+					this->Dx = ImGui::GetMousePos().x;
+					this->Dy = ImGui::GetMousePos().y;
+
+					dragging = true;
+				}
+
+				if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
+					dragging = false;
+				}
+
+				if (dragging) {
 					this->req = Request::Move_Window;
 				}
 
-				if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-					this->req = Request::Maximize_Window;
-				}
 
 			}
 		}
@@ -57,7 +72,7 @@ namespace Orb {
 			}
 		}
 
-		// Window close button
+		// Window close/maximize/minimize button
 		{
 			ImDrawList* draw_list_fg = ImGui::GetForegroundDrawList();
 
@@ -109,6 +124,32 @@ namespace Orb {
 			}
 		}
 
+		// Window resize frame WIP
+		{
+			ImDrawList* draw_list_fg = ImGui::GetForegroundDrawList();
+
+			auto workSize = ImGui::GetMainViewport()->Size;
+
+			draw_list_fg->AddRect(
+				ImVec2(0, 0),
+				ImVec2(5, workSize.y),
+				ImColor(ImVec4(1.0f, 1.0f, 1.0f, 0.0f)));
+
+			draw_list_fg->AddRect(
+				ImVec2(0, 0),
+				ImVec2(workSize.x, 1),
+				ImColor(ImVec4(1.0f, 1.0f, 1.0f, 0.0f)));
+
+			draw_list_fg->AddRect(
+				ImVec2(workSize.x, 0),
+				ImVec2(workSize.x, 0),
+				ImColor(ImVec4(1.0f, 1.0f, 1.0f, 0.0f)));
+
+			draw_list_fg->AddRect(
+				ImVec2(0, 0),
+				ImVec2(1, workSize.y),
+				ImColor(ImVec4(1.0f, 1.0f, 1.0f, 0.0f)));
+		}
 		// ---------------------------
 
 		int tabID = 1;
@@ -245,7 +286,7 @@ namespace Orb {
 		return;
 	}
 
-	void LayoutManager::loadImGuiTheme() {
+	void ViewManager::loadImGuiTheme() {
 
 		ImGuiStyle& style = ImGui::GetStyle();
 		style.WindowBorderSize = 0.0f;

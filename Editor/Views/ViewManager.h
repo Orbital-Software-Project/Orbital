@@ -2,6 +2,9 @@
 
 #include "IView.hpp"
 
+
+
+
 #include <vector>
 #include <memory>
 
@@ -9,7 +12,7 @@ namespace Orb {
 
 	// TODO: rename class to ViewManager
 	// Hardcoded default layout of the Views
-	class LayoutManager {
+	class ViewManager {
 
 	public:
 		enum class Request {
@@ -35,9 +38,9 @@ namespace Orb {
 		};
 
 	public:
-		LayoutManager();
+		ViewManager();
 
-		~LayoutManager();
+		~ViewManager();
 
 	public:
 		void AddView(std::shared_ptr<IView> view, DockType dockType);
@@ -58,5 +61,6 @@ namespace Orb {
 	private:
 		std::vector<ViewDockTypePair> viewCollection;
 		Request req = Request::None;
+
 	};
 }

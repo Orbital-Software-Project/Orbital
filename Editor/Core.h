@@ -2,7 +2,7 @@
 
 #include "Editor/Global.h"
 
-#include "Editor/Views/LayoutManager.h"
+#include "Editor/Views/ViewManager.h"
 
 #include <string>
 

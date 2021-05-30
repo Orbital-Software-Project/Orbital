@@ -22,19 +22,14 @@ namespace Orb {
 
     Core::Core(std::string rootDir) {
         Global::GetInstance().RootDir = rootDir;
-
-        
     }
 
-    Core::~Core() {
-    
-        
-    }
+    Core::~Core() {}
 
     void Core::Run() {
 
         Window wnd;
-        LayoutManager lmgr;
+        ViewManager lmgr;
 
         std::string rootDir = Global::GetInstance().RootDir;
         auto shader =
@@ -44,35 +39,35 @@ namespace Orb {
 
         auto toolbar = std::make_shared<Toolbar>();
         wnd.AddView(toolbar);
-        lmgr.AddView(toolbar, LayoutManager::DockType::Dock_Float);
+        lmgr.AddView(toolbar, ViewManager::DockType::Dock_Float);
 
         auto outliner = std::make_shared<Outliner>(Global::GetInstance().Renderer);
         wnd.AddView(outliner);
-        lmgr.AddView(outliner, LayoutManager::DockType::Dock_Left);
+        lmgr.AddView(outliner, ViewManager::DockType::Dock_Left);
 
         auto propEd = std::make_shared<PropertyEditor>(Global::GetInstance().Renderer);
         wnd.AddView(propEd);
-        lmgr.AddView(propEd, LayoutManager::DockType::Dock_Right);
+        lmgr.AddView(propEd, ViewManager::DockType::Dock_Right);
 
         auto taskpnl = std::make_shared<TaskPanel>();
         wnd.AddView(taskpnl);
-        lmgr.AddView(taskpnl, LayoutManager::DockType::Dock_Right);
+        lmgr.AddView(taskpnl, ViewManager::DockType::Dock_Right);
 
         auto videoPrev = std::make_shared<VideoPreview>();
         wnd.AddView(videoPrev);
-        lmgr.AddView(videoPrev, LayoutManager::DockType::Dock_Central_Top);
+        lmgr.AddView(videoPrev, ViewManager::DockType::Dock_Central_Top);
 
         auto mapViewer = std::make_shared<MapViewer>(Global::GetInstance().Renderer, shader);
         wnd.AddView(mapViewer);
-        lmgr.AddView(mapViewer, LayoutManager::DockType::Dock_Central_Top);
+        lmgr.AddView(mapViewer, ViewManager::DockType::Dock_Central_Top);
 
         auto seq = std::make_shared<Sequencer>();
         wnd.AddView(seq);
-        lmgr.AddView(seq, LayoutManager::DockType::Dock_Central_Bottom);
+        lmgr.AddView(seq, ViewManager::DockType::Dock_Central_Bottom);
 
         auto nodeEd = std::make_shared<NodeEditor>(Global::GetInstance().Renderer);
         wnd.AddView(nodeEd);
-        lmgr.AddView(nodeEd, LayoutManager::DockType::Dock_Central_Bottom);
+        lmgr.AddView(nodeEd, ViewManager::DockType::Dock_Central_Bottom);
 
 
         // Default views
@@ -85,7 +80,6 @@ namespace Orb {
 
             // Handle IView Requests
             {
-
                 std::shared_ptr<IView> viewToRemoveIdx = nullptr;
                 for (auto view : wnd.GetViews()) {
                     // Handle requests
@@ -124,28 +118,26 @@ namespace Orb {
                         viewToRemoveIdx = nullptr;
                     }
                 }
-
             }
 
-            //Handle LayoutManager Requests
+            //Handle ViewManager Requests
             {
-                LayoutManager::Request request = LayoutManager::Request::None;
+                ViewManager::Request request = ViewManager::Request::None;
                 if (lmgr.HasRequest(request)) {
                     switch (request) {
-                    case LayoutManager::Request::Move_Window:
-                        wnd.MoveByDelta(lmgr.Dx, lmgr.Dy);
+                    case ViewManager::Request::Move_Window:
+                        wnd.MoveWindow(lmgr.Dx, lmgr.Dy);
                         break;
-                    case LayoutManager::Request::Close_Window:
+                    case ViewManager::Request::Close_Window:
                         wnd.Close();
                         break;
-                    case LayoutManager::Request::Minimize_Window:
+                    case ViewManager::Request::Minimize_Window:
                         wnd.Minimize();
                         break;
-                    case LayoutManager::Request::Maximize_Window:
+                    case ViewManager::Request::Maximize_Window:
                         wnd.Maximize();
                         break;
                     }
-                    
                 }
             }
 

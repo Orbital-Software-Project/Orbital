@@ -37,7 +37,7 @@ namespace Orb {
         
         void RemoveView(std::shared_ptr<IView> view);
 
-        void MoveByDelta(int dx, int dy);
+        void MoveWindow(int dx, int dy);
 
         void Close();
 
