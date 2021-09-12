@@ -9,8 +9,6 @@
 #include <memory>
 
 namespace Orb {
-
-	// TODO: rename class to ViewManager
 	// Hardcoded default layout of the Views
 	class ViewManager {
 
@@ -50,10 +48,9 @@ namespace Orb {
 		bool HasRequest(Request& r);
 
 	public:
-		
-		int Dx = 0;
+		float Dx = 0;
 
-		int Dy = 0;
+		float Dy = 0;
 
 	private:
 		void loadImGuiTheme();

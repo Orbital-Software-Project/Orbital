@@ -37,31 +37,24 @@ namespace Orb {
 		{
 			static bool dragging = false;
 			if (dragging || (mp.x < ImGui::GetMainViewport()->WorkSize.x - 60 && mp.y <= 20)) {
-
 				// Mouse cursor inside main menu bar
 				if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
 					this->req = Request::Maximize_Window;
 					return;
 				}
-
 				if (!dragging &&
 					ImGui::IsMouseDown(ImGuiMouseButton_Left) && 
 					ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
 					this->Dx = ImGui::GetMousePos().x;
 					this->Dy = ImGui::GetMousePos().y;
-
 					dragging = true;
 				}
-
 				if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
 					dragging = false;
 				}
-
 				if (dragging) {
 					this->req = Request::Move_Window;
 				}
-
-
 			}
 		}
 
@@ -156,9 +149,9 @@ namespace Orb {
 
 		// ---------------------------
 
-		int leftViewPosY = ImGui::GetMainViewport()->WorkPos.y + 1;
-		int leftViewSizeY = ImGui::GetMainViewport()->WorkSize.y;
-		static int leftViewSizeX = 300;
+		float leftViewPosY = ImGui::GetMainViewport()->WorkPos.y + 1;
+		float leftViewSizeY = ImGui::GetMainViewport()->WorkSize.y;
+		static float leftViewSizeX = 300.0f;
 
 		static ImGuiWindowFlags flags =
 			ImGuiWindowFlags_NoCollapse |
@@ -187,10 +180,10 @@ namespace Orb {
 
 		// ---------------------------
 
-		static int rightViewSizeX = 300 - 1;
-		int rightViewPosX  = ImGui::GetMainViewport()->Size.x - rightViewSizeX + 1;
-		int rightViewPosY  = ImGui::GetMainViewport()->WorkPos.y + 1;
-		int rightViewSizeY = ImGui::GetMainViewport()->WorkSize.y;
+		static float rightViewSizeX = 300 - 1;
+		float rightViewPosX  = ImGui::GetMainViewport()->Size.x - rightViewSizeX + 1;
+		float rightViewPosY  = ImGui::GetMainViewport()->WorkPos.y + 1;
+		float rightViewSizeY = ImGui::GetMainViewport()->WorkSize.y;
 
 		ImGui::SetNextWindowPos(ImVec2(rightViewPosX, rightViewPosY));
 		ImGui::SetNextWindowSize(ImVec2(rightViewSizeX, rightViewSizeY));
@@ -222,10 +215,10 @@ namespace Orb {
 			ImGuiWindowFlags_NoSavedSettings |
 			ImGuiWindowFlags_NoBringToFrontOnFocus;
 
-		int topCentralPosX  = leftViewSizeX + 1;
-		int topCentralPosY  = ImGui::GetMainViewport()->WorkPos.y + 1;
-		int topCentralSizeX = ImGui::GetMainViewport()->WorkSize.x - rightViewSizeX - leftViewSizeX - 1;
-		static int topCentralSizeY = ImGui::GetMainViewport()->WorkSize.y - 500;
+		float topCentralPosX  = leftViewSizeX + 1;
+		float topCentralPosY  = ImGui::GetMainViewport()->WorkPos.y + 1;
+		float topCentralSizeX = ImGui::GetMainViewport()->WorkSize.x - rightViewSizeX - leftViewSizeX - 1;
+		static float topCentralSizeY = ImGui::GetMainViewport()->WorkSize.y - 500;
 
 		ImGui::SetNextWindowSizeConstraints(ImVec2(-1, 0), ImVec2(-1, FLT_MAX));      // Vertical only
 		ImGui::SetNextWindowPos(ImVec2(topCentralPosX, topCentralPosY));

@@ -126,7 +126,7 @@ namespace Orb {
                 if (lmgr.HasRequest(request)) {
                     switch (request) {
                     case ViewManager::Request::Move_Window:
-                        wnd.MoveWindow(lmgr.Dx, lmgr.Dy);
+                        wnd.MoveWindow(static_cast<int>(lmgr.Dx), static_cast<int>(lmgr.Dy));
                         break;
                     case ViewManager::Request::Close_Window:
                         wnd.Close();

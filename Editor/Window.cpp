@@ -137,7 +137,6 @@ namespace Orb {
 
         bool shouldClose = glfwWindowShouldClose(mainWnd.Window);
 
-
             glfwPollEvents();
 
             glClearColor(
@@ -209,7 +208,10 @@ namespace Orb {
 
         int mouseWndDeltaX = dx - xpos;
         int mouseWndDeltaY = dy - ypos;
-        glfwSetWindowPos(this->childWindows[0].Window, cursorPosX - mouseWndDeltaX, cursorPosY - mouseWndDeltaY);
+        glfwSetWindowPos(
+            this->childWindows[0].Window, 
+            static_cast<int>(cursorPosX - mouseWndDeltaX), 
+            static_cast<int>(cursorPosY - mouseWndDeltaY));
     }
 
 }
