@@ -14,7 +14,7 @@
 namespace Orb {
 
     TaskPanel::TaskPanel() {
-        this->vocabFile = Global::GetInstance().RootDir + "\\orb_vocab.fbow";
+        this->vocabFile = EditorState::GetInstance().RootDir + "\\orb_vocab.fbow";
 
         this->Name = "Task panel";
     }

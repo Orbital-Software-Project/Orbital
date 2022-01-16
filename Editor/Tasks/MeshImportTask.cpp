@@ -29,7 +29,7 @@ namespace Orb {
 
         for (std::shared_ptr<Mesh> meshdata : lst) {
             meshdata->DrawOnlyVertColors(false);
-            Global::GetInstance().Renderer->AddEntity(std::move(meshdata));
+            EditorState::GetInstance().Renderer->AddEntity(std::move(meshdata));
         }
 
         this->Status = TaskStatus::Finished;

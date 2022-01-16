@@ -33,7 +33,7 @@ namespace Orb {
 
     void VideoPreview::OnRender() {
 
-        if (Global::GetInstance().SequencerFrame != nullptr) {
+        if (EditorState::GetInstance().SequencerFrame != nullptr) {
 
             static ImVec2 imgViewPos;
             float viewWidth = ImGui::GetWindowWidth();
@@ -60,8 +60,8 @@ namespace Orb {
 
 
             {
-                float imgWidth = Global::GetInstance().SequencerFrame->GetColorMap().cols;
-                float imgHeight = Global::GetInstance().SequencerFrame->GetColorMap().rows;
+                float imgWidth = EditorState::GetInstance().SequencerFrame->GetColorMap().cols;
+                float imgHeight = EditorState::GetInstance().SequencerFrame->GetColorMap().rows;
                 float aspect = imgWidth / imgHeight;
 
                 ImVec2 p_min = ImVec2(
@@ -71,11 +71,9 @@ namespace Orb {
 
                 std::string sizeStr = std::to_string(static_cast<int>(imgWidth)) + "x" + std::to_string(static_cast<int>(imgHeight));
 
-                ScopeMutexLock lock(Global::GetInstance().GlobalMutex);
-
                 ImGui::GetWindowDrawList()->AddText(ImVec2(p_min.x, p_min.y - 15), IM_COL32(255, 255, 255, 255), sizeStr.c_str());
                 ImGui::GetWindowDrawList()->AddImage(
-                    (void*)(intptr_t)Global::GetInstance().SequencerFrame->GetTextureID(),
+                    (void*)(intptr_t)EditorState::GetInstance().SequencerFrame->GetTextureID(),
                     p_min,
                     ImVec2(
                         panPanelPos.x + imgViewPos.x + imgWidth + (zoom * aspect),

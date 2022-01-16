@@ -34,6 +34,7 @@ namespace Orb {
 
 		// Window dragging and double click behavior
 		auto mp = ImGui::GetMousePos();
+
 		{
 			static bool dragging = false;
 			if (dragging || (mp.x < ImGui::GetMainViewport()->WorkSize.x - 60 && mp.y <= 20)) {
@@ -58,7 +59,6 @@ namespace Orb {
 			}
 		}
 
-
 		for (auto viewDock : this->viewCollection) {
 			if (viewDock.Type == DockType::Dock_Float) {
 				viewDock.View->OnRender();
@@ -66,61 +66,12 @@ namespace Orb {
 		}
 
 		// Window close/maximize/minimize button
-		{
-			ImDrawList* draw_list_fg = ImGui::GetForegroundDrawList();
-
-			auto workSize = ImGui::GetMainViewport()->WorkSize;
-
-			draw_list_fg->AddCircleFilled(ImVec2(workSize.x - 55, 10), 5.0f, ImColor(ImVec4(1.0f, 1.0f, 0.0f, 1.0f)));
-			draw_list_fg->AddCircleFilled(ImVec2(workSize.x - 35, 10), 5.0f, ImColor(ImVec4(0.0f, 1.0f, 0.0f, 1.0f)));
-			draw_list_fg->AddCircleFilled(ImVec2(workSize.x - 15, 10), 5.0f, ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f)));
-			
-
-			if (mp.x >= workSize.x - 60 && 
-				mp.y >= 0 &&
-				mp.x <= workSize.x &&
-				mp.y <= 20
-				) {
-				draw_list_fg->AddCircleFilled(ImVec2(workSize.x - 55, 10), 2.0f, ImColor(ImVec4(0.75f, 0.75f, 0.0f, 1.0f)));
-				draw_list_fg->AddCircleFilled(ImVec2(workSize.x - 35, 10), 2.0f, ImColor(ImVec4(0.0f, 0.75f, 0.0f, 1.0f)));
-				draw_list_fg->AddCircleFilled(ImVec2(workSize.x - 15, 10), 2.0f, ImColor(ImVec4(0.75f, 0.0f, 0.0f, 1.0f)));
-			}
-
-			if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-
-				// Minimize
-				if (mp.x >= workSize.x - 60 &&
-					mp.y >= 0 &&
-					mp.x <= workSize.x - 46 &&
-					mp.y <= 20) {
-
-					this->req = Request::Minimize_Window;
-				}
-
-				// Maximize
-				if (mp.x >= workSize.x - 45 &&
-					mp.y >= 0 &&
-					mp.x <= workSize.x - 26 &&
-					mp.y <= 20) {
-
-					this->req = Request::Maximize_Window;
-				}
-
-				// Close
-				if (mp.x >= workSize.x - 25 &&
-					mp.y >= 0 &&
-					mp.x <= workSize.x &&
-					mp.y <= 20) {
-
-					this->req = Request::Close_Window;
-				}
-			}
-		}
-
+		this->drawWindowCtrlButton();
+		
 		// Window resize frame WIP
 		{
+			/*
 			ImDrawList* draw_list_fg = ImGui::GetForegroundDrawList();
-
 			auto workSize = ImGui::GetMainViewport()->Size;
 
 			draw_list_fg->AddRect(
@@ -142,12 +93,24 @@ namespace Orb {
 				ImVec2(0, 0),
 				ImVec2(1, workSize.y),
 				ImColor(ImVec4(1.0f, 1.0f, 1.0f, 0.0f)));
+				*/
 		}
+
 		// ---------------------------
 
 		int tabID = 1;
 
 		// ---------------------------
+
+		/*
+		+-----------> x
+		|
+		|
+		|
+		|
+		v
+		y
+		*/
 
 		float leftViewPosY = ImGui::GetMainViewport()->WorkPos.y + 1;
 		float leftViewSizeY = ImGui::GetMainViewport()->WorkSize.y;
@@ -156,7 +119,9 @@ namespace Orb {
 		static ImGuiWindowFlags flags =
 			ImGuiWindowFlags_NoCollapse |
 			ImGuiWindowFlags_NoTitleBar |
-			ImGuiWindowFlags_NoSavedSettings;
+			ImGuiWindowFlags_NoSavedSettings | 
+			ImGuiWindowFlags_NoResize | 
+			ImGuiWindowFlags_NoDecoration;
 
 		ImGui::SetNextWindowPos(ImVec2(0, leftViewPosY));
 		ImGui::SetNextWindowSize(ImVec2(leftViewSizeX, leftViewSizeY));
@@ -176,6 +141,31 @@ namespace Orb {
 				ImGui::EndTabBar();
 			}
 			ImGui::End();
+
+
+			// Resize between left and top/central panel
+			{
+				auto mp = ImGui::GetMousePos();
+
+				ImVec2 tl = ImVec2(leftViewSizeX, leftViewPosY);
+				ImVec2 br = ImVec2(leftViewSizeX + 1, leftViewSizeY);
+
+				static bool bool_switch = false;
+
+				if (tl.x <= mp.x && br.x >= mp.x &&
+					tl.y <= mp.y && br.y >= mp.y &&
+					ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+					bool_switch = true;
+				}
+
+				if (bool_switch && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+					leftViewSizeX = ImGui::GetMousePos().x;
+				} else {
+					bool_switch = false;
+				}
+			}
+
+
 		}
 
 		// ---------------------------
@@ -205,6 +195,29 @@ namespace Orb {
 			ImGui::End();
 		}
 
+		// Resize between right and top/central panel
+		{
+			auto mp = ImGui::GetMousePos();
+
+			ImVec2 tl = ImVec2(rightViewPosX - 1, rightViewPosY);
+			ImVec2 br = ImVec2(rightViewPosX, rightViewSizeY);
+
+			static bool bool_switch = false;
+
+			if (tl.x <= mp.x && br.x >= mp.x &&
+				tl.y <= mp.y && br.y >= mp.y &&
+				ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+				bool_switch = true;
+			}
+
+			if (bool_switch && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+				rightViewSizeX = ImGui::GetMainViewport()->Size.x - ImGui::GetMousePos().x;
+			}
+			else {
+				bool_switch = false;
+			}
+		}
+
 		// ---------------------------
 
 		static ImGuiWindowFlags flagsTopCentralView =
@@ -213,7 +226,9 @@ namespace Orb {
 			ImGuiWindowFlags_NoScrollWithMouse | 
 			ImGuiWindowFlags_NoScrollbar |
 			ImGuiWindowFlags_NoSavedSettings |
-			ImGuiWindowFlags_NoBringToFrontOnFocus;
+			ImGuiWindowFlags_NoBringToFrontOnFocus |
+			ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoDecoration;
 
 		float topCentralPosX  = leftViewSizeX + 1;
 		float topCentralPosY  = ImGui::GetMainViewport()->WorkPos.y + 1;
@@ -241,6 +256,7 @@ namespace Orb {
 			ImGui::End();
 		}
 
+
 		// ---------------------------
 
 		static ImGuiWindowFlags flagsBottomCentralView =
@@ -248,6 +264,7 @@ namespace Orb {
 			ImGuiWindowFlags_NoTitleBar |
 			ImGuiWindowFlags_NoScrollWithMouse |
 			ImGuiWindowFlags_NoDecoration | 
+			ImGuiWindowFlags_NoResize |
 			ImGuiWindowFlags_NoSavedSettings;
 
 		int bottomCentralPosX  = leftViewSizeX + 1;
@@ -276,8 +293,34 @@ namespace Orb {
 			ImGui::End();
 		}
 
-		return;
+
+		// Resize between top and central panel
+		{
+			auto mp = ImGui::GetMousePos();
+
+			ImVec2 tl = ImVec2(bottomCentralPosX, bottomCentralPosY - 1);
+			ImVec2 br = ImVec2(bottomCentralSizeX, bottomCentralPosY);
+
+			static bool bool_switch = false;
+
+			if (tl.x <= mp.x && br.x >= mp.x &&
+				tl.y <= mp.y && br.y >= mp.y &&
+				ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+				bool_switch = true;
+			}
+
+			if (bool_switch && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+				topCentralSizeY = ImGui::GetMousePos().y - 21;
+			}
+			else {
+				bool_switch = false;
+			}
+		}
+
+
 	}
+
+
 
 	void ViewManager::loadImGuiTheme() {
 
@@ -347,5 +390,60 @@ namespace Orb {
 
 
 	}
+
+	void ViewManager::drawWindowCtrlButton() {
+
+		auto mp = ImGui::GetMousePos();
+
+		ImDrawList* draw_list_fg = ImGui::GetForegroundDrawList();
+
+		auto workSize = ImGui::GetMainViewport()->WorkSize;
+
+		draw_list_fg->AddCircleFilled(ImVec2(workSize.x - 55, 10), 5.0f, ImColor(ImVec4(1.0f, 1.0f, 0.0f, 1.0f)));
+		draw_list_fg->AddCircleFilled(ImVec2(workSize.x - 35, 10), 5.0f, ImColor(ImVec4(0.0f, 1.0f, 0.0f, 1.0f)));
+		draw_list_fg->AddCircleFilled(ImVec2(workSize.x - 15, 10), 5.0f, ImColor(ImVec4(1.0f, 0.0f, 0.0f, 1.0f)));
+
+
+		if (mp.x >= workSize.x - 60 &&
+			mp.y >= 0 &&
+			mp.x <= workSize.x &&
+			mp.y <= 20
+			) {
+			draw_list_fg->AddCircleFilled(ImVec2(workSize.x - 55, 10), 2.0f, ImColor(ImVec4(0.75f, 0.75f, 0.0f, 1.0f)));
+			draw_list_fg->AddCircleFilled(ImVec2(workSize.x - 35, 10), 2.0f, ImColor(ImVec4(0.0f, 0.75f, 0.0f, 1.0f)));
+			draw_list_fg->AddCircleFilled(ImVec2(workSize.x - 15, 10), 2.0f, ImColor(ImVec4(0.75f, 0.0f, 0.0f, 1.0f)));
+		}
+
+		if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+
+			// Minimize
+			if (mp.x >= workSize.x - 60 &&
+				mp.y >= 0 &&
+				mp.x <= workSize.x - 46 &&
+				mp.y <= 20) {
+
+				this->req = Request::Minimize_Window;
+			}
+
+			// Maximize
+			if (mp.x >= workSize.x - 45 &&
+				mp.y >= 0 &&
+				mp.x <= workSize.x - 26 &&
+				mp.y <= 20) {
+
+				this->req = Request::Maximize_Window;
+			}
+
+			// Close
+			if (mp.x >= workSize.x - 25 &&
+				mp.y >= 0 &&
+				mp.x <= workSize.x &&
+				mp.y <= 20) {
+
+				this->req = Request::Close_Window;
+			}
+		}
+	}
+
 
 }

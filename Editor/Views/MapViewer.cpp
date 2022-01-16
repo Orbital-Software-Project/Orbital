@@ -55,7 +55,6 @@ namespace Orb {
     }
 
     void MapViewer::OnRender() {
-        ScopeMutexLock lock(Global::GetInstance().GlobalMutex);
 
         this->drawToolbar();
 
@@ -160,7 +159,7 @@ namespace Orb {
 
         // Get indexes of all camera entities
         std::vector<int> cameraIdxVec;
-        std::vector<std::shared_ptr<IEntity>> cameraCollection = Global::GetInstance().Renderer->EntitiesByType(IEntity::EntityType::Camera);
+        std::vector<std::shared_ptr<IEntity>> cameraCollection = EditorState::GetInstance().Renderer->EntitiesByType(IEntity::EntityType::Camera);
 
 
         int idx = 0;

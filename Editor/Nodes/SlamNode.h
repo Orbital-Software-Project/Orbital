@@ -1,23 +1,23 @@
 #pragma once
 
-#include "INode.h"
-
 #include <memory>
+
+#include "INode.h"
+#include "Editor/Tasks/OpenVslamTask.h"
 
 namespace Orb {
 
+    class SlamNode : public INode {
 
-class SlamNode : public INode {
+    public:
+        SlamNode();
 
-public:
-    SlamNode();
+        ~SlamNode();
 
-    ~SlamNode();
+        void OnRender(int& id);
 
-    void OnRender(int &id);
+    private:
+        OpenVslamTask task;
 
-private:
-    //std::unique_ptr<SlamTask> slamTask = nullptr;
-};
-
+    };
 }

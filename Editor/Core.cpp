@@ -21,7 +21,7 @@
 namespace Orb {
 
     Core::Core(std::string rootDir) {
-        Global::GetInstance().RootDir = rootDir;
+        EditorState::GetInstance().RootDir = rootDir;
     }
 
     Core::~Core() {}
@@ -31,7 +31,7 @@ namespace Orb {
         Window wnd;
         ViewManager lmgr;
 
-        std::string rootDir = Global::GetInstance().RootDir;
+        std::string rootDir = EditorState::GetInstance().RootDir;
         auto shader =
             std::make_shared<Shader>(
                 rootDir + "\\Shaders\\Mesh.vs",
@@ -41,11 +41,11 @@ namespace Orb {
         wnd.AddView(toolbar);
         lmgr.AddView(toolbar, ViewManager::DockType::Dock_Float);
 
-        auto outliner = std::make_shared<Outliner>(Global::GetInstance().Renderer);
+        auto outliner = std::make_shared<Outliner>(EditorState::GetInstance().Renderer);
         wnd.AddView(outliner);
         lmgr.AddView(outliner, ViewManager::DockType::Dock_Left);
 
-        auto propEd = std::make_shared<PropertyEditor>(Global::GetInstance().Renderer);
+        auto propEd = std::make_shared<PropertyEditor>(EditorState::GetInstance().Renderer);
         wnd.AddView(propEd);
         lmgr.AddView(propEd, ViewManager::DockType::Dock_Right);
 
@@ -57,7 +57,7 @@ namespace Orb {
         wnd.AddView(videoPrev);
         lmgr.AddView(videoPrev, ViewManager::DockType::Dock_Central_Top);
 
-        auto mapViewer = std::make_shared<MapViewer>(Global::GetInstance().Renderer, shader);
+        auto mapViewer = std::make_shared<MapViewer>(EditorState::GetInstance().Renderer, shader);
         wnd.AddView(mapViewer);
         lmgr.AddView(mapViewer, ViewManager::DockType::Dock_Central_Top);
 
@@ -65,7 +65,7 @@ namespace Orb {
         wnd.AddView(seq);
         lmgr.AddView(seq, ViewManager::DockType::Dock_Central_Bottom);
 
-        auto nodeEd = std::make_shared<NodeEditor>(Global::GetInstance().Renderer);
+        auto nodeEd = std::make_shared<NodeEditor>(EditorState::GetInstance().Renderer);
         wnd.AddView(nodeEd);
         lmgr.AddView(nodeEd, ViewManager::DockType::Dock_Central_Bottom);
 
@@ -91,13 +91,13 @@ namespace Orb {
                             viewToRemoveIdx = view;
                             break;
                         case IView::ViewWindowRequest::Open_MapViewer:
-                            wnd.AddView(std::make_shared<Orb::MapViewer>(Global::GetInstance().Renderer, shader));
+                            wnd.AddView(std::make_shared<Orb::MapViewer>(EditorState::GetInstance().Renderer, shader));
                             break;
                         case IView::ViewWindowRequest::Open_Outliner:
-                            wnd.AddView(std::make_shared<Orb::Outliner>(Global::GetInstance().Renderer));
+                            wnd.AddView(std::make_shared<Orb::Outliner>(EditorState::GetInstance().Renderer));
                             break;
                         case IView::ViewWindowRequest::Open_PropertyEd:
-                            wnd.AddView(std::make_shared<Orb::PropertyEditor>(Global::GetInstance().Renderer));
+                            wnd.AddView(std::make_shared<Orb::PropertyEditor>(EditorState::GetInstance().Renderer));
                             break;
                         case IView::ViewWindowRequest::Open_Sequencer:
                             wnd.AddView(std::make_shared<Orb::Sequencer>());
@@ -109,7 +109,7 @@ namespace Orb {
                             wnd.AddView(std::make_shared<Orb::VideoPreview>());
                             break;
                         case IView::ViewWindowRequest::Open_NodeEd:
-                            wnd.AddView(std::make_shared<Orb::NodeEditor>(Global::GetInstance().Renderer));
+                            wnd.AddView(std::make_shared<Orb::NodeEditor>(EditorState::GetInstance().Renderer));
                             break;
                         }
                     }

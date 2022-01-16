@@ -54,6 +54,7 @@ namespace Orb {
 
 	private:
 		void loadImGuiTheme();
+		void drawWindowCtrlButton();
 
 	private:
 		std::vector<ViewDockTypePair> viewCollection;

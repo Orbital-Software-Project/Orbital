@@ -23,7 +23,7 @@ Viso2Task::Viso2Task(Viso2TaskParam param) {
     this->slamCam = std::make_shared<Camera>();
     this->slamCam->SetName("Slam camera");
     this->slamCam->VisibleInOutliner = true;
-    Global::GetInstance().Renderer->AddEntity(this->slamCam);
+    EditorState::GetInstance().Renderer->AddEntity(this->slamCam);
 
 
 }
@@ -101,13 +101,11 @@ void Viso2Task::Run() {
             //this->cameraPoses.push_back(currPose);
 
             {
-                ScopeMutexLock lock(Global::GetInstance().GlobalMutex);
-
-                if (Global::GetInstance().VideoFrame == nullptr) {
-                    Global::GetInstance().VideoFrame = std::make_shared<Texture>();
+                if (EditorState::GetInstance().VideoFrame == nullptr) {
+                    EditorState::GetInstance().VideoFrame = std::make_shared<Texture>();
                 }
 
-                Global::GetInstance().VideoFrame->UpdateTexture(currFrame);
+                EditorState::GetInstance().VideoFrame->UpdateTexture(currFrame);
 
                 //std::cout << currPose << std::endl;
 

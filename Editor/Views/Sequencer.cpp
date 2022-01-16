@@ -68,7 +68,7 @@ namespace Orb {
 
 
         auto firstVideoEnt 
-            = Global::GetInstance()
+            = EditorState::GetInstance()
             .Renderer->EntitiesByType(IEntity::EntityType::Video);
 
         if (firstVideoEnt.size() > 0) {
@@ -78,7 +78,7 @@ namespace Orb {
 
             //ent->SetFrameIdx(this->VideoSliderValue);
             auto frame = ent->ReadFrameByIndex(this->VideoSliderValue);
-            Global::GetInstance().SequencerFrame->UpdateTexture(frame);
+            EditorState::GetInstance().SequencerFrame->UpdateTexture(frame);
 
         }
 
@@ -91,7 +91,7 @@ namespace Orb {
         {
 
             this->sequence.myItems.clear();
-            auto videosEnts = Global::GetInstance().Renderer->EntitiesByType(IEntity::EntityType::Video);
+            auto videosEnts = EditorState::GetInstance().Renderer->EntitiesByType(IEntity::EntityType::Video);
 
             // Get all video entities and fill sequencer
             for (int i = 0; i < videosEnts.size(); i++) {

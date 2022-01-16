@@ -8,17 +8,17 @@
 
 namespace Orb {
 
-class Global {
+class EditorState {
 
 public: // Singleton
-    static Global& GetInstance()
+    static EditorState& GetInstance()
     {
-        static Global instance;
+        static EditorState instance;
 
         return instance;
     }
 private:
-    Global() {
+    EditorState() {
         this->Renderer = std::make_shared<SceneRenderer>();
 
         this->VideoFrame = std::make_shared<Texture>();
@@ -27,16 +27,14 @@ private:
     }
 
 public:
-    Global(Global const&) = delete;
-    void operator=(Global const&) = delete;
+    EditorState(EditorState const&) = delete;
+    void operator=(EditorState const&) = delete;
 
     std::shared_ptr<SceneRenderer> Renderer;
 
     std::shared_ptr<Texture> VideoFrame;
 
     std::shared_ptr<Texture> SequencerFrame;
-
-    std::mutex GlobalMutex;
 
     std::string RootDir = "";
 

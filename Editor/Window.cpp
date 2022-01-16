@@ -11,6 +11,7 @@
 #include "Editor/Global.h"
 
 
+
 namespace Orb {
 
     Window::Window() {
@@ -102,18 +103,11 @@ namespace Orb {
                 ImGui_ImplGlfw_InitForOpenGL(mainWindow.Window, true);
                 ImGui_ImplOpenGL3_Init(glsl_version.c_str());
 
-                //ImGuiIO& io = ImGui::GetIO();
-                //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
             }
 
         }
 
-
         this->childWindows.push_back(std::move(mainWindow));
-
-        
-
-
 
     }
 
@@ -198,6 +192,14 @@ namespace Orb {
     }
 
     void Window::MoveWindow(int dx, int dy) {
+
+
+        int maximized = glfwGetWindowAttrib(this->childWindows[0].Window, GLFW_MAXIMIZED);
+        if (maximized == GL_TRUE) {
+            glfwRestoreWindow(this->childWindows[0].Window);
+        }
+
+
         int xpos = 0;
         int ypos = 0;
         glfwGetWindowPos(this->childWindows[0].Window, &xpos, &ypos);

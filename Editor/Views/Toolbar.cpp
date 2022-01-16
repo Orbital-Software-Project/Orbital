@@ -40,7 +40,7 @@ namespace Orb {
                     if (ImGui::MenuItem("Import video")) {
                         std::string file = Utils::PickFile();
                         if (file != "") {
-                            Global::GetInstance().Renderer->AddEntity(std::make_shared<Video>(file));
+                            EditorState::GetInstance().Renderer->AddEntity(std::make_shared<Video>(file));
                         }
                     }
 

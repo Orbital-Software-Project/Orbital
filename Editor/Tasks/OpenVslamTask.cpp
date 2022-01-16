@@ -5,11 +5,17 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/imgproc.hpp>
 
+
+
 #include <chrono>
 #include <thread>
+#include <mutex>
+
+#include <opencv2/core.hpp>
+
+#include <Eigen/Core>
 
 #include <glm/ext/matrix_transform.hpp>
-
 
 #include "Editor/Global.h"
 #include "Editor/Utils.hpp"
@@ -18,18 +24,18 @@
 
 namespace Orb {
 
+    
+
+
     OpenVslamTask::OpenVslamTask(std::string videoFile, std::string configFile, std::string vocabFile) {
         this->videoFile  = videoFile;
         this->configFile = configFile;
         this->vocabFile  = vocabFile;
 
 
-        ScopeMutexLock lock(Global::GetInstance().GlobalMutex);
-
-
         this->entGroup = std::make_shared<EntityGroup>();
         entGroup->SetName("OpenVSLAM reconstruction");
-        Global::GetInstance().Renderer->AddEntity(entGroup);
+        EditorState::GetInstance().Renderer->AddEntity(entGroup);
 
 
         this->videoEnt = std::make_shared<Video>(videoFile);
@@ -72,12 +78,12 @@ namespace Orb {
 
         this->Status = TaskStatus::Running;
 
-        this->cfg_ptr = std::make_shared<openvslam::config>(this->configFile);
-        this->SLAM = std::make_unique<openvslam::system>(this->cfg_ptr, this->vocabFile);
-        this->SLAM->startup();
+        cfg_ptr = std::make_shared<openvslam::config>(this->configFile);
+        SLAM = std::make_unique<openvslam::system>(cfg_ptr, this->vocabFile);
+        SLAM->startup();
 
-        this->framePublisher = this->SLAM->get_frame_publisher();
-        this->mapPublisher   = this->SLAM->get_map_publisher();
+        framePublisher = SLAM->get_frame_publisher();
+        mapPublisher   = SLAM->get_map_publisher();
 
 
         cv::VideoCapture video(this->videoFile);
@@ -101,7 +107,7 @@ namespace Orb {
 
             if (this->CancelRequested) {
                 this->Status = TaskStatus::Canceled;
-                this->SLAM->request_terminate();
+                SLAM->request_terminate();
                 break;
             }
 
@@ -130,7 +136,6 @@ namespace Orb {
             ++num_frame;
 
             {
-                ScopeMutexLock lock(Global::GetInstance().GlobalMutex);
 
                 this->updatePointCloud();
                 this->updateKeyframes();
@@ -142,7 +147,7 @@ namespace Orb {
                 this->updateVideoPlane(frame.cols, frame.rows, 2.5f);
 
                 // Update video preview
-                Global::GetInstance().VideoFrame = this->videoTexture;
+                EditorState::GetInstance().VideoFrame = this->videoTexture;
             }
 
             this->updateReport(frameCount, num_frame);
@@ -212,7 +217,7 @@ namespace Orb {
         
         std::vector<openvslam::data::landmark*> allLandmarks;
         std::set<openvslam::data::landmark*> localLandmarks;
-        this->mapPublisher->get_landmarks(allLandmarks, localLandmarks);
+        mapPublisher->get_landmarks(allLandmarks, localLandmarks);
 
 
         // Small performance optimization
@@ -283,7 +288,7 @@ namespace Orb {
     void OpenVslamTask::updateKeyframes() {
 
         std::vector<openvslam::data::keyframe*> keyFrames;
-        this->mapPublisher->get_keyframes(keyFrames);
+        mapPublisher->get_keyframes(keyFrames);
 
         // Small performance optimization
         // Do not update the pointcloud for every frame
@@ -383,7 +388,7 @@ namespace Orb {
 
         // Get camera pose and convert it to opengl conform matrix (glm)
         Eigen::Matrix4f camera_pos = Eigen::Matrix4f::Identity();
-        camera_pos = this->mapPublisher->get_current_cam_pose().inverse().eval().cast<float>();
+        camera_pos = mapPublisher->get_current_cam_pose().inverse().eval().cast<float>();
         glm::mat4 converted = Utils::ToGLM_Mat4f(camera_pos);
 
         // With inverse i get the correct pos, and
@@ -432,7 +437,7 @@ namespace Orb {
         glm::mat4 newMat = glm::translate(this->slamCam->Matrix, glm::vec3(0.0f, 0.0f, depth));
         this->videoPlane->Matrix = newMat;
 
-        this->videoTexture->UpdateTexture(this->framePublisher->draw_frame());
+        this->videoTexture->UpdateTexture(framePublisher->draw_frame());
     }
 
 }

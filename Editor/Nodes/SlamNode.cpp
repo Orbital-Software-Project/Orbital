@@ -48,10 +48,6 @@ namespace Orb {
                 ImGui::Text("Orb Vocab");
                 ImNodes::EndInputAttribute();
 
-
-                if (ImGui::Button("Start")) {
-
-                }
             }
 
         }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30907.101
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Editor", "Editor\Editor.vcxproj", "{D307EA5F-FFB0-4898-B18E-756FD53642DB}"
 EndProject
@@ -20,8 +20,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shaders", "Shaders\Shaders.vcxproj", "{8C99E6FE-04AF-4FD9-96F4-EB260D4A0E0D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Calib", "ThirdParty\Calib.vcxproj", "{37CCCC32-E3D8-45E5-9742-C496CDAFF430}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibMV", "ThirdParty\LibMV.vcxproj", "{462BED96-5E32-4DD8-A550-DE4321FC9381}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,14 +93,6 @@ Global
 		{37CCCC32-E3D8-45E5-9742-C496CDAFF430}.Release|x64.Build.0 = Release|x64
 		{37CCCC32-E3D8-45E5-9742-C496CDAFF430}.Release|x86.ActiveCfg = Release|Win32
 		{37CCCC32-E3D8-45E5-9742-C496CDAFF430}.Release|x86.Build.0 = Release|Win32
-		{462BED96-5E32-4DD8-A550-DE4321FC9381}.Debug|x64.ActiveCfg = Debug|x64
-		{462BED96-5E32-4DD8-A550-DE4321FC9381}.Debug|x64.Build.0 = Debug|x64
-		{462BED96-5E32-4DD8-A550-DE4321FC9381}.Debug|x86.ActiveCfg = Debug|Win32
-		{462BED96-5E32-4DD8-A550-DE4321FC9381}.Debug|x86.Build.0 = Debug|Win32
-		{462BED96-5E32-4DD8-A550-DE4321FC9381}.Release|x64.ActiveCfg = Release|x64
-		{462BED96-5E32-4DD8-A550-DE4321FC9381}.Release|x64.Build.0 = Release|x64
-		{462BED96-5E32-4DD8-A550-DE4321FC9381}.Release|x86.ActiveCfg = Release|Win32
-		{462BED96-5E32-4DD8-A550-DE4321FC9381}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,7 +103,6 @@ Global
 		{3C4FFEDC-2839-4246-B376-32F616DA37D2} = {432E3B37-349C-4EC5-8A69-C89156C2CDC1}
 		{A2C1FBBE-7FE7-4274-987A-B90D7F13E4CC} = {432E3B37-349C-4EC5-8A69-C89156C2CDC1}
 		{37CCCC32-E3D8-45E5-9742-C496CDAFF430} = {432E3B37-349C-4EC5-8A69-C89156C2CDC1}
-		{462BED96-5E32-4DD8-A550-DE4321FC9381} = {432E3B37-349C-4EC5-8A69-C89156C2CDC1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {690ABDD9-DF23-4A6F-B56C-BF4FA0B38E04}
