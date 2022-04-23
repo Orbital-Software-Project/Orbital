@@ -1,23 +1,22 @@
 #pragma once
 
-#include <openvslam/system.h>
-#include <openvslam/config.h>
-#include <openvslam/publish/frame_publisher.h>
-#include <openvslam/publish/map_publisher.h>
-#include <openvslam/data/keyframe.h>
-#include <openvslam/data/landmark.h>
+#include <stella_vslam/system.h>
+#include <stella_vslam/config.h>
+#include <stella_vslam/publish/frame_publisher.h>
+#include <stella_vslam/publish/map_publisher.h>
+#include <stella_vslam/data/keyframe.h>
+#include <stella_vslam/data/landmark.h>
 
 #include <string>
 #include <memory>
 
 #include "Editor/Tasks/TaskWorker.h"
-
-#include "Engine/Vertex.hpp"
-#include "Engine/Mesh.h"
-#include "Engine/Camera.h"
-#include "Engine/Video.h"
-#include "Engine/EntityGroup.hpp"
-#include "Engine/FrameTransformation.hpp"
+#include "Editor/Engine/Vertex.hpp"
+#include "Editor/Engine/Mesh.h"
+#include "Editor/Engine/Camera.h"
+#include "Editor/Engine/Video.h"
+#include "Editor/Engine/EntityGroup.hpp"
+#include "Editor/Engine/FrameTransformation.hpp"
 
 namespace Orb {
 
@@ -51,10 +50,10 @@ private:
 
     std::string videoFile = "", configFile = "", vocabFile = "";
 
-    std::shared_ptr<openvslam::config> cfg_ptr;
-    std::unique_ptr<openvslam::system> SLAM;
-    std::shared_ptr<openvslam::publish::map_publisher> mapPublisher;
-    std::shared_ptr<openvslam::publish::frame_publisher> framePublisher;
+    std::shared_ptr<stella_vslam::config> cfg_ptr;
+    std::unique_ptr<stella_vslam::system> SLAM;
+    std::shared_ptr<stella_vslam::publish::map_publisher> mapPublisher;
+    std::shared_ptr<stella_vslam::publish::frame_publisher> framePublisher;
 
     std::shared_ptr<Video> videoEnt = nullptr;
     std::shared_ptr<EntityGroup> entGroup = nullptr;

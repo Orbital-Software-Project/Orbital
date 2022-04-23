@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Texture.h"
+#include "Editor/Engine/Texture.h"
 
 #include "Editor/Views/IView.hpp"
 

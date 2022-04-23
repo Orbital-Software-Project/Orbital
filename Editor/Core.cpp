@@ -1,21 +1,25 @@
 #include "Editor/Core.h"
 #include "Editor/Window.h"
-
+#include "Editor/Global.h"
 
 #include "Editor/Views/Outliner.h"
 #include "Editor/Views/PropertyEditor.h"
 #include "Editor/Views/VideoPreview.h"
 #include "Editor/Views/MapViewer.h"
 #include "Editor/Views/Sequencer.h"
-#include "Editor/Views/NodeEditor/NodeEditor.h"
+//#include "Editor/Views/NodeEditor/NodeEditor.h"
 #include "Editor/Views/TaskPanel.h"
 #include "Editor/Views/Toolbar.h"
+#include "Editor/Views/ViewManager.h"
+
 
 #include <memory>
 #include <GL/glew.h>
 
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+
+
 
 
 namespace Orb {
@@ -65,9 +69,9 @@ namespace Orb {
         wnd.AddView(seq);
         lmgr.AddView(seq, ViewManager::DockType::Dock_Central_Bottom);
 
-        auto nodeEd = std::make_shared<NodeEditor>(EditorState::GetInstance().Renderer);
-        wnd.AddView(nodeEd);
-        lmgr.AddView(nodeEd, ViewManager::DockType::Dock_Central_Bottom);
+        //auto nodeEd = std::make_shared<NodeEditor>(EditorState::GetInstance().Renderer);
+        //wnd.AddView(nodeEd);
+        //lmgr.AddView(nodeEd, ViewManager::DockType::Dock_Central_Bottom);
 
 
         // Default views
@@ -108,9 +112,9 @@ namespace Orb {
                         case IView::ViewWindowRequest::Open_VideoPrev:
                             wnd.AddView(std::make_shared<Orb::VideoPreview>());
                             break;
-                        case IView::ViewWindowRequest::Open_NodeEd:
-                            wnd.AddView(std::make_shared<Orb::NodeEditor>(EditorState::GetInstance().Renderer));
-                            break;
+                        //case IView::ViewWindowRequest::Open_NodeEd:
+                        //    wnd.AddView(std::make_shared<Orb::NodeEditor>(EditorState::GetInstance().Renderer));
+                        //    break;
                         }
                     }
                     if (viewToRemoveIdx != nullptr) {
@@ -142,9 +146,7 @@ namespace Orb {
             }
 
 
-#ifndef NDEBUG
-            ImGui::ShowDemoWindow();
-#endif
+
 
             ImGui::EndFrame();
             ImGui::Render();

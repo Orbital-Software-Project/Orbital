@@ -19,7 +19,7 @@
 
 #include "Editor/Global.h"
 #include "Editor/Utils.hpp"
-#include "Engine/PrimitiveFactory.h"
+#include "Editor/Engine/PrimitiveFactory.h"
 
 
 namespace Orb {
@@ -34,7 +34,7 @@ namespace Orb {
 
 
         this->entGroup = std::make_shared<EntityGroup>();
-        entGroup->SetName("OpenVSLAM reconstruction");
+        entGroup->SetName("stella_vslam reconstruction");
         EditorState::GetInstance().Renderer->AddEntity(entGroup);
 
 
@@ -78,8 +78,8 @@ namespace Orb {
 
         this->Status = TaskStatus::Running;
 
-        cfg_ptr = std::make_shared<openvslam::config>(this->configFile);
-        SLAM = std::make_unique<openvslam::system>(cfg_ptr, this->vocabFile);
+        cfg_ptr = std::make_shared<stella_vslam::config>(this->configFile);
+        SLAM = std::make_unique<stella_vslam::system>(cfg_ptr, this->vocabFile);
         SLAM->startup();
 
         framePublisher = SLAM->get_frame_publisher();
@@ -215,8 +215,8 @@ namespace Orb {
     
     void OpenVslamTask::updatePointCloud() {
         
-        std::vector<openvslam::data::landmark*> allLandmarks;
-        std::set<openvslam::data::landmark*> localLandmarks;
+        std::vector<std::shared_ptr<stella_vslam::data::landmark>> allLandmarks;
+        std::set< std::shared_ptr<stella_vslam::data::landmark>> localLandmarks;
         mapPublisher->get_landmarks(allLandmarks, localLandmarks);
 
 
@@ -236,7 +236,7 @@ namespace Orb {
         }
 
         std::vector<Vertex> vertices;
-        for (openvslam::data::landmark* currLandMark : allLandmarks) {
+        for (auto currLandMark : allLandmarks) {
             if (!currLandMark || currLandMark->will_be_erased()) {
                 continue;
             }
@@ -260,7 +260,7 @@ namespace Orb {
             vertices.push_back(vertLandmarks);
         }
 
-        for (openvslam::data::landmark* currLandMark : allLandmarks) {
+        for (auto currLandMark : allLandmarks) {
             if (!currLandMark || currLandMark->will_be_erased()) {
                 continue;
             }
@@ -281,13 +281,11 @@ namespace Orb {
         }
 
         this->pointCloud->UpdateColored(vertices);
-
-
     }
 
     void OpenVslamTask::updateKeyframes() {
 
-        std::vector<openvslam::data::keyframe*> keyFrames;
+        std::vector< std::shared_ptr<stella_vslam::data::keyframe>> keyFrames;
         mapPublisher->get_keyframes(keyFrames);
 
         // Small performance optimization
@@ -300,7 +298,7 @@ namespace Orb {
         keyFrameSize = currSize;
 
         std::vector<Vertex> vertices;
-        const auto draw_edge = [&](const openvslam::Vec3_t& cam_center_1, const openvslam::Vec3_t& cam_center_2) {
+        const auto draw_edge = [&](const stella_vslam::Vec3_t& cam_center_1, const stella_vslam::Vec3_t& cam_center_2) {
             vertices.push_back(
                 Vertex({
                            cam_center_1.cast<float>().x(),
@@ -327,7 +325,7 @@ namespace Orb {
                 continue;
             }
 
-            const openvslam::Vec3_t cam_center_1 = keyFrame->get_cam_center();
+            const stella_vslam::Vec3_t cam_center_1 = keyFrame->get_cam_center();
 
             // covisibility graph
             bool drawCovisibilityGraph = true;
@@ -342,7 +340,7 @@ namespace Orb {
                         if (covisibility->id_ < keyFrame->id_) {
                             continue;
                         }
-                        const openvslam::Vec3_t cam_center_2 = covisibility->get_cam_center();
+                        const stella_vslam::Vec3_t cam_center_2 = covisibility->get_cam_center();
                         draw_edge(cam_center_1, cam_center_2);
                     }
                 }
@@ -354,7 +352,7 @@ namespace Orb {
 
                 auto spanning_parent = keyFrame->graph_node_->get_spanning_parent();
                 if (spanning_parent) {
-                    const openvslam::Vec3_t cam_center_2 = spanning_parent->get_cam_center();
+                    const stella_vslam::Vec3_t cam_center_2 = spanning_parent->get_cam_center();
                     draw_edge(cam_center_1, cam_center_2);
                 }
             }
@@ -372,7 +370,7 @@ namespace Orb {
                     if (loop_edge->id_ < keyFrame->id_) {
                         continue;
                     }
-                    const openvslam::Vec3_t cam_center_2 = loop_edge->get_cam_center();
+                    const stella_vslam::Vec3_t cam_center_2 = loop_edge->get_cam_center();
                     draw_edge(cam_center_1, cam_center_2);
                 }
             }

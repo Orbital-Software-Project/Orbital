@@ -1,7 +1,7 @@
 #include "MeshImportTask.h"
 
 #include "Editor/Global.h"
-#include "Engine/MeshImporter.h"
+#include "Editor/Engine/MeshImporter.h"
 
 #include "Editor/Base/ScopeMutexLock.hpp"
 

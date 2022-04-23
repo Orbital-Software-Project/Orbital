@@ -1,8 +1,5 @@
 #pragma once
 
-#include "Editor/Global.h"
-
-#include "Editor/Views/ViewManager.h"
 
 #include <string>
 

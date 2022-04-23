@@ -103,6 +103,8 @@ namespace Orb {
                 ImGui_ImplGlfw_InitForOpenGL(mainWindow.Window, true);
                 ImGui_ImplOpenGL3_Init(glsl_version.c_str());
 
+                ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
             }
 
         }

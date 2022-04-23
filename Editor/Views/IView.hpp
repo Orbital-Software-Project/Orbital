@@ -24,6 +24,11 @@ namespace Orb {
 
         };
 
+        enum class ViewType {
+            ViewType_Window,
+            ViewType_Toolbar,
+        };
+
     public:
         virtual ~IView() {}
         
@@ -50,6 +55,8 @@ namespace Orb {
         }
 
         bool Open = true;
+
+        ViewType Type = ViewType::ViewType_Window;
 
     protected:
         ViewWindowRequest Request = ViewWindowRequest::None;

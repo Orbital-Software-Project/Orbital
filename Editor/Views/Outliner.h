@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Engine/SceneRenderer.h"
+#include "Editor/Engine/SceneRenderer.h"
 
 #include "Editor/Views/IView.hpp"
-#include "Engine/EntityGroup.hpp"
+#include "Editor/Engine/EntityGroup.hpp"
 
 namespace Orb {
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Engine/Mesh.h"
-#include "Engine/Camera.h"
-#include "Engine/SceneRenderer.h"
+#include "Editor/Engine/Mesh.h"
+#include "Editor/Engine/Camera.h"
+#include "Editor/Engine/SceneRenderer.h"
 
 #include "Editor/Views/IView.hpp"
 

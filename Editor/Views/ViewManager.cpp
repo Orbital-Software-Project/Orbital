@@ -1,16 +1,21 @@
 #include "ViewManager.h"
 
-#include <imgui.h>
-#include <imgui_internal.h>
-
 #include <string>
 #include <iostream>
-
 
 namespace Orb {
 
 	ViewManager::ViewManager() {
 		this->loadImGuiTheme();
+
+		this->viewFlags =
+			ImGuiWindowFlags_NoCollapse |
+			ImGuiWindowFlags_NoScrollWithMouse |
+			ImGuiWindowFlags_NoScrollbar |
+			ImGuiWindowFlags_NoSavedSettings |
+			ImGuiWindowFlags_NoBringToFrontOnFocus |
+			ImGuiWindowFlags_NoNavFocus;
+
 	}
 
 	ViewManager::~ViewManager() {
@@ -21,6 +26,7 @@ namespace Orb {
 		this->viewCollection.push_back(
 			ViewDockTypePair {dockType, view}
 		);
+
 	}
 
 	bool ViewManager::HasRequest(Request& r) {
@@ -32,295 +38,165 @@ namespace Orb {
 
 	void ViewManager::OnRender() {
 
-		// Window dragging and double click behavior
-		auto mp = ImGui::GetMousePos();
+		//this->handleDockSpace();
 
-		{
-			static bool dragging = false;
-			if (dragging || (mp.x < ImGui::GetMainViewport()->WorkSize.x - 60 && mp.y <= 20)) {
-				// Mouse cursor inside main menu bar
-				if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-					this->req = Request::Maximize_Window;
-					return;
+#ifndef NDEBUG
+		//ImGui::ShowDemoWindow();
+#endif
+		
+		bool leftPanelOpen = true;
+
+		auto main_dock_id = ImGui::DockSpaceOverViewport();
+
+
+		for (auto view : this->viewCollection) {
+
+			if (view.View->Type == IView::ViewType::ViewType_Window) {
+				if (ImGui::Begin(view.View->Name.c_str(), &leftPanelOpen, viewFlags)) {
+					view.View->OnRender();
+
 				}
-				if (!dragging &&
-					ImGui::IsMouseDown(ImGuiMouseButton_Left) && 
-					ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
-					this->Dx = ImGui::GetMousePos().x;
-					this->Dy = ImGui::GetMousePos().y;
-					dragging = true;
-				}
-				if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
-					dragging = false;
-				}
-				if (dragging) {
-					this->req = Request::Move_Window;
-				}
+				ImGui::End();
+			}
+
+			if (view.View->Type == IView::ViewType::ViewType_Toolbar) {
+				view.View->OnRender();
 			}
 		}
 
+		static ImGuiID id_split_1, id_split_2, id_split_3, id_split_4, id_split_5, id_split_6;
+
+		static bool init_layout = true;
+		if (init_layout) {
+			init_layout = false;
+
+			
+			auto dockspace_id = ImGui::DockBuilderAddNode(main_dock_id);
+
+
+			ImGui::DockBuilderSplitNode(main_dock_id, ImGuiDir_Right, 0.5, &id_split_1, &id_split_2);
+			ImGui::DockBuilderSplitNode(id_split_2, ImGuiDir_Right, 0.5, &id_split_3, &id_split_4);
+			ImGui::DockBuilderSplitNode(id_split_3, ImGuiDir_Down, 0.5, &id_split_5, &id_split_6);
+
+
+			
+			ImGui::DockBuilderDockWindow("Outliner", id_split_4);
+
+			ImGui::DockBuilderDockWindow("Video preview", id_split_6);
+			ImGui::DockBuilderDockWindow("Map viewer", id_split_6);
+			ImGui::DockBuilderDockWindow("Sequencer", id_split_5);
+			ImGui::DockBuilderDockWindow("Property editor", id_split_1);
+			ImGui::DockBuilderDockWindow("Task panel", id_split_1);
+
+
+		}
+
+		ImGui::DockBuilderFinish(main_dock_id);
+
+
+		// Window dragging and double click behavior
+		this->handleWindowMovement();
+
+		this->drawWindowCtrlButton();
+
+		
+
+		return;
+
+
+		
+		
+		// Window close/maximize/minimize button
+		
+		
+		this->tabID = 1;
+
+		// Separator and resizing logic for the panels
+		this->handlePanelResizing();
+		
+		this->drawFloatingPanel();
+
+
+		this->drawPanel("LeftPanel", this->leftPanel.Min, this->leftPanel.GetSize(), DockType::Dock_Left);
+		this->drawPanel("RightPanel", this->rightPanel.Min, this->rightPanel.GetSize(), DockType::Dock_Right);
+		this->drawPanel("CentralTopPanel", this->topPanel.Min, this->topPanel.GetSize(), DockType::Dock_Central_Top);
+		this->drawPanel("CentralBottomPanel", this->bottomPanel.Min, this->bottomPanel.GetSize(), DockType::Dock_Central_Bottom);
+
+
+
+
+	}
+
+	void ViewManager::handlePanelResizing() {
+
+		ImVec2 host_wnd_size = ImVec2(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y);
+
+		this->separatorLogic();
+
+		this->leftPanel = ImRect(
+			0.0f,
+			ImGui::GetMainViewport()->WorkPos.y + 1, // Because of the toolbar (21px offset)
+			this->separator_left_panel.x,
+			host_wnd_size.y
+		);
+
+		this->rightPanel = ImRect(
+			this->separator_right_panel.x,
+			ImGui::GetMainViewport()->WorkPos.y + 1, 
+			host_wnd_size.x,                         
+			host_wnd_size.y                          
+		);
+
+		this->topPanel = ImRect(
+			this->leftPanel.GetTR().x + 1.0f,
+			this->leftPanel.GetTR().y,
+			this->rightPanel.GetTL().x - 1.0f,
+			this->separator_left_panel.y                                  
+		);
+
+		this->bottomPanel = ImRect(
+			this->topPanel.GetBL().x,
+			this->topPanel.GetBL().y + 1.0f,
+			this->topPanel.GetBR().x,
+			this->rightPanel.GetBL().y
+		);
+	}
+
+	void ViewManager::drawPanel(std::string name, ImVec2 pos, ImVec2 size, DockType dock_type) {
+
+		ImGui::SetNextWindowPos(pos, ImGuiCond_Always);
+		ImGui::SetNextWindowSize(size, ImGuiCond_Always);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+
+		bool leftPanelOpen = true;
+		if (ImGui::Begin(name.c_str(), &leftPanelOpen, viewFlags)) {
+			//this->drawRectCurrWND();
+			if (ImGui::BeginTabBar(("TabBar_" + name).c_str(), ImGuiTabBarFlags_None)) {
+				for (auto viewDock : this->viewCollection) {
+					if (viewDock.Type == dock_type) {
+						if (ImGui::BeginTabItem((viewDock.View->Name + "##" + std::to_string(this->tabID)).c_str())) {
+							viewDock.View->OnRender();
+							ImGui::EndTabItem();
+						}
+						this->tabID++;
+					}
+				}
+				ImGui::EndTabBar();
+			}
+			ImGui::End();
+		}
+
+		ImGui::PopStyleVar();
+	}
+
+	void ViewManager::drawFloatingPanel() {
 		for (auto viewDock : this->viewCollection) {
 			if (viewDock.Type == DockType::Dock_Float) {
 				viewDock.View->OnRender();
 			}
 		}
-
-		// Window close/maximize/minimize button
-		this->drawWindowCtrlButton();
-		
-		// Window resize frame WIP
-		{
-			/*
-			ImDrawList* draw_list_fg = ImGui::GetForegroundDrawList();
-			auto workSize = ImGui::GetMainViewport()->Size;
-
-			draw_list_fg->AddRect(
-				ImVec2(0, 0),
-				ImVec2(5, workSize.y),
-				ImColor(ImVec4(1.0f, 1.0f, 1.0f, 0.0f)));
-
-			draw_list_fg->AddRect(
-				ImVec2(0, 0),
-				ImVec2(workSize.x, 1),
-				ImColor(ImVec4(1.0f, 1.0f, 1.0f, 0.0f)));
-
-			draw_list_fg->AddRect(
-				ImVec2(workSize.x, 0),
-				ImVec2(workSize.x, 0),
-				ImColor(ImVec4(1.0f, 1.0f, 1.0f, 0.0f)));
-
-			draw_list_fg->AddRect(
-				ImVec2(0, 0),
-				ImVec2(1, workSize.y),
-				ImColor(ImVec4(1.0f, 1.0f, 1.0f, 0.0f)));
-				*/
-		}
-
-		// ---------------------------
-
-		int tabID = 1;
-
-		// ---------------------------
-
-		/*
-		+-----------> x
-		|
-		|
-		|
-		|
-		v
-		y
-		*/
-
-		float leftViewPosY = ImGui::GetMainViewport()->WorkPos.y + 1;
-		float leftViewSizeY = ImGui::GetMainViewport()->WorkSize.y;
-		static float leftViewSizeX = 300.0f;
-
-		static ImGuiWindowFlags flags =
-			ImGuiWindowFlags_NoCollapse |
-			ImGuiWindowFlags_NoTitleBar |
-			ImGuiWindowFlags_NoSavedSettings | 
-			ImGuiWindowFlags_NoResize | 
-			ImGuiWindowFlags_NoDecoration;
-
-		ImGui::SetNextWindowPos(ImVec2(0, leftViewPosY));
-		ImGui::SetNextWindowSize(ImVec2(leftViewSizeX, leftViewSizeY));
-		bool leftPanelOpen = true;
-		if (ImGui::Begin("LeftPanel", &leftPanelOpen, flags)) {
-			if (ImGui::BeginTabBar("LeftTabBar", ImGuiTabBarFlags_None)) {
-				for (auto viewDock : this->viewCollection) {
-					if (viewDock.Type == DockType::Dock_Left) {
-						if (ImGui::BeginTabItem((viewDock.View->Name + "##" + std::to_string(tabID)).c_str())) {
-							viewDock.View->OnRender();
-							ImGui::EndTabItem();
-						}
-						leftViewSizeX = ImGui::GetWindowSize().x;
-						tabID++;
-					}
-				}
-				ImGui::EndTabBar();
-			}
-			ImGui::End();
-
-
-			// Resize between left and top/central panel
-			{
-				auto mp = ImGui::GetMousePos();
-
-				ImVec2 tl = ImVec2(leftViewSizeX, leftViewPosY);
-				ImVec2 br = ImVec2(leftViewSizeX + 1, leftViewSizeY);
-
-				static bool bool_switch = false;
-
-				if (tl.x <= mp.x && br.x >= mp.x &&
-					tl.y <= mp.y && br.y >= mp.y &&
-					ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-					bool_switch = true;
-				}
-
-				if (bool_switch && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-					leftViewSizeX = ImGui::GetMousePos().x;
-				} else {
-					bool_switch = false;
-				}
-			}
-
-
-		}
-
-		// ---------------------------
-
-		static float rightViewSizeX = 300 - 1;
-		float rightViewPosX  = ImGui::GetMainViewport()->Size.x - rightViewSizeX + 1;
-		float rightViewPosY  = ImGui::GetMainViewport()->WorkPos.y + 1;
-		float rightViewSizeY = ImGui::GetMainViewport()->WorkSize.y;
-
-		ImGui::SetNextWindowPos(ImVec2(rightViewPosX, rightViewPosY));
-		ImGui::SetNextWindowSize(ImVec2(rightViewSizeX, rightViewSizeY));
-		bool rightPanelOpen = true;
-		if (ImGui::Begin("RightPanel", &rightPanelOpen, flags)) {
-			if (ImGui::BeginTabBar("RightTabBar", ImGuiTabBarFlags_None)) {
-				for (auto viewDock : this->viewCollection) {
-					if (viewDock.Type == DockType::Dock_Right) {
-						if (ImGui::BeginTabItem((viewDock.View->Name + "##" + std::to_string(tabID)).c_str())) {
-							viewDock.View->OnRender();
-							ImGui::EndTabItem();
-						}
-						rightViewSizeX = ImGui::GetWindowSize().x;
-						tabID++;
-					}
-				}
-				ImGui::EndTabBar();
-			}
-			ImGui::End();
-		}
-
-		// Resize between right and top/central panel
-		{
-			auto mp = ImGui::GetMousePos();
-
-			ImVec2 tl = ImVec2(rightViewPosX - 1, rightViewPosY);
-			ImVec2 br = ImVec2(rightViewPosX, rightViewSizeY);
-
-			static bool bool_switch = false;
-
-			if (tl.x <= mp.x && br.x >= mp.x &&
-				tl.y <= mp.y && br.y >= mp.y &&
-				ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-				bool_switch = true;
-			}
-
-			if (bool_switch && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-				rightViewSizeX = ImGui::GetMainViewport()->Size.x - ImGui::GetMousePos().x;
-			}
-			else {
-				bool_switch = false;
-			}
-		}
-
-		// ---------------------------
-
-		static ImGuiWindowFlags flagsTopCentralView =
-			ImGuiWindowFlags_NoCollapse |
-			ImGuiWindowFlags_NoTitleBar |
-			ImGuiWindowFlags_NoScrollWithMouse | 
-			ImGuiWindowFlags_NoScrollbar |
-			ImGuiWindowFlags_NoSavedSettings |
-			ImGuiWindowFlags_NoBringToFrontOnFocus |
-			ImGuiWindowFlags_NoResize |
-			ImGuiWindowFlags_NoDecoration;
-
-		float topCentralPosX  = leftViewSizeX + 1;
-		float topCentralPosY  = ImGui::GetMainViewport()->WorkPos.y + 1;
-		float topCentralSizeX = ImGui::GetMainViewport()->WorkSize.x - rightViewSizeX - leftViewSizeX - 1;
-		static float topCentralSizeY = ImGui::GetMainViewport()->WorkSize.y - 500;
-
-		ImGui::SetNextWindowSizeConstraints(ImVec2(-1, 0), ImVec2(-1, FLT_MAX));      // Vertical only
-		ImGui::SetNextWindowPos(ImVec2(topCentralPosX, topCentralPosY));
-		ImGui::SetNextWindowSize(ImVec2(topCentralSizeX, topCentralSizeY));
-		bool centralTopPanelOpen = true;
-		if (ImGui::Begin("CentralTopPanel", &centralTopPanelOpen, flagsTopCentralView)) {
-			if (ImGui::BeginTabBar("CentralTopTabBar", ImGuiTabBarFlags_None)) {
-				for (auto viewDock : this->viewCollection) {
-					if (viewDock.Type == DockType::Dock_Central_Top) {
-						if (ImGui::BeginTabItem((viewDock.View->Name + "##" + std::to_string(tabID)).c_str())) {
-							viewDock.View->OnRender();
-							ImGui::EndTabItem();
-						}
-						topCentralSizeY = ImGui::GetWindowSize().y;
-						tabID++;
-					}
-				}
-				ImGui::EndTabBar();
-			}
-			ImGui::End();
-		}
-
-
-		// ---------------------------
-
-		static ImGuiWindowFlags flagsBottomCentralView =
-			ImGuiWindowFlags_NoCollapse |
-			ImGuiWindowFlags_NoTitleBar |
-			ImGuiWindowFlags_NoScrollWithMouse |
-			ImGuiWindowFlags_NoDecoration | 
-			ImGuiWindowFlags_NoResize |
-			ImGuiWindowFlags_NoSavedSettings;
-
-		int bottomCentralPosX  = leftViewSizeX + 1;
-		int bottomCentralPosY  = topCentralSizeY + 21;
-		int bottomCentralSizeX = ImGui::GetMainViewport()->WorkSize.x - rightViewSizeX - leftViewSizeX - 1;
-		int bottomCentralSizeY = ImGui::GetMainViewport()->WorkSize.y - topCentralSizeY - 2;
-
-		
-		ImGui::SetNextWindowPos(ImVec2(bottomCentralPosX, bottomCentralPosY));
-		ImGui::SetNextWindowSize(ImVec2(bottomCentralSizeX, bottomCentralSizeY));
-		bool centralBottomPanelOpen = true;
-		if (ImGui::Begin("CentralBottomPanel", &centralBottomPanelOpen, flagsBottomCentralView)) {
-			if (ImGui::BeginTabBar("CentralBottomTabBar", ImGuiTabBarFlags_None)) {
-				for (auto viewDock : this->viewCollection) {
-					if (viewDock.Type == DockType::Dock_Central_Bottom) {
-						if (ImGui::BeginTabItem((viewDock.View->Name + "##" + std::to_string(tabID)).c_str())) {
-							viewDock.View->OnRender();
-							ImGui::EndTabItem();
-						}
-						topCentralSizeX = ImGui::GetWindowSize().x;
-						tabID++;
-					}
-				}
-				ImGui::EndTabBar();
-			}
-			ImGui::End();
-		}
-
-
-		// Resize between top and central panel
-		{
-			auto mp = ImGui::GetMousePos();
-
-			ImVec2 tl = ImVec2(bottomCentralPosX, bottomCentralPosY - 1);
-			ImVec2 br = ImVec2(bottomCentralSizeX, bottomCentralPosY);
-
-			static bool bool_switch = false;
-
-			if (tl.x <= mp.x && br.x >= mp.x &&
-				tl.y <= mp.y && br.y >= mp.y &&
-				ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-				bool_switch = true;
-			}
-
-			if (bool_switch && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-				topCentralSizeY = ImGui::GetMousePos().y - 21;
-			}
-			else {
-				bool_switch = false;
-			}
-		}
-
-
 	}
-
-
 
 	void ViewManager::loadImGuiTheme() {
 
@@ -445,5 +321,139 @@ namespace Orb {
 		}
 	}
 
+	void ViewManager::drawRectCurrWND() {
+		//return;
 
+		ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+		ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+
+		vMin.x += ImGui::GetWindowPos().x;
+		vMin.y += ImGui::GetWindowPos().y;
+		vMax.x += ImGui::GetWindowPos().x;
+		vMax.y += ImGui::GetWindowPos().y;
+
+		ImGui::GetWindowDrawList()->AddRect(vMin, vMax, IM_COL32(255, 0, 0, 255));
+	}
+
+	void ViewManager::separatorLogic() {
+
+		ImGui::GetForegroundDrawList()->AddCircleFilled(this->separator_left_panel, 3.0f, IM_COL32(0, 0, 0, 255));
+		ImGui::GetForegroundDrawList()->AddCircleFilled(this->separator_right_panel,3.0f, IM_COL32(0, 0, 0, 255));
+
+		auto mpos = ImGui::GetMousePos();
+
+		static bool drag_switch = false;
+		static bool is_left = false;
+		static bool is_right = false;
+		
+		if (!drag_switch) {
+
+			if (mpos.x >= this->separator_left_panel.x - 3 && mpos.x <= this->separator_left_panel.x + 3) {
+				if (mpos.y >= this->separator_left_panel.y - 3 && mpos.y <= this->separator_left_panel.y + 3) {
+
+					ImGui::GetForegroundDrawList()->AddCircleFilled(this->separator_left_panel, 3.0f, IM_COL32(255, 255, 255, 255));
+
+					if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+						drag_switch = true;
+						is_left = true;
+					}
+				}
+			}
+
+			if (mpos.x >= this->separator_right_panel.x - 3 && mpos.x <= this->separator_right_panel.x + 3) {
+				if (mpos.y >= this->separator_right_panel.y - 3 && mpos.y <= this->separator_right_panel.y + 3) {
+
+					ImGui::GetForegroundDrawList()->AddCircleFilled(this->separator_right_panel, 3.0f, IM_COL32(255, 255, 255, 255));
+
+					if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+						drag_switch = true; 
+						is_right = true;
+					}
+				}
+			}
+		}
+		else 
+		{
+			drag_switch = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+
+			if (!drag_switch) {
+				is_left = false;
+				is_right = false;
+			}
+			
+		}
+
+		if (drag_switch) {
+			if (is_left) {
+				this->separator_left_panel = mpos;
+				this->separator_right_panel.y = mpos.y;
+			}
+			if (is_right) {
+				this->separator_right_panel = mpos;
+				this->separator_left_panel.y = mpos.y;
+			}
+
+			
+
+		}
+
+
+
+
+	}
+
+	void ViewManager::handleWindowMovement() {
+
+		auto mp = ImGui::GetMousePos();
+		static bool dragging = false;
+		if (dragging || (mp.x < ImGui::GetMainViewport()->WorkSize.x - 60 && mp.y <= 20)) {
+			// Mouse cursor inside main menu bar
+			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+				this->req = Request::Maximize_Window;
+				return;
+			}
+			if (!dragging && ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+				this->Dx = ImGui::GetMousePos().x;
+				this->Dy = ImGui::GetMousePos().y;
+				dragging = true;
+			}
+			if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
+				dragging = false;
+			}
+			if (dragging) {
+				this->req = Request::Move_Window;
+			}
+		}
+
+	}
+
+	void ViewManager::handleDockSpace() {
+
+		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(viewport->WorkPos);
+		ImGui::SetNextWindowSize(viewport->WorkSize);
+		ImGui::SetNextWindowViewport(viewport->ID);
+		
+
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
+		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+		static bool open = true;
+
+		ImGui::Begin("DockSpace", &open, window_flags);
+
+		ImGuiIO& io = ImGui::GetIO();
+		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+		{
+			ImGuiID dockspace_id = ImGui::GetID("DockSpace");
+			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+		}
+		
+		ImGui::End();
+
+
+	}
 }

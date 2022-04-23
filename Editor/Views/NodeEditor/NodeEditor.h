@@ -16,12 +16,12 @@
 #include <memory>
 
 
-#include <imnodes.h>
-
 namespace Orb {
     class SceneRenderer;
     class INode;
 }
+
+struct ImNodesContext;
 
 namespace Orb {
 

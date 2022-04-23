@@ -1,13 +1,11 @@
 #include "MapViewer.h"
+
 #include "Editor/Global.h"
 #include "Editor/Utils.hpp"
-#include "Engine/MeshImporter.h"
-
-#include "Engine/PrimitiveFactory.h"
-
+#include "Editor/Engine/MeshImporter.h"
+#include "Editor/Engine/PrimitiveFactory.h"
 #include "Editor/Tasks/MeshImportTask.h"
 #include "Editor/Tasks/TaskWorker.h"
-
 #include "Editor/Base/ScopeMutexLock.hpp"
 
 #include <stdint.h>
@@ -17,7 +15,7 @@
 #include <GLFW/glfw3.h>
 
 #include <string>
-#include <openvslam/data/landmark.h>
+#include <stella_vslam/data/landmark.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>

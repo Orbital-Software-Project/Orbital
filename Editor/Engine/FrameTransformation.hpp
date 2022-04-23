@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/IEntity.h"
+#include "Editor/Engine/IEntity.h"
 
 #include <glm/glm.hpp>
 #include <memory>

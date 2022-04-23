@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 
-project(Editor)
+project(Orbital.Editor)
 
 Set(SRC
     # Core
@@ -11,6 +11,7 @@ Set(SRC
     Core.cpp
     Utils.hpp
     Global.h
+
 
     # Base
     Base/Percentage.hpp
@@ -43,6 +44,9 @@ Set(SRC
     Views/TaskPanel.cpp
     Views/Sequencer.h
     Views/Sequencer.cpp
+    Views/ViewManager.h
+    Views/ViewManager.cpp
+    Views/ImSplitContainer.h
 
     # Nodes
     #Nodes/FileNode.h
@@ -54,56 +58,54 @@ Set(SRC
     #Nodes/MapViewNode.h
     #Nodes/MapViewNode.cpp
 
+    # Engine
+    Engine/Shader.h
+    Engine/Shader.cpp
+    Engine/Texture.h
+    Engine/Texture.cpp
+    Engine/Video.h
+    Engine/Video.cpp
+    Engine/Vertex.hpp
+
+    Engine/MeshImporter.h
+    Engine/MeshImporter.cpp
+    Engine/SceneRenderer.h
+    Engine/SceneRenderer.cpp
+    Engine/PrimitiveFactory.h
+    Engine/PrimitiveFactory.cpp
+    Engine/CameraController.h
+    Engine/CameraController.cpp
+    
+    # Entities
+    Engine/IEntity.h
+    Engine/Mesh.h
+    Engine/Mesh.cpp
+    Engine/Camera.h
+    Engine/Camera.cpp
+    Engine/EntityGroup.hpp
+    Engine/FrameTransformation.hpp
 )
 
 
+add_executable(Orbital.Editor ${SRC})
 
-find_package(unofficial-nativefiledialog CONFIG REQUIRED)
-find_package(SuiteSparse CONFIG REQUIRED)
-#find_package(libpng CONFIG REQUIRED)
-
-find_package(openvslam CONFIG REQUIRED)
-find_package(fbow CONFIG REQUIRED)
-
-# For CMake < 3.9, we need to make the target ourselves
-if(NOT TARGET OpenMP::OpenMP_CXX)
-    find_package(Threads REQUIRED)
-    add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
-    set_property(TARGET OpenMP::OpenMP_CXX
-                 PROPERTY INTERFACE_COMPILE_OPTIONS ${OpenMP_CXX_FLAGS})
-    # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang)
-    set_property(TARGET OpenMP::OpenMP_CXX
-                 PROPERTY INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
-endif()
-
-
-
-add_executable(Editor ${SRC})
-
-
-target_link_libraries(Editor PRIVATE 
-    Engine
-    ImGui
+target_link_libraries(Orbital.Editor PRIVATE 
     ${OpenCV_LIBS}
-    Threads::Threads
-    OpenMP::OpenMP_CXX
-    fbow::fbow
-    openvslam::openvslam 
     unofficial::nativefiledialog::nfd
-    ${SUITESPARSE_LIBRARIES} 
-    #libviso2
-    #libmv
-    #${PNG_LIBRARIES}
+    stella_vslam
+    GLEW::GLEW
+    imgui::imgui
+    assimp::assimp
+    Orbital.ImGuizmo
 )
-
 
 
 if(MSVC)
-    target_compile_options(Editor PRIVATE /bigobj /source-charset:utf-8 /execution-charset:utf-8 /wd4996 /wd4275 /wd4251 /wd4244 /wd4305 /wd4267 /wd4127)
-    target_compile_options(Editor PRIVATE "$<$<CONFIG:Debug>:/MTd>;$<$<CONFIG:Release>:/MT>")
-   
+    target_compile_options(Orbital.Editor PRIVATE "$<$<CONFIG:Debug>:/MTd>;$<$<CONFIG:Release>:/MT>")
+    target_link_options(Orbital.Editor PUBLIC /NODEFAULTLIB:library)
+    
     # Set Editor as Visual Studio startup project
-    set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT Editor)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Orbital.Editor)
 
     source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SRC})
 endif()

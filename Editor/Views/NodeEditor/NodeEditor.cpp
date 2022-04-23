@@ -9,6 +9,9 @@
 
 #include <imnodes_internal.h>
 
+#include <imnodes.h>
+
+
 namespace Orb {
 
 

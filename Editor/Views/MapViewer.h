@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Engine/Shader.h"
-#include "Engine/Mesh.h"
-#include "Engine/SceneRenderer.h"
+#include "Editor/Engine/Shader.h"
+#include "Editor/Engine/Mesh.h"
+#include "Editor/Engine/SceneRenderer.h"
 #include "IView.hpp"
 
 #include <opencv2/core.hpp>
@@ -11,7 +11,7 @@
 #include <imgui.h>
 #include <memory>
 
-#include <openvslam/publish/map_publisher.h>
+#include <stella_vslam/publish/map_publisher.h>
 
 namespace Orb {
 

@@ -10,13 +10,15 @@
 
 // Import video
 #include "Editor/Global.h"
-#include "Engine/Video.h"
+#include "Editor/Engine/Video.h"
 
 namespace Orb {
 
     Toolbar::Toolbar() {
 
         this->Name = "Toolbar";
+        this->Type = ViewType::ViewType_Toolbar;
+        
     }
 
     Toolbar::~Toolbar() {
